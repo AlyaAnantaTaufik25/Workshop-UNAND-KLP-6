@@ -6,7 +6,7 @@ import {
 
 const roles = [
   { key: 'peserta',            label: 'Peserta',            icon: User,      path: '/' },
-  { key: 'humas',              label: 'Humas',              icon: Building2, path: '/' },
+  { key: 'humas',              label: 'Humas',              icon: Building2, path: '/humas/ringkasan' },
   { key: 'sekretariat-rektor', label: 'Sekretariat Rektor', icon: FileText,  path: '/sekretariat/kegiatan' },
   { key: 'mitra',              label: 'Mitra',              icon: Users,     path: '/' },
   { key: 'rektor',             label: 'Rektor',             icon: Landmark,  path: '/rektor/pengajuan' },

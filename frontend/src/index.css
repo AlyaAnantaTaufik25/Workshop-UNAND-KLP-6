@@ -2361,3 +2361,1569 @@ input, select, textarea {
   color: var(--green-700);
   background: var(--gray-50);
 }
+
+/* ============================================================
+   HUMAS - ROLE STYLES
+   ============================================================ */
+
+.humas-ringkasan {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Prototype Banner */
+.humas-prototype-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12.5px;
+  color: #065f46;
+}
+
+.humas-prototype-tag {
+  font-weight: 700;
+  font-size: 12px;
+  background: #d1fae5;
+  color: #047857;
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.humas-prototype-text {
+  flex: 1;
+  color: #065f46;
+}
+
+.humas-prototype-date {
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: #059669;
+  font-weight: 500;
+}
+
+/* Action Row */
+.humas-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.humas-notif-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.humas-notif-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+}
+
+.humas-tambah-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: var(--green-700);
+  border: none;
+  color: white;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.humas-tambah-btn:hover {
+  background: var(--green-600);
+}
+
+/* Section */
+.humas-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.humas-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0;
+}
+
+.humas-section-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-top: -8px;
+}
+
+.humas-link {
+  color: var(--green-700);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.humas-link:hover {
+  text-decoration: underline;
+}
+
+/* Stats Grid */
+.humas-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.humas-stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+.humas-stat-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.humas-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.humas-stat-icon--green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.humas-stat-icon--blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.humas-stat-icon--teal {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+.humas-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.humas-stat-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.humas-stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1;
+}
+
+.humas-stat-note {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+/* Kegiatan Terdekat */
+.humas-terdekat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.humas-terdekat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+.humas-terdekat-card:hover {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.humas-terdekat-badge {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 4px 8px;
+}
+
+.humas-terdekat-tanggal {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.humas-terdekat-bulan {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.humas-terdekat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.humas-terdekat-nama {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.humas-terdekat-detail {
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+
+.humas-lihat-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 7px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.humas-lihat-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+}
+
+/* Status Badges (Humas) */
+.humas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.humas-badge-berlangsung {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.humas-badge-publik {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.humas-badge-selesai {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+.humas-badge-draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Tindakan Buttons */
+.humas-tindakan-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.humas-tindakan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.humas-tindakan-view {
+  color: var(--green-700);
+  background: #d1fae5;
+}
+
+.humas-tindakan-view:hover {
+  background: #a7f3d0;
+}
+
+.humas-tindakan-edit {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.humas-tindakan-edit:hover {
+  background: #bfdbfe;
+}
+
+.humas-tindakan-delete {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.humas-tindakan-delete:hover {
+  background: #fecaca;
+}
+
+.humas-tindakan-draft {
+  color: #92400e;
+  background: #fef3c7;
+  font-size: 11.5px;
+}
+
+.humas-tindakan-draft:hover {
+  background: #fde68a;
+}
+
+
+/* ============================================================
+   MODAL -- TAMBAH KEGIATAN
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 64px);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-100);
+  flex-shrink: 0;
+}
+
+.modal-header-crumb {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--green-700);
+  margin-bottom: 4px;
+}
+
+.modal-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.modal-section-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.modal-section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.modal-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.modal-body .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+.humas-list-page .form-group,
+.humas-detail-page .form-group,
+.profil-card .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+.req {
+  color: #dc2626;
+}
+
+.form-label-opt {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  font-weight: 400;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-textarea--sm {
+  min-height: 64px;
+}
+
+.form-input--half {
+  max-width: 50%;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+}
+
+.file-upload-label:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+  background: var(--green-50);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--gray-100);
+  flex-shrink: 0;
+}
+
+.modal-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-btn-batal {
+  border: 1.5px solid var(--gray-200);
+  background: white;
+  color: var(--gray-700);
+}
+
+.modal-btn-batal:hover {
+  border-color: var(--gray-400);
+  background: var(--gray-50);
+}
+
+.modal-btn-draft {
+  border: 1.5px solid var(--green-600);
+  background: white;
+  color: var(--green-700);
+}
+
+.modal-btn-draft:hover {
+  background: var(--green-50);
+}
+
+.modal-btn-publish {
+  border: none;
+  background: var(--green-700);
+  color: white;
+}
+
+.modal-btn-publish:hover {
+  background: var(--green-600);
+}
+
+/* ============================================================
+   HUMAS - DETAIL KEGIATAN PAGE
+   ============================================================ */
+
+.humas-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.humas-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+  width: fit-content;
+}
+
+.humas-back-btn:hover {
+  color: var(--green-700);
+}
+
+/* Event Header */
+.humas-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.humas-detail-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.humas-jenis-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 4px;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+.humas-detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.3;
+}
+
+.humas-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.humas-detail-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.humas-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border: 1.5px solid var(--green-600);
+  border-radius: 8px;
+  background: white;
+  color: var(--green-700);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.humas-edit-btn:hover {
+  background: var(--green-50);
+}
+
+/* Tabs */
+.humas-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.humas-tab-btn {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.humas-tab-btn:hover {
+  color: var(--gray-800);
+}
+
+.humas-tab-btn.active {
+  color: var(--green-700);
+  font-weight: 600;
+  border-bottom-color: var(--green-600);
+}
+
+/* Detail body 2-col */
+.humas-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.humas-detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.humas-detail-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+}
+
+.humas-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.humas-detail-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.humas-detail-text {
+  font-size: 13.5px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* Info Card (sidebar) */
+.humas-detail-sidebar {
+  position: sticky;
+  top: 88px;
+}
+
+.humas-info-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.humas-info-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+}
+
+.humas-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.humas-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.humas-info-label {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+.humas-info-value {
+  font-size: 13px;
+  color: var(--gray-800);
+  font-weight: 500;
+}
+
+/* Tab generic content */
+.humas-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.humas-tab-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Presensi placeholder */
+.humas-presensi-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+}
+
+/* Rekap grid */
+.humas-rekap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ============================================================
+   HUMAS - SHARED LIST PAGE STYLES
+   ============================================================ */
+
+.humas-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.humas-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Info banners */
+.humas-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.humas-info-banner--green {
+  background: var(--green-50);
+  border-color: var(--green-200);
+  color: var(--green-800, #166534);
+}
+
+/* Filter bar - extended for humas pages */
+.humas-list-page .filter-bar,
+.humas-detail-page .filter-bar {
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+/* Table footnote */
+.humas-table-footnote {
+  font-size: 12.5px;
+  color: var(--gray-400);
+  padding: 4px 0;
+}
+
+/* Confirm modal */
+.confirm-modal {
+  background: white;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.confirm-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.confirm-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.confirm-modal-body {
+  padding: 16px 24px;
+  font-size: 14px;
+  color: var(--gray-700);
+}
+
+.confirm-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--gray-100);
+}
+
+/* -- Detail page: back link + toprow -- */
+.humas-detail-toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.humas-detail-back-link {
+  background: none;
+  border: none;
+  color: var(--green-700);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.humas-detail-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* QR info box */
+.humas-qr-info-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.humas-qr-info-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gray-800);
+}
+
+.humas-qr-info-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.humas-qr-info-text {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.humas-qr-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 7px;
+  padding: 10px 13px;
+  font-size: 12.5px;
+  color: #92400e;
+  margin-top: 4px;
+}
+
+/* -- Perbaikan Sertifikat -- */
+.humas-detail-info-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.humas-detail-info-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+.humas-detail-info-label {
+  color: var(--gray-500);
+}
+
+.humas-detail-info-value {
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+.humas-perbaikan-issue {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.humas-perbaikan-issue-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* Certificate Preview */
+.cert-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+}
+
+.cert-preview-box {
+  background: white;
+  border: 2px solid var(--green-700);
+  border-radius: 6px;
+  padding: 36px 48px;
+  width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.cert-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.cert-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--green-700);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cert-logo-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green-800);
+}
+
+.cert-logo-sub {
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+.cert-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--green-200);
+  margin: 4px 0;
+}
+
+.cert-label-sertifikat {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--green-700);
+}
+
+.cert-diberikan {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.cert-nama {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: 0.02em;
+}
+
+.cert-atas {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.cert-kegiatan {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-800);
+  font-style: italic;
+}
+
+.cert-tanggal {
+  font-size: 11.5px;
+  color: var(--gray-400);
+}
+
+.cert-ttd-row {
+  display: flex;
+  gap: 48px;
+  margin-top: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cert-ttd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.cert-ttd-line {
+  width: 100px;
+  height: 1px;
+  background: var(--gray-400);
+}
+
+.cert-ttd-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.cert-ttd-sub {
+  font-size: 10.5px;
+  color: var(--gray-400);
+}
+
+/* -- Laporan -- */
+.laporan-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.laporan-summary-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.laporan-summary-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.laporan-summary-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+
+.laporan-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.laporan-export-excel {
+  border: 1.5px solid var(--gray-300);
+  background: white;
+  color: var(--gray-700);
+}
+
+.laporan-export-excel:hover {
+  border-color: var(--gray-500);
+  background: var(--gray-50);
+}
+
+.laporan-export-pdf {
+  border: none;
+  background: var(--green-700);
+  color: white;
+}
+
+.laporan-export-pdf:hover {
+  background: var(--green-600);
+}
+
+/* -- Profil -- */
+.profil-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profil-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.profil-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.profil-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.profil-role {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.profil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profil-form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.profil-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+/* ============================================================
+   HUMAS - RINGKASAN PAGE
+   ============================================================ */
+
+.ringkasan-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.ringkasan-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+/* Stats row */
+.ringkasan-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.ringkasan-stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+.ringkasan-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+.ringkasan-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ringkasan-stat-icon--green { background: var(--green-50); color: var(--green-700); }
+.ringkasan-stat-icon--blue  { background: #eff6ff;         color: #1d4ed8; }
+.ringkasan-stat-icon--teal  { background: #f0fdfa;         color: #0f766e; }
+
+.ringkasan-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ringkasan-stat-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.ringkasan-stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+
+.ringkasan-stat-note {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+/* Section */
+.ringkasan-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ringkasan-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+/* Kegiatan Terdekat cards */
+.ringkasan-terdekat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ringkasan-terdekat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.ringkasan-terdekat-card:hover {
+  border-color: var(--green-300);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Date badge (calendar-style) */
+.ringkasan-date-badge {
+  min-width: 62px;
+  max-width: 62px;
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ringkasan-date-day {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ringkasan-date-jenis {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Info block */
+.ringkasan-terdekat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ringkasan-terdekat-nama {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-700);
+  cursor: pointer;
+}
+
+.ringkasan-terdekat-nama:hover {
+  text-decoration: underline;
+}
+
+.ringkasan-terdekat-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ringkasan-terdekat-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+
+/* Lihat detail button in terdekat cards */
+.ringkasan-lihat-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 7px;
+  background: white;
+  color: var(--gray-700);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.ringkasan-lihat-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+  background: var(--green-50);
+}
+
+/* -- Notifikasi Modal -- */
+.notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+}
+
+.notif-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.notif-item-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.notif-item-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.notif-item-time {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+.notif-item-link {
+  background: none;
+  border: none;
+  color: var(--green-700);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  width: fit-content;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+
+.notif-item-link:hover {
+  color: var(--green-600);
+}
