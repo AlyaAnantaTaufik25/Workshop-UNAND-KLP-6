@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UnandLogo from '../components/UnandLogo';
+import './login.css';
 import {
   User, Building2, FileText, Landmark, Users, Check
 } from 'lucide-react';
 
 const roles = [
-  { key: 'peserta',            label: 'Peserta',            icon: User,      path: '/' },
+  { key: 'peserta',            label: 'Peserta',            icon: User,      path: '/peserta/cari-workshop' },
   { key: 'humas',              label: 'Humas',              icon: Building2, path: '/humas/ringkasan' },
   { key: 'sekretariat-rektor', label: 'Sekretariat Rektor', icon: FileText,  path: '/sekretariat/kegiatan' },
   { key: 'mitra',              label: 'Mitra',              icon: Users,     path: '/' },
@@ -37,7 +39,7 @@ export default function Login() {
       {/* ── LEFT PANEL ── */}
       <div className="login-left">
         <div className="login-logo">
-          <div className="login-logo-icon">U</div>
+          <UnandLogo className="login-logo-icon" />
           <div className="login-logo-text">
             <span className="login-logo-name">Workshop UNAND</span>
             <span className="login-logo-sub">Universitas Andalas</span>

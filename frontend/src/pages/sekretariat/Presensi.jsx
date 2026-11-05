@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search, Download, ArrowLeft, Users, CheckCircle, Clock } from 'lucide-react';
 import { workshops, presensiData } from '../../data/mockData';
-import { downloadPresensiCSV } from '../../utils/exportHelper';
+import { downloadPresensiCSV } from './utils/exportHelper';
 
 export default function Presensi() {
   const [search, setSearch]             = useState('');

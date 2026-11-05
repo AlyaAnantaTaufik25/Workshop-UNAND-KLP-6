@@ -1,0 +1,142 @@
+/* ============================================================
+   REKTOR PORTAL STYLES
+   ============================================================ */
+
+:where(.role-rektor) .sidebar-role-badge-box {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--green-900);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 2px;
+}
+
+:where(.role-rektor) .sidebar-nav-item-rektor {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+
+:where(.role-rektor) .sidebar-nav-item-rektor:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+:where(.role-rektor) .sidebar-nav-item-rektor.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  font-weight: 600;
+  border-left: 3px solid #52b788;
+}
+
+:where(.role-rektor) .sidebar-user-bottom-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 6px;
+  margin-bottom: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+}
+
+:where(.role-rektor) .sidebar-user-avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+:where(.role-rektor) .sidebar-user-bottom-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+:where(.role-rektor) .sidebar-user-bottom-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.role-rektor) .sidebar-user-bottom-role {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.role-rektor) .btn-tandatangan-disabled {
+  width: 100%;
+  padding: 12px;
+  background: var(--gray-200);
+  color: var(--gray-500);
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Tombol Tandatangani Ulang Simulasi untuk Rektor */
+:where(.role-rektor) .dp-btn-tandatangan-ulang {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #739e82;
+  color: white;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+:where(.role-rektor) .dp-btn-tandatangan-ulang:hover {
+  background: #5b8269;
+}
+
+/* Badge sumber outline (seperti pada figma riwayat tanda tangan) */
+:where(.role-rektor) .badge-sumber-outline {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--gray-300);
+  background: white;
+  color: var(--gray-700);
+}
+
+:where(.role-rektor) .header-avatar-rektor {
+  background: var(--green-800);
+}

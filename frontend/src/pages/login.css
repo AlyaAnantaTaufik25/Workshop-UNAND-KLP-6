@@ -1,0 +1,232 @@
+/* ============================================================
+   LOGIN PAGE
+   ============================================================ */
+
+.login-root {
+  display: flex;
+  min-height: 100vh;
+}
+
+.login-left {
+  width: 360px;
+  min-height: 100vh;
+  background-color: var(--green-900);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px;
+  flex-shrink: 0;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-logo-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.login-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-logo-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+}
+
+.login-logo-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+}
+
+.login-left-bottom {
+  padding-bottom: 8px;
+}
+
+.login-tagline-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.login-tagline-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  margin-bottom: 14px;
+}
+
+.login-tagline-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.login-copyright {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 24px;
+  background: white;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-welcome-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--green-700);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.login-heading {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+}
+
+.login-subheading {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 24px;
+}
+
+.login-register-link {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-top: 14px;
+}
+
+.login-register-link a {
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0;
+}
+
+.login-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+.login-demo-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--green-700);
+  text-transform: uppercase;
+}
+
+.login-demo-subtitle {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 14px;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.demo-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  background: white;
+  color: var(--gray-700);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+
+.demo-btn:hover {
+  border-color: var(--green-500);
+  background: var(--green-50);
+}
+
+.demo-btn.active {
+  border-color: var(--green-600);
+  background: var(--green-50);
+  color: var(--green-800);
+}
+
+.demo-btn .demo-check {
+  margin-left: auto;
+  color: var(--green-600);
+}
+
+.demo-btn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--green-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-700);
+}
+
+.demo-btn.active .demo-btn-icon {
+  background: var(--green-700);
+  color: white;
+}
+
+.demo-btn-full {
+  grid-column: 1 / -1;
+}
+
+.login-banner {
+  background: var(--green-100);
+  border: 1px solid var(--green-200);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--green-700);
+  margin-bottom: 24px;
+}

@@ -1,0 +1,1600 @@
+/* PROFIL PAGE */
+:where(.role-humas) .profil-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 560px;
+}
+
+:where(.role-humas) .profil-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+:where(.role-humas) .profil-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+:where(.role-humas) .profil-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+/* Prototype Banner */
+:where(.role-humas) .humas-prototype-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12.5px;
+  color: #065f46;
+}
+
+:where(.role-humas) .humas-prototype-tag {
+  font-weight: 700;
+  font-size: 12px;
+  background: #d1fae5;
+  color: #047857;
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .humas-prototype-text {
+  flex: 1;
+  color: #065f46;
+}
+
+:where(.role-humas) .humas-prototype-date {
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: #059669;
+  font-weight: 500;
+}
+
+:where(.role-humas) .humas-notif-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+:where(.role-humas) .humas-notif-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+}
+
+:where(.role-humas) .humas-tambah-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: var(--green-700);
+  border: none;
+  color: white;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+:where(.role-humas) .humas-tambah-btn:hover {
+  background: var(--green-600);
+}
+
+:where(.role-humas) .humas-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0;
+}
+
+:where(.role-humas) .humas-section-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-top: -8px;
+}
+
+:where(.role-humas) .humas-link {
+  color: var(--green-700);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+:where(.role-humas) .humas-link:hover {
+  text-decoration: underline;
+}
+
+/* Stats Grid */
+:where(.role-humas) .humas-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+:where(.role-humas) .humas-stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+:where(.role-humas) .humas-stat-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+:where(.role-humas) .humas-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .humas-stat-icon--green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+:where(.role-humas) .humas-stat-icon--blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+:where(.role-humas) .humas-stat-icon--teal {
+  background: #ccfbf1;
+  color: #0d9488;
+}
+
+:where(.role-humas) .humas-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:where(.role-humas) .humas-stat-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+:where(.role-humas) .humas-stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1;
+}
+
+:where(.role-humas) .humas-stat-note {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+:where(.role-humas) .humas-lihat-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 7px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+:where(.role-humas) .humas-lihat-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+}
+
+/* Status Badges (Humas) */
+:where(.role-humas) .humas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .humas-badge-berlangsung {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+:where(.role-humas) .humas-badge-publik {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+:where(.role-humas) .humas-badge-selesai {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+:where(.role-humas) .humas-badge-draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Tindakan Buttons */
+:where(.role-humas) .humas-tindakan-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+:where(.role-humas) .humas-tindakan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .humas-tindakan-view {
+  color: var(--green-700);
+  background: #d1fae5;
+}
+
+:where(.role-humas) .humas-tindakan-view:hover {
+  background: #a7f3d0;
+}
+
+:where(.role-humas) .humas-tindakan-edit {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+:where(.role-humas) .humas-tindakan-edit:hover {
+  background: #bfdbfe;
+}
+
+:where(.role-humas) .humas-tindakan-delete {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+:where(.role-humas) .humas-tindakan-delete:hover {
+  background: #fecaca;
+}
+
+:where(.role-humas) .humas-tindakan-draft {
+  color: #92400e;
+  background: #fef3c7;
+  font-size: 11.5px;
+}
+
+:where(.role-humas) .humas-tindakan-draft:hover {
+  background: #fde68a;
+}
+
+
+/* ============================================================
+   MODAL -- TAMBAH KEGIATAN
+   ============================================================ */
+
+:where(.role-humas) .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 1000;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+
+:where(.role-humas) .modal-box {
+  background: white;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 64px);
+}
+
+:where(.role-humas) .modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-100);
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .modal-header-crumb {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--green-700);
+  margin-bottom: 4px;
+}
+
+:where(.role-humas) .modal-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+:where(.role-humas) .modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .modal-close-btn:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+:where(.role-humas) .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+:where(.role-humas) .modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+:where(.role-humas) .modal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+:where(.role-humas) .modal-section-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+:where(.role-humas) .modal-section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+:where(.role-humas) .modal-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+:where(.role-humas) .modal-body .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+:where(.role-humas) .humas-list-page .form-group,
+:where(.role-humas) .humas-detail-page .form-group,
+:where(.role-humas) .profil-card .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+:where(.role-humas) .req {
+  color: #dc2626;
+}
+
+:where(.role-humas) .form-label-opt {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  font-weight: 400;
+}
+
+:where(.role-humas) .form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+:where(.role-humas) .form-textarea--sm {
+  min-height: 64px;
+}
+
+:where(.role-humas) .form-input--half {
+  max-width: 50%;
+}
+
+:where(.role-humas) .form-hint {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+
+:where(.role-humas) .file-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+}
+
+:where(.role-humas) .file-upload-label:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+  background: var(--green-50);
+}
+
+:where(.role-humas) .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--gray-100);
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .modal-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+:where(.role-humas) .modal-btn-batal {
+  border: 1.5px solid var(--gray-200);
+  background: white;
+  color: var(--gray-700);
+}
+
+:where(.role-humas) .modal-btn-batal:hover {
+  border-color: var(--gray-400);
+  background: var(--gray-50);
+}
+
+:where(.role-humas) .modal-btn-draft {
+  border: 1.5px solid var(--green-600);
+  background: white;
+  color: var(--green-700);
+}
+
+:where(.role-humas) .modal-btn-draft:hover {
+  background: var(--green-50);
+}
+
+:where(.role-humas) .modal-btn-publish {
+  border: none;
+  background: var(--green-700);
+  color: white;
+}
+
+:where(.role-humas) .modal-btn-publish:hover {
+  background: var(--green-600);
+}
+
+/* ============================================================
+   HUMAS - DETAIL KEGIATAN PAGE
+   ============================================================ */
+
+:where(.role-humas) .humas-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Event Header */
+:where(.role-humas) .humas-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+:where(.role-humas) .humas-detail-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+:where(.role-humas) .humas-jenis-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--green-700);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  border-radius: 4px;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+:where(.role-humas) .humas-detail-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.3;
+}
+
+:where(.role-humas) .humas-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+:where(.role-humas) .humas-detail-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .humas-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border: 1.5px solid var(--green-600);
+  border-radius: 8px;
+  background: white;
+  color: var(--green-700);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .humas-edit-btn:hover {
+  background: var(--green-50);
+}
+
+/* Tabs */
+:where(.role-humas) .humas-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+:where(.role-humas) .humas-tab-btn {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+:where(.role-humas) .humas-tab-btn:hover {
+  color: var(--gray-800);
+}
+
+:where(.role-humas) .humas-tab-btn.active {
+  color: var(--green-700);
+  font-weight: 600;
+  border-bottom-color: var(--green-600);
+}
+
+/* Detail body 2-col */
+:where(.role-humas) .humas-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+:where(.role-humas) .humas-detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+:where(.role-humas) .humas-detail-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+}
+
+:where(.role-humas) .humas-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+:where(.role-humas) .humas-detail-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+:where(.role-humas) .humas-detail-text {
+  font-size: 13.5px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* Info Card (sidebar) */
+:where(.role-humas) .humas-detail-sidebar {
+  position: sticky;
+  top: 88px;
+}
+
+:where(.role-humas) .humas-info-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+:where(.role-humas) .humas-info-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+}
+
+:where(.role-humas) .humas-info-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+:where(.role-humas) .humas-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:where(.role-humas) .humas-info-label {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+:where(.role-humas) .humas-info-value {
+  font-size: 13px;
+  color: var(--gray-800);
+  font-weight: 500;
+}
+
+/* Tab generic content */
+:where(.role-humas) .humas-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ============================================================
+   HUMAS - SHARED LIST PAGE STYLES
+   ============================================================ */
+
+:where(.role-humas) .humas-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+:where(.role-humas) .humas-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Info banners */
+:where(.role-humas) .humas-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+:where(.role-humas) .humas-info-banner--green {
+  background: var(--green-50);
+  border-color: var(--green-200);
+  color: var(--green-800, #166534);
+}
+
+/* Filter bar - extended for humas pages */
+:where(.role-humas) .humas-list-page .filter-bar,
+:where(.role-humas) .humas-detail-page .filter-bar {
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+/* Table footnote */
+:where(.role-humas) .humas-table-footnote {
+  font-size: 12.5px;
+  color: var(--gray-400);
+  padding: 4px 0;
+}
+
+/* Confirm modal */
+:where(.role-humas) .confirm-modal {
+  background: white;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+:where(.role-humas) .confirm-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+:where(.role-humas) .confirm-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+:where(.role-humas) .confirm-modal-body {
+  padding: 16px 24px;
+  font-size: 14px;
+  color: var(--gray-700);
+}
+
+:where(.role-humas) .confirm-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--gray-100);
+}
+
+/* -- Detail page: back link + toprow -- */
+:where(.role-humas) .humas-detail-toprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:where(.role-humas) .humas-detail-back-link {
+  background: none;
+  border: none;
+  color: var(--green-700);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+:where(.role-humas) .humas-detail-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* QR info box */
+:where(.role-humas) .humas-qr-info-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+:where(.role-humas) .humas-qr-info-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gray-800);
+}
+
+:where(.role-humas) .humas-qr-info-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:where(.role-humas) .humas-qr-info-text {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+:where(.role-humas) .humas-qr-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 7px;
+  padding: 10px 13px;
+  font-size: 12.5px;
+  color: #92400e;
+  margin-top: 4px;
+}
+
+/* -- Perbaikan Sertifikat -- */
+:where(.role-humas) .humas-detail-info-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+:where(.role-humas) .humas-detail-info-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+:where(.role-humas) .humas-detail-info-label {
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .humas-detail-info-value {
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+:where(.role-humas) .humas-perbaikan-issue {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+:where(.role-humas) .humas-perbaikan-issue-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* Certificate Preview */
+:where(.role-humas) .cert-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+}
+
+:where(.role-humas) .cert-preview-box {
+  background: white;
+  border: 2px solid var(--green-700);
+  border-radius: 6px;
+  padding: 36px 48px;
+  width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+:where(.role-humas) .cert-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+:where(.role-humas) .cert-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--green-700);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:where(.role-humas) .cert-logo-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green-800);
+}
+
+:where(.role-humas) .cert-logo-sub {
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+:where(.role-humas) .cert-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--green-200);
+  margin: 4px 0;
+}
+
+:where(.role-humas) .cert-label-sertifikat {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--green-700);
+}
+
+:where(.role-humas) .cert-diberikan {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .cert-nama {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: 0.02em;
+}
+
+:where(.role-humas) .cert-atas {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .cert-kegiatan {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-800);
+  font-style: italic;
+}
+
+:where(.role-humas) .cert-tanggal {
+  font-size: 11.5px;
+  color: var(--gray-400);
+}
+
+:where(.role-humas) .cert-ttd-row {
+  display: flex;
+  gap: 48px;
+  margin-top: 16px;
+  width: 100%;
+  justify-content: center;
+}
+
+:where(.role-humas) .cert-ttd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+:where(.role-humas) .cert-ttd-line {
+  width: 100px;
+  height: 1px;
+  background: var(--gray-400);
+}
+
+:where(.role-humas) .cert-ttd-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+:where(.role-humas) .cert-ttd-sub {
+  font-size: 10.5px;
+  color: var(--gray-400);
+}
+
+/* -- Laporan -- */
+:where(.role-humas) .laporan-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+:where(.role-humas) .laporan-summary-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .laporan-summary-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+:where(.role-humas) .laporan-summary-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+
+:where(.role-humas) .laporan-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .laporan-export-excel {
+  border: 1.5px solid var(--gray-300);
+  background: white;
+  color: var(--gray-700);
+}
+
+:where(.role-humas) .laporan-export-excel:hover {
+  border-color: var(--gray-500);
+  background: var(--gray-50);
+}
+
+:where(.role-humas) .laporan-export-pdf {
+  border: none;
+  background: var(--green-700);
+  color: white;
+}
+
+:where(.role-humas) .laporan-export-pdf:hover {
+  background: var(--green-600);
+}
+
+/* -- Profil -- */
+:where(.role-humas) .profil-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+:where(.role-humas) .profil-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+:where(.role-humas) .profil-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .profil-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+:where(.role-humas) .profil-role {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .profil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+:where(.role-humas) .profil-form-row {
+  display: flex;
+  gap: 16px;
+}
+
+:where(.role-humas) .profil-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+/* ============================================================
+   HUMAS - RINGKASAN PAGE
+   ============================================================ */
+
+:where(.role-humas) .ringkasan-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+:where(.role-humas) .ringkasan-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+/* Stats row */
+:where(.role-humas) .ringkasan-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+:where(.role-humas) .ringkasan-stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+:where(.role-humas) .ringkasan-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+:where(.role-humas) .ringkasan-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .ringkasan-stat-icon--green { background: var(--green-50); color: var(--green-700); }
+:where(.role-humas) .ringkasan-stat-icon--blue  { background: #eff6ff;         color: #1d4ed8; }
+:where(.role-humas) .ringkasan-stat-icon--teal  { background: #f0fdfa;         color: #0f766e; }
+
+:where(.role-humas) .ringkasan-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+:where(.role-humas) .ringkasan-stat-label {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+:where(.role-humas) .ringkasan-stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.1;
+}
+
+:where(.role-humas) .ringkasan-stat-note {
+  font-size: 11.5px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+/* Section */
+:where(.role-humas) .ringkasan-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+:where(.role-humas) .ringkasan-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+/* Kegiatan Terdekat cards */
+:where(.role-humas) .ringkasan-terdekat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+:where(.role-humas) .ringkasan-terdekat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+:where(.role-humas) .ringkasan-terdekat-card:hover {
+  border-color: var(--green-300);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Date badge (calendar-style) */
+:where(.role-humas) .ringkasan-date-badge {
+  min-width: 62px;
+  max-width: 62px;
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .ringkasan-date-day {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+:where(.role-humas) .ringkasan-date-jenis {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Info block */
+:where(.role-humas) .ringkasan-terdekat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .ringkasan-terdekat-nama {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green-700);
+  cursor: pointer;
+}
+
+:where(.role-humas) .ringkasan-terdekat-nama:hover {
+  text-decoration: underline;
+}
+
+:where(.role-humas) .ringkasan-terdekat-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+:where(.role-humas) .ringkasan-terdekat-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+
+/* Lihat detail button in terdekat cards */
+:where(.role-humas) .ringkasan-lihat-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 7px;
+  background: white;
+  color: var(--gray-700);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .ringkasan-lihat-btn:hover {
+  border-color: var(--green-500);
+  color: var(--green-700);
+  background: var(--green-50);
+}
+
+/* -- Notifikasi Modal -- */
+:where(.role-humas) .notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+}
+
+:where(.role-humas) .notif-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-100);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:where(.role-humas) .notif-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+:where(.role-humas) .notif-item-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+:where(.role-humas) .notif-item-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+:where(.role-humas) .notif-item-time {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+:where(.role-humas) .notif-item-link {
+  background: none;
+  border: none;
+  color: var(--green-700);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  width: fit-content;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+
+:where(.role-humas) .notif-item-link:hover {
+  color: var(--green-600);
+}
+
+/* ============================================================
+   HUMAS - ROLE STYLES
+   ============================================================ */
+
+:where(.role-humas) .humas-ringkasan {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Action Row */
+:where(.role-humas) .humas-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Section */
+:where(.role-humas) .humas-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Kegiatan Terdekat */
+:where(.role-humas) .humas-terdekat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+:where(.role-humas) .humas-terdekat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: box-shadow 0.15s;
+}
+
+:where(.role-humas) .humas-terdekat-card:hover {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+:where(.role-humas) .humas-terdekat-badge {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 4px 8px;
+}
+
+:where(.role-humas) .humas-terdekat-tanggal {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+:where(.role-humas) .humas-terdekat-bulan {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  text-align: center;
+}
+
+:where(.role-humas) .humas-terdekat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+:where(.role-humas) .humas-terdekat-nama {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+:where(.role-humas) .humas-terdekat-detail {
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+
+:where(.role-humas) .humas-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+  width: fit-content;
+}
+
+:where(.role-humas) .humas-back-btn:hover {
+  color: var(--green-700);
+}
+
+:where(.role-humas) .humas-tab-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Presensi placeholder */
+:where(.role-humas) .humas-presensi-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+}
+
+/* Rekap grid */
+:where(.role-humas) .humas-rekap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}

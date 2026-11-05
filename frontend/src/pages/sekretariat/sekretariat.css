@@ -1,0 +1,385 @@
+/* SECTION HEADING */
+:where(.role-sekretariat) .section-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+:where(.role-sekretariat) .section-subheading {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 20px;
+}
+
+:where(.role-sekretariat) .table-link {
+  color: var(--green-700);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+:where(.role-sekretariat) .table-link:hover {
+  text-decoration: underline;
+}
+
+:where(.role-sekretariat) .badge-gray {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
+
+:where(.role-sekretariat) .btn-terbitkan {
+  width: 100%;
+  padding: 12px;
+  background: var(--green-100);
+  color: var(--green-800);
+  border: 1px solid var(--green-200);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+:where(.role-sekretariat) .btn-terbitkan:hover {
+  background: var(--green-200);
+}
+
+/* ============================================================
+   DETAIL KEGIATAN — KEGIATAN PAGE
+   ============================================================ */
+
+/* Back link */
+:where(.role-sekretariat) .dk-back-link {
+  background: none;
+  border: none;
+  color: var(--green-700);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s;
+}
+:where(.role-sekretariat) .dk-back-link:hover { color: var(--green-900); text-decoration: underline; }
+
+/* Main card */
+:where(.role-sekretariat) .dk-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Card header */
+:where(.role-sekretariat) .dk-card-header {
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+:where(.role-sekretariat) .dk-jenis-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--green-700);
+  margin-bottom: 6px;
+}
+
+:where(.role-sekretariat) .dk-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+:where(.role-sekretariat) .dk-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+:where(.role-sekretariat) .dk-subtitle-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+:where(.role-sekretariat) .dk-subtitle-dot {
+  color: var(--gray-300);
+  font-size: 16px;
+}
+
+/* Tabs */
+:where(.role-sekretariat) .dk-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 28px;
+}
+
+:where(.role-sekretariat) .dk-tab {
+  padding: 12px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--gray-500);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+:where(.role-sekretariat) .dk-tab:hover { color: var(--green-700); }
+
+:where(.role-sekretariat) .dk-tab-active {
+  color: var(--green-800);
+  font-weight: 700;
+  border-bottom-color: var(--green-700);
+}
+
+/* Tab content area */
+:where(.role-sekretariat) .dk-tab-content {
+  padding: 24px 28px;
+}
+
+/* Two-column layout (Informasi tab) */
+:where(.role-sekretariat) .dk-two-col {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Left column */
+:where(.role-sekretariat) .dk-left { display: flex; flex-direction: column; gap: 0; }
+
+:where(.role-sekretariat) .dk-img-wrap {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: var(--gray-100);
+  height: 220px;
+}
+
+:where(.role-sekretariat) .dk-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+:where(.role-sekretariat) .dk-content-section {
+  margin-bottom: 20px;
+}
+
+:where(.role-sekretariat) .dk-content-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 5px;
+}
+
+:where(.role-sekretariat) .dk-content-text {
+  font-size: 13.5px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+:where(.role-sekretariat) .dk-narasumber-link {
+  font-size: 13.5px;
+  color: var(--green-700);
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.6;
+}
+:where(.role-sekretariat) .dk-narasumber-link:hover { text-decoration: underline; }
+
+/* Right column — info panel */
+:where(.role-sekretariat) .dk-right {}
+
+:where(.role-sekretariat) .dk-info-panel {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 18px;
+  position: sticky;
+  top: 80px;
+}
+
+:where(.role-sekretariat) .dk-info-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+}
+
+:where(.role-sekretariat) .dk-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+}
+
+:where(.role-sekretariat) .dk-info-label {
+  color: var(--gray-500);
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+:where(.role-sekretariat) .dk-info-value {
+  font-weight: 600;
+  color: var(--gray-800);
+  text-align: right;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   DETAIL KEGIATAN SERTIFIKAT — extra sections
+   ============================================================ */
+
+:where(.role-sekretariat) .sert-section {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--gray-200);
+}
+
+:where(.role-sekretariat) .sert-section-heading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+:where(.role-sekretariat) .sert-section-sub {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   REKAP STAT CARDS (Tab Rekap)
+   ============================================================ */
+
+:where(.role-sekretariat) .rekap-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+:where(.role-sekretariat) .rekap-stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.role-sekretariat) .rekap-stat-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+:where(.role-sekretariat) .rekap-stat-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:where(.role-sekretariat) .rekap-stat-label {
+  font-size: 13px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+:where(.role-sekretariat) .rekap-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gray-900);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+:where(.role-sekretariat) .rekap-stat-sub {
+  font-size: 11.5px;
+  color: var(--gray-400);
+}
+
+@media (max-width: 768px) {
+  :where(.role-sekretariat) .rekap-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+:where(.role-sekretariat) .dp-btn-proses {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--green-900);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+:where(.role-sekretariat) .dp-btn-proses:hover {
+  background: var(--green-800);
+}
+
+:where(.role-sekretariat) .dp-btn-terbitkan-disabled {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--green-200);
+  background: var(--green-100);
+  color: var(--green-800);
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Rekap tab cards */
+:where(.role-sekretariat) .dk-rekap-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+:where(.role-sekretariat) .dk-rekap-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+:where(.role-sekretariat) .dk-rekap-label {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+}
+
+:where(.role-sekretariat) .dk-rekap-value {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+@media (max-width: 860px) {
+  :where(.role-sekretariat) .dk-two-col { grid-template-columns: 1fr; }
+  :where(.role-sekretariat) .dk-rekap-grid { grid-template-columns: repeat(2, 1fr); }
+}

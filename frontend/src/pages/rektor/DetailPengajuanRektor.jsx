@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Check, PenTool } from 'lucide-react';
 import { sertifikatData, dokumenPengganti } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
+import UnandLogo from '../../components/UnandLogo';
 
 const statusClass = {
   'menunggu-rektor': 'badge badge-orange',
@@ -83,7 +84,7 @@ export default function DetailPengajuanRektor() {
           <div className="certificate-preview">
             <div className="certificate-doc">
               <div className="cert-header-row">
-                <div className="cert-logo">U</div>
+                <UnandLogo className="cert-logo" />
                 <div className="cert-univ-name">UNIVERSITAS<br />ANDALAS</div>
               </div>
               <p style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '18px' }}>

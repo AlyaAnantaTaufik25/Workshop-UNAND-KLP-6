@@ -4,8 +4,8 @@ import {
   CalendarDays, Users, CheckCircle, Bell, Plus, Eye, Pencil,
   Trash2, X, MapPin, Clock
 } from 'lucide-react';
-import { humasStats, humasKegiatan, humasKegiatanTerdekat } from '../../data/mockData';
-import TambahKegiatanModal from '../../components/TambahKegiatanModal';
+import { humasStats, humasKegiatan, humasKegiatanTerdekat } from './data';
+import TambahKegiatanModal from './components/TambahKegiatanModal';
 
 // ─── helpers ────────────────────────────────────────────
 const statusConfig = {

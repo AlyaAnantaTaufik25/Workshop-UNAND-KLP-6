@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, Users, Check, Download } from 'lucide-react';
 import { workshops } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
-import { downloadPresensiCSV } from '../../utils/exportHelper';
+import { downloadPresensiCSV } from './utils/exportHelper';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',

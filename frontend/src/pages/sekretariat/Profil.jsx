@@ -1,5 +1,5 @@
 import { User, Lock, ShieldCheck } from 'lucide-react';
-import { currentUser } from '../../data/mockData';
+import { currentUser } from './data';
 
 export default function Profil() {
   return (

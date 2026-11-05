@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Upload, Check, Search } from 'lucide-react';
 import { sertifikatData, presensiData, dokumenPengganti } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
+import UnandLogo from '../../components/UnandLogo';
 
 /* ─── Status maps ─────────────────────────────────────── */
 const sertStatusClass = {
@@ -104,7 +105,7 @@ export default function DetailKegiatan() {
           <div className="certificate-preview">
             <div className="certificate-doc">
               <div className="cert-header-row">
-                <div className="cert-logo">U</div>
+                <UnandLogo className="cert-logo" />
                 <div className="cert-univ-name">UNIVERSITAS<br />ANDALAS</div>
               </div>
               <p style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '20px' }}>

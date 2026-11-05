@@ -1,5 +1,5 @@
 import { User, Lock, ShieldCheck } from 'lucide-react';
-import { currentRektor } from '../../data/mockData';
+import { currentRektor } from './data';
 
 export default function ProfilRektor() {
   return (

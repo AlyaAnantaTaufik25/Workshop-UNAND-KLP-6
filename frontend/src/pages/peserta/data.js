@@ -1,0 +1,124 @@
+export const initialProfile = {
+  nama: 'Nadia Amelia',
+  email: 'nadia.amelia@student.unand.ac.id',
+  jenis: 'Mahasiswa',
+  telepon: '0812 6789 4321',
+  nim: '2111522017',
+  prodi: 'Sistem Informasi',
+};
+
+export const participantWorkshops = [
+  {
+    id: 'data-science',
+    title: 'Workshop Data Science untuk Riset Akademik',
+    mode: 'offline',
+    theme: 'Teknologi',
+    date: '18 Mei 2025',
+    isoDate: '2025-05-18',
+    time: '09.00 - 15.30 WIB',
+    place: 'Convention Hall, Kampus Limau Manis',
+    shortPlace: 'Convention Hall UNAND',
+    fullPlace: 'Convention Hall, Kampus UNAND Limau Manis, Padang',
+    quota: '12 kursi tersisa',
+    remaining: 12,
+    capacity: 120,
+    deadline: '15 Mei 2025',
+    image: 'https://images.unsplash.com/photo-1742549586702-c23994895082?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=600&h=400',
+    description: 'Pelajari cara mengolah dan menerjemahkan data menjadi temuan riset yang bermakna bersama praktisi berpengalaman.',
+    about: 'Workshop ini dirancang untuk mahasiswa, dosen, dan peneliti yang ingin memperkuat kemampuan analisis data untuk kebutuhan akademik.',
+    target: 'Mahasiswa, dosen, peneliti, dan peserta umum yang tertarik pada analisis data.',
+    speaker: 'Dr. Rina Afriani, M.Kom.',
+    speakerInitials: 'RA',
+    speakerRole: 'Data Scientist & Dosen UNAND',
+    partner: 'PT Semen Padang',
+  },
+  {
+    id: 'hilirisasi-riset',
+    title: 'Strategi Hilirisasi Riset dan Inovasi',
+    mode: 'online',
+    theme: 'Riset & Inovasi',
+    date: '24 Mei 2025',
+    isoDate: '2025-05-24',
+    time: '08.30 - 12.00 WIB',
+    place: 'Zoom Meeting',
+    shortPlace: 'Zoom Meeting',
+    fullPlace: 'Online melalui Zoom Meeting',
+    quota: '28 kursi tersisa',
+    remaining: 28,
+    capacity: 80,
+    deadline: '22 Mei 2025',
+    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+    description: 'Temukan strategi untuk membawa hasil riset dan inovasi akademik menjadi solusi yang bermanfaat bagi masyarakat.',
+    about: 'Diskusi bersama akademisi dan praktisi mengenai pengembangan hasil riset, kolaborasi industri, dan ekosistem inovasi.',
+    target: 'Dosen, peneliti, mahasiswa, dan peserta umum yang tertarik pada riset dan inovasi.',
+    speaker: 'Prof. Dr. Budi Santoso',
+    speakerInitials: 'BS',
+    speakerRole: 'Akademisi & Praktisi Riset',
+    partner: 'Bank Nagari',
+  },
+  {
+    id: 'kepemimpinan-muda',
+    title: 'Kepemimpinan Muda Berdampak',
+    mode: 'offline',
+    theme: 'Pengembangan Diri',
+    date: '2 Juni 2025',
+    isoDate: '2025-06-02',
+    time: '13.00 - 16.00 WIB',
+    place: 'Seminar FISIP UNAND',
+    shortPlace: 'Seminar FISIP UNAND',
+    quota: 'Pendaftaran segera tutup',
+    remaining: 38,
+    capacity: 100,
+    deadline: '31 Mei 2025',
+    closing: true,
+    image: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&w=600&q=80',
+    description: 'Kembangkan kemampuan memimpin, berkomunikasi, dan berkolaborasi untuk menghadirkan perubahan yang berdampak.',
+    about: 'Kegiatan pengembangan diri untuk membangun kepemimpinan muda melalui diskusi, studi kasus, dan praktik kolaborasi.',
+    target: 'Mahasiswa, profesional muda, dan peserta umum.',
+    speaker: 'Ahmad Fauzi, M.M.',
+    speakerInitials: 'AF',
+    speakerRole: 'Praktisi Pengembangan Kepemimpinan',
+    partner: 'Telkom Indonesia',
+  },
+  {
+    id: 'public-speaking',
+    title: 'Public Speaking untuk Profesional Muda',
+    mode: 'offline',
+    theme: 'Pengembangan Diri',
+    date: '12 April 2025',
+    isoDate: '2025-04-12',
+    time: '09.00 - 12.00 WIB',
+    place: 'Auditorium UNAND',
+    shortPlace: 'Auditorium UNAND',
+    completed: true,
+    description: 'Membangun kepercayaan diri dan kemampuan berbicara di depan publik untuk dunia profesional.',
+    about: 'Pelatihan komunikasi publik dengan praktik presentasi dan umpan balik dari pemateri.',
+    target: 'Mahasiswa dan profesional muda.',
+    speaker: 'Tim Pengembangan Karier UNAND',
+    speakerRole: 'Praktisi Komunikasi',
+    partner: 'Universitas Andalas',
+  },
+];
+
+export const initialRegistrations = [
+  { workshopId: 'data-science', status: 'registered' },
+  { workshopId: 'hilirisasi-riset', status: 'waiting', queue: 4 },
+  { workshopId: 'public-speaking', status: 'completed' },
+];
+
+export const participantCertificates = [
+  { id: '042', workshopId: 'public-speaking', number: '042/UN16/WS/IV/2025', issued: '18 April 2025', recipient: 'Nadia Amelia' },
+];
+
+export function initials(name) {
+  return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+}
+
+export function readParticipantData(key, fallback, validate) {
+  try {
+    const value = JSON.parse(localStorage.getItem(`workshop-unand:peserta:${key}`));
+    return validate(value) ? value : fallback;
+  } catch {
+    return fallback;
+  }
+}

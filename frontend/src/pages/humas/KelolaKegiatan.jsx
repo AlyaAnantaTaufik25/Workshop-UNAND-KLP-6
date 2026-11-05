@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
-import { humasKegiatan } from '../../data/mockData';
-import TambahKegiatanModal from '../../components/TambahKegiatanModal';
+import { humasKegiatan } from './data';
+import TambahKegiatanModal from './components/TambahKegiatanModal';
 
 const statusConfig = {
   berlangsung: { label: 'Berlangsung', className: 'humas-badge humas-badge-berlangsung' },

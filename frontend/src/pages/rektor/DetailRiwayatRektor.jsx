@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Check, PenTool } from 'lucide-react';
 import { sertifikatData } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
+import UnandLogo from '../../components/UnandLogo';
 
 export default function DetailRiwayatRektor() {
   const { id }    = useParams();
@@ -49,7 +50,7 @@ export default function DetailRiwayatRektor() {
           <div className="certificate-preview">
             <div className="certificate-doc">
               <div className="cert-header-row">
-                <div className="cert-logo">U</div>
+                <UnandLogo className="cert-logo" />
                 <div className="cert-univ-name">PT SEMEN PADANG<br /><span style={{ fontSize: '10px', color: 'var(--gray-400)', fontWeight: 400 }}>Pratinjau contoh - bukan PDF resmi</span></div>
               </div>
               

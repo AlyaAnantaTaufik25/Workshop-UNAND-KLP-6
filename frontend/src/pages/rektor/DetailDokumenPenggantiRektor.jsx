@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { PenTool, AlertTriangle, CheckCircle } from 'lucide-react';
 import { dokumenPengganti } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
+import UnandLogo from '../../components/UnandLogo';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
@@ -220,9 +221,7 @@ export default function DetailDokumenPenggantiRektor() {
               borderColor: activeView === 'lama' ? '#dc2626' : 'var(--green-900)'
             }}>
               <div className="dp-cert-header">
-                <div className="dp-cert-logo-box" style={{ background: activeView === 'lama' ? '#7f1d1d' : 'var(--green-900)' }}>
-                  U
-                </div>
+                <UnandLogo className="dp-cert-logo-box" />
                 <div className="dp-cert-partner-name">{dp.penyelenggara.toUpperCase()}</div>
               </div>
               <div style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '14px' }}>

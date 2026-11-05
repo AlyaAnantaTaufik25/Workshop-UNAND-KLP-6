@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import UnandLogo from '../../components/UnandLogo';
 import { Search, Bell, X, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const initialData = [
@@ -31,7 +32,7 @@ function CertPreview({ nama, kegiatan, tanggal }) {
     <div className="cert-preview-wrapper">
       <div className="cert-preview-box">
         <div className="cert-logo-row">
-          <div className="cert-logo-icon">U</div>
+          <UnandLogo className="cert-logo-icon" />
           <div>
             <div className="cert-logo-title">UNIVERSITAS ANDALAS</div>
             <div className="cert-logo-sub">Pratinjau contoh, bukan PDF resmi</div>

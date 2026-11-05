@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Pencil, Bell, CalendarDays, Clock, MapPin, QrCode, AlertTriangle } from 'lucide-react';
-import { humasKegiatan } from '../../data/mockData';
+import { humasKegiatan } from './data';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
 
