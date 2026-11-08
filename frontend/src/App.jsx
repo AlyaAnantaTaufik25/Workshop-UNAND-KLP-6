@@ -30,6 +30,19 @@ import ProfilRektor from './pages/rektor/ProfilRektor';
 
 // Humas
 import LayoutHumas from './components/LayoutHumas';
+
+// Mitra
+import LayoutMitra from './pages/mitra/LayoutMitra';
+import KegiatanKerjaSama from './pages/mitra/KegiatanKerjaSama';
+import DetailKegiatanMitra from './pages/mitra/DetailKegiatanMitra';
+import PesertaMitra from './pages/mitra/PesertaMitra';
+import TemplateSertifikatMitra from './pages/mitra/TemplateSertifikatMitra';
+import PerbaikanSertifikatMitra from './pages/mitra/PerbaikanSertifikatMitra';
+import DetailDokumenPenggantiMitra from './pages/mitra/DetailDokumenPenggantiMitra';
+import TandaTanganMitra from './pages/mitra/TandaTanganMitra';
+import DetailTandaTanganMitra from './pages/mitra/DetailTandaTanganMitra';
+import LaporanMitra from './pages/mitra/LaporanMitra';
+import ProfilMitra from './pages/mitra/ProfilMitra';
 import RingkasanHumas from './pages/humas/RingkasanHumas';
 import DetailKegiatanHumas from './pages/humas/DetailKegiatanHumas';
 import KelolaKegiatan from './pages/humas/KelolaKegiatan';
@@ -93,6 +106,21 @@ function App() {
           <Route path="perbaikan-sertifikat" element={<PerbaikanSertifikat />} />
           <Route path="laporan" element={<Laporan />} />
           <Route path="profil" element={<ProfilHumas />} />
+        </Route>
+
+        {/* ── ROLE: MITRA ── */}
+        <Route path="/mitra" element={<LayoutMitra />}>
+          <Route index element={<Navigate to="kegiatan-kerja-sama" replace />} />
+          <Route path="kegiatan-kerja-sama" element={<KegiatanKerjaSama />} />
+          <Route path="kegiatan-kerja-sama/:id" element={<DetailKegiatanMitra />} />
+          <Route path="peserta" element={<PesertaMitra />} />
+          <Route path="template-sertifikat" element={<TemplateSertifikatMitra />} />
+          <Route path="perbaikan-sertifikat" element={<PerbaikanSertifikatMitra />} />
+          <Route path="dokumen-pengganti/:id" element={<DetailDokumenPenggantiMitra />} />
+          <Route path="tanda-tangan" element={<TandaTanganMitra />} />
+          <Route path="tanda-tangan/:id" element={<DetailTandaTanganMitra />} />
+          <Route path="laporan" element={<LaporanMitra />} />
+          <Route path="profil" element={<ProfilMitra />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
