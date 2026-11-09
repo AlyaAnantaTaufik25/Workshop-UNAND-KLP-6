@@ -19,14 +19,16 @@ export default function Kegiatan() {
   const navigate = useNavigate();
   const [search,     setSearch]     = useState('');
   const [filterJenis, setFilterJenis] = useState('');
+  const [filterMode,  setFilterMode]  = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
   const filtered = workshops.filter(w => {
     const matchSearch = w.nama.toLowerCase().includes(search.toLowerCase()) ||
                         w.penyelenggara.toLowerCase().includes(search.toLowerCase());
     const matchJenis  = filterJenis  ? w.jenis === filterJenis : true;
+    const matchMode   = filterMode   ? w.mode === filterMode   : true;
     const matchStatus = filterStatus ? w.statusSertifikat === filterStatus : true;
-    return matchSearch && matchJenis && matchStatus;
+    return matchSearch && matchJenis && matchMode && matchStatus;
   });
 
   return (
@@ -56,6 +58,16 @@ export default function Kegiatan() {
           <option value="">Semua jenis</option>
           <option value="Workshop">Workshop</option>
           <option value="Seminar">Seminar</option>
+        </select>
+
+        <select
+          className="filter-select"
+          value={filterMode}
+          onChange={e => setFilterMode(e.target.value)}
+        >
+          <option value="">Semua kategori mode</option>
+          <option value="offline">Offline (Tatap Muka)</option>
+          <option value="online">Online (Daring)</option>
         </select>
 
         <select
@@ -99,7 +111,14 @@ export default function Kegiatan() {
                 <td>
                   <span className="table-name-bold">{w.nama}</span>
                 </td>
-                <td>{w.jenis}</td>
+                <td>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', alignItems: 'flex-start' }}>
+                    <span>{w.jenis}</span>
+                    <span className={`mode-badge mode-badge--${w.mode || 'offline'}`}>
+                      {w.mode === 'online' ? 'Online' : 'Offline'}
+                    </span>
+                  </div>
+                </td>
                 <td style={{ whiteSpace: 'nowrap' }}>{w.tanggal}</td>
                 <td>{w.penyelenggara}</td>
                 <td>
