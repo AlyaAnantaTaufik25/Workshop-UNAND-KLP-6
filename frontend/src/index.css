@@ -273,6 +273,641 @@ input, select, textarea {
   color: #fca5a5;
 }
 
+/* ============================================================
+   SHELL, SIDEBAR & HEADER: SEKRETARIAT REKTOR & REKTOR
+   SESUAI DENGAN DESAIN PESERTA (SINGLE SOURCE OF TRUTH)
+   ============================================================ */
+
+.role-sekretariat,
+.role-rektor {
+  min-height: 100vh;
+  color: #263238;
+  background: #f7f8fa;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-size: 16px;
+  letter-spacing: 0;
+  display: flex;
+}
+
+.role-sekretariat .sidebar,
+.role-rektor .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  padding: 26px 18px 20px;
+  border-right: 1px solid #dfe6e1;
+  background: #ffffff;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .sidebar-brand,
+.role-rektor .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.role-sekretariat .sidebar-brandmark,
+.role-rektor .sidebar-brandmark {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  flex: none;
+  color: white;
+  background: #14532d;
+  border: 3px double rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  font: 700 20px Georgia, serif;
+}
+
+.role-sekretariat .sidebar-brand strong,
+.role-rektor .sidebar-brand strong {
+  display: block;
+  font-size: 14px;
+  color: #14532d;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.role-sekretariat .sidebar-brand div > span,
+.role-rektor .sidebar-brand div > span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #66736c;
+  line-height: 1.2;
+}
+
+.role-sekretariat .sidebar-role-badge,
+.role-rektor .sidebar-role-badge {
+  margin: 28px 4px 18px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: #edf7ef;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .sidebar-role-badge > span,
+.role-rektor .sidebar-role-badge > span {
+  display: block;
+  font-size: 9px;
+  color: #66736c;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-sekretariat .sidebar-role-badge > strong,
+.role-rektor .sidebar-role-badge > strong {
+  display: block;
+  margin-top: 4px;
+  color: #14532d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.role-sekretariat .sidebar nav,
+.role-rektor .sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.role-sekretariat .sidebar nav a,
+.role-rektor .sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  width: 100%;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #52605a;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .sidebar nav a svg,
+.role-rektor .sidebar nav a svg {
+  flex-shrink: 0;
+  color: #52605a;
+  transition: color 0.15s ease;
+}
+
+.role-sekretariat .sidebar nav a:hover,
+.role-rektor .sidebar nav a:hover {
+  background: #f4f7f5;
+  color: #14532d;
+}
+
+.role-sekretariat .sidebar nav a:hover svg,
+.role-rektor .sidebar nav a:hover svg {
+  color: #14532d;
+}
+
+.role-sekretariat .sidebar nav a.is-active,
+.role-sekretariat .sidebar nav a.active,
+.role-rektor .sidebar nav a.is-active,
+.role-rektor .sidebar nav a.active {
+  color: #ffffff;
+  background: #14532d;
+  box-shadow: 0 4px 12px rgba(20, 83, 45, 0.17);
+}
+
+.role-sekretariat .sidebar nav a.is-active svg,
+.role-sekretariat .sidebar nav a.active svg,
+.role-rektor .sidebar nav a.is-active svg,
+.role-rektor .sidebar nav a.active svg {
+  color: #ffffff;
+}
+
+.role-sekretariat .sidebar-logout,
+.role-rektor .sidebar-logout {
+  margin-top: auto;
+  padding: 17px 12px 0;
+  border: 0;
+  border-top: 1px solid #dfe6e1;
+  border-radius: 0;
+  color: #7b4747;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .sidebar-logout svg,
+.role-rektor .sidebar-logout svg {
+  flex-shrink: 0;
+}
+
+.role-sekretariat .sidebar-logout:hover,
+.role-rektor .sidebar-logout:hover {
+  color: #a52d2d;
+  background: transparent;
+}
+
+/* MAIN CONTENT AREA */
+.role-sekretariat .main-content,
+.role-sekretariat .main-area,
+.role-rektor .main-content,
+.role-rektor .main-area {
+  margin-left: 240px;
+  min-width: 0;
+  min-height: 100vh;
+  background: #f7f8fa;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* TOP HEADER */
+.role-sekretariat .top-header,
+.role-rektor .top-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 89px;
+  height: 89px;
+  padding: 14px 34px;
+  border-bottom: 1px solid #dfe6e1;
+  background: #fffffff5;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .top-header-left,
+.role-rektor .top-header-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.role-sekretariat .top-header-crumb,
+.role-rektor .top-header-crumb {
+  color: #228b45;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.role-sekretariat .top-header-title,
+.role-rektor .top-header-title {
+  margin: 3px 0 0;
+  font-size: 21px;
+  line-height: 1.5;
+  color: #263238;
+  font-weight: 600;
+}
+
+.role-sekretariat .top-header-right,
+.role-rektor .top-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.role-sekretariat .top-header-icon-btn,
+.role-rektor .top-header-icon-btn {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #263238;
+  cursor: pointer;
+}
+
+.role-sekretariat .top-header-icon-btn:hover,
+.role-rektor .top-header-icon-btn:hover {
+  background: #edf7ef;
+}
+
+.role-sekretariat .top-header-notif-dot,
+.role-rektor .top-header-notif-dot {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #228b45;
+}
+
+.role-sekretariat .user-profile-btn,
+.role-rektor .user-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 0 18px;
+  border: 0;
+  border-left: 1px solid #dfe6e1;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.role-sekretariat .user-profile-btn:hover,
+.role-rektor .user-profile-btn:hover {
+  background: transparent;
+  opacity: 0.85;
+}
+
+.role-sekretariat .user-avatar,
+.role-rektor .user-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #edf7ef;
+  color: #14532d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.role-sekretariat .user-info,
+.role-rektor .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.role-sekretariat .user-name,
+.role-rektor .user-name {
+  display: block;
+  max-width: 190px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 700;
+  color: #263238;
+  line-height: 1.3;
+}
+
+.role-sekretariat .user-role,
+.role-rektor .user-role {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #66736c;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+/* NOTIF POPOVER */
+.role-sekretariat .header-notif-popover,
+.role-rektor .header-notif-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  background: white;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  padding: 14px;
+  z-index: 200;
+}
+
+.role-sekretariat .header-notif-popover h2,
+.role-rektor .header-notif-popover h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #263238;
+  margin: 0 0 8px;
+}
+
+.role-sekretariat .header-notif-item,
+.role-rektor .header-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  background: #f7f8fa;
+  color: #263238;
+  text-decoration: none;
+  font-size: 12px;
+  border: 1px solid #dfe6e1;
+  transition: background 0.15s;
+}
+
+.role-sekretariat .header-notif-item:hover,
+.role-rektor .header-notif-item:hover {
+  background: #edf7ef;
+}
+
+/* CONTENT CONTAINER & TYPOGRAPHY */
+.role-sekretariat .content-container,
+.role-rektor .content-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 30px 34px 54px;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+.role-sekretariat .section-heading,
+.role-rektor .section-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #263238;
+  margin: 0 0 5px;
+}
+
+.role-sekretariat .section-subheading,
+.role-rektor .section-subheading {
+  font-size: 13px;
+  color: #66736c;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+/* FILTER BAR, INPUTS, TABLES (Selaras dengan Peserta) */
+.role-sekretariat .filter-bar,
+.role-rektor .filter-bar,
+.role-sekretariat .search-bar,
+.role-rektor .search-bar,
+.role-sekretariat .search-filter-card,
+.role-rektor .search-filter-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 3px 12px rgba(30, 60, 40, 0.04);
+  margin-bottom: 24px;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .search-wrap,
+.role-rektor .search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  min-width: 200px;
+}
+
+.role-sekretariat .search-icon,
+.role-rektor .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #87918c;
+  pointer-events: none;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.role-sekretariat .search-input,
+.role-rektor .search-input {
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  border: 1px solid #d5ddd8;
+  border-radius: 8px;
+  padding: 0 14px 0 42px !important;
+  font-size: 13px;
+  color: #263238;
+  background: white;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.role-sekretariat .search-input::placeholder,
+.role-rektor .search-input::placeholder {
+  color: #87918c;
+}
+
+.role-sekretariat .search-input:focus,
+.role-rektor .search-input:focus {
+  border-color: #228b45;
+  outline: 2px solid #228b45;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.1);
+}
+
+.role-sekretariat select,
+.role-rektor select,
+.role-sekretariat .filter-select,
+.role-rektor .filter-select {
+  height: 42px;
+  min-height: 42px;
+  border: 1px solid #d5ddd8;
+  border-radius: 8px;
+  padding: 0 38px 0 14px !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: #263238;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2352605a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 16px 16px !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.role-sekretariat select:hover,
+.role-rektor select:hover,
+.role-sekretariat .filter-select:hover,
+.role-rektor .filter-select:hover {
+  border-color: #b9cec0;
+  background-color: #fafbfb;
+}
+
+.role-sekretariat select:focus,
+.role-rektor select:focus,
+.role-sekretariat .filter-select:focus,
+.role-rektor .filter-select:focus {
+  border-color: #228b45;
+  outline: 2px solid #228b45;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.1);
+}
+
+.role-sekretariat .table-container,
+.role-rektor .table-container {
+  background: white;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(30, 60, 40, 0.04);
+  margin-bottom: 24px;
+}
+
+.role-sekretariat table,
+.role-rektor table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.role-sekretariat table th,
+.role-rektor table th {
+  background: #fafbfb;
+  color: #66736c;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 13px 16px;
+  border-bottom: 1px solid #dfe6e1;
+  text-align: left;
+}
+
+.role-sekretariat table td,
+.role-rektor table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #263238;
+  border-bottom: 1px solid #edf2ef;
+}
+
+/* TABLE ACTIONS (Lihat Presensi, Unduh, dll — Ringkas & Rapi) */
+.role-sekretariat .btn-table-action,
+.role-rektor .btn-table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #14532d;
+  background: #ffffff;
+  border: 1px solid #d5ddd8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.role-sekretariat .btn-table-action:hover,
+.role-rektor .btn-table-action:hover {
+  background: #edf7ef;
+  border-color: #228b45;
+  color: #14532d;
+}
+
+.role-sekretariat .btn-table-icon,
+.role-rektor .btn-table-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: #14532d;
+  background: #ffffff;
+  border: 1px solid #d5ddd8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.role-sekretariat .btn-table-icon:hover,
+.role-rektor .btn-table-icon:hover {
+  background: #edf7ef;
+  border-color: #228b45;
+  color: #14532d;
+}
+
+.role-sekretariat .sert-process-banner {
+  background: white;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 3px 12px rgba(30, 60, 40, 0.04);
+  margin-bottom: 20px;
+}
+
 /* MAIN CONTENT */
 .main-content,
 .main-area {
@@ -471,7 +1106,7 @@ input, select, textarea {
 }
 
 .filter-select {
-  padding: 9px 32px 9px 12px;
+  padding: 9px 34px 9px 12px;
   border: 1px solid var(--gray-200);
   border-radius: 8px;
   font-size: 13px;
@@ -480,9 +1115,11 @@ input, select, textarea {
   outline: none;
   cursor: pointer;
   appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 10px center;
   transition: border-color 0.15s;
   white-space: nowrap;
 }
@@ -1563,4 +2200,164 @@ input, select, textarea {
   border-color: var(--green-600);
   color: var(--green-700);
   background: var(--gray-50);
+}
+
+/* ============================================================
+   Profile Page Styles (Unified Participant Style)
+   ============================================================ */
+.peserta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  width: 100%;
+}
+
+.peserta-intro h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--gray-900);
+}
+
+.peserta-intro p {
+  color: var(--gray-500);
+  font-size: 13px;
+  margin: 0;
+}
+
+.peserta-profile-form {
+  padding: 24px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 3px 14px rgba(26, 54, 35, 0.04);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.peserta-profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #dfe6e1;
+}
+
+.peserta-profile-heading h3 {
+  margin-bottom: 4px;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.peserta-profile-heading p {
+  color: var(--gray-500);
+  font-size: 12px;
+  margin: 0;
+}
+
+.peserta-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #edf7ef;
+  color: #14532d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.peserta-avatar--large {
+  width: 64px;
+  height: 64px;
+  font-size: 18px;
+}
+
+.peserta-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.peserta-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.peserta-form-grid label > span {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: #374151;
+}
+
+.peserta-form-grid input,
+.peserta-form-grid select {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #d5ddd8;
+  border-radius: 8px;
+  background: white;
+  color: #111827;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.peserta-form-grid input:focus,
+.peserta-form-grid select:focus {
+  outline: none;
+  border-color: #228b45;
+  box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.12);
+}
+
+.peserta-form-grid input[readonly] {
+  background: #f9fafb;
+  color: #4b5563;
+  cursor: not-allowed;
+}
+
+.peserta-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.peserta-form-error {
+  margin-top: 15px !important;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.peserta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #14532d;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.peserta-button:hover {
+  background: #166534;
+}
+
+@media (max-width: 768px) {
+  .peserta-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

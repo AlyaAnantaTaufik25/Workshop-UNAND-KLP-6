@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Check, PenTool } from 'lucide-react';
-import { sertifikatData, dokumenPengganti } from '../../data/mockData';
+import { sertifikatData } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
 
@@ -187,55 +187,6 @@ export default function DetailPengajuanRektor() {
               {signed ? 'Sertifikat Telah Ditandatangani' : 'Tandatangani Sertifikat'}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* ── Section Dokumen Pengganti di Bawah (Screenshot 2) ── */}
-      <div className="section-divider" style={{ marginTop: '40px' }}>
-        <p className="section-divider-label">DOKUMEN PENGGANTI</p>
-        <h3 className="section-divider-heading">Pemrosesan Sertifikat Hasil Perbaikan</h3>
-        <p className="section-divider-sub">
-          Periksa pengajuan dan lanjutkan dokumen pengganti sesuai alur penerbitan.
-        </p>
-
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>NAMA PESERTA</th>
-                <th>NAMA KEGIATAN</th>
-                <th>NOMOR SERTIFIKAT</th>
-                <th>JENIS PERBAIKAN</th>
-                <th>TANGGAL PENGAJUAN</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dokumenPengganti.map(d => (
-                <tr key={d.id}>
-                  <td><span className="table-name-bold">{d.namaPeserta}</span></td>
-                  <td>
-                    <div style={{ fontWeight: 600, color: 'var(--gray-800)', fontSize: '13px' }}>
-                      {d.namaKegiatan}
-                    </div>
-                    <div style={{ fontSize: '12px', color: 'var(--gray-400)' }}>{d.penyelenggara}</div>
-                  </td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{d.nomorSertifikat}</td>
-                  <td>{d.jenisPerbaikan}</td>
-                  <td style={{ whiteSpace: 'nowrap' }}>{d.tanggalPengajuan}</td>
-                  <td>
-                    <span className="badge badge-blue">
-                      Sedang Diproses
-                    </span>
-                  </td>
-                  <td>
-                    <span className="table-action-link">Lihat Detail</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

@@ -37,16 +37,6 @@ export default function DetailDokumenPenggantiMitra() {
         <p>Periksa pengajuan perbaikan sertifikat kegiatan instansi Anda sebelum diteruskan ke alur TTE Rektor.</p>
       </div>
 
-      {/* Info Banner Alur */}
-      <div className="mitra-prototype-banner">
-        <div className="mitra-prototype-left">
-          <AlertCircle size={16} color="var(--mitra-green)" />
-          <span className="mitra-prototype-text">
-            <strong>Alur Penerbitan Khusus Mitra:</strong> {dp.alurPenerbitan || 'Mitra menyetujui koreksi → Rektor membubuhkan TTE ulang → Sekretariat menerbitkan dokumen pengganti.'}
-          </span>
-        </div>
-      </div>
-
       {/* Kartu Ringkasan Informasi Pengajuan */}
       <div className="mitra-card">
         <h3 className="mitra-section-title" style={{ marginBottom: 16 }}>Rincian Pengajuan</h3>
@@ -55,7 +45,14 @@ export default function DetailDokumenPenggantiMitra() {
             <tbody>
               <tr>
                 <td style={{ width: 220, color: 'var(--mitra-muted)', fontWeight: 600 }}>Nama peserta</td>
-                <td style={{ fontWeight: 700, color: '#111827' }}>{dp.namaPeserta}</td>
+                <td style={{ fontWeight: 700, color: '#111827' }}>
+                  {dp.namaPeserta}
+                  {dp.namaPesertaLama && (
+                    <span style={{ fontSize: 12, color: 'var(--mitra-muted)', marginLeft: 8, fontWeight: 500 }}>
+                      (Sebelumnya: <span style={{ textDecoration: 'line-through', color: '#dc2626' }}>{dp.namaPesertaLama}</span>)
+                    </span>
+                  )}
+                </td>
               </tr>
               <tr>
                 <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Nama kegiatan</td>
@@ -66,8 +63,10 @@ export default function DetailDokumenPenggantiMitra() {
                 <td>{dp.jenisKegiatan || 'Workshop'}</td>
               </tr>
               <tr>
-                <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Nomor sertifikat lama</td>
-                <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{dp.nomorSertifikat}</td>
+                <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Nomor sertifikat</td>
+                <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                  {dp.nomorSertifikat}
+                </td>
               </tr>
               <tr>
                 <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Tanggal kegiatan</td>
@@ -81,14 +80,14 @@ export default function DetailDokumenPenggantiMitra() {
                 <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Jenis perbaikan</td>
                 <td>
                   <span className="mitra-badge-status mitra-badge-status--amber">
-                    <i></i> {dp.jenisPerbaikan}
+                    <i></i> Perbaikan {dp.jenisPerbaikan}
                   </span>
                 </td>
               </tr>
               <tr>
                 <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Rincian koreksi</td>
                 <td style={{ color: '#111827', fontWeight: 500, lineHeight: 1.6 }}>
-                  {dp.jenisPerbaikanDetail || `Judul pada sertifikat lama tertulis "${dp.namaKegiatan}", disesuaikan menjadi "${dp.namaKegiatanBaru || dp.namaKegiatan}".`}
+                  {dp.jenisPerbaikanDetail || `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || 'Nadia Amelya'}", seharusnya "${dp.namaPeserta}".`}
                 </td>
               </tr>
             </tbody>
@@ -133,14 +132,47 @@ export default function DetailDokumenPenggantiMitra() {
             <div className="cert-label-sertifikat">
               {activeView === 'baru' ? 'SERTIFIKAT PENGGANTI' : 'SERTIFIKAT'}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--mitra-muted)', marginBottom: 8 }}>
-              No: {activeView === 'baru' ? `${dp.nomorSertifikat}-REV1` : dp.nomorSertifikat}
+            <div style={{ fontSize: 11, color: 'var(--mitra-muted)', marginBottom: 8, fontFamily: 'monospace' }}>
+              No: {dp.nomorSertifikat}
             </div>
             <div className="cert-diberikan">Diberikan kepada</div>
-            <div className="cert-nama">{dp.namaPeserta}</div>
+            {activeView === 'lama' ? (
+              <div style={{ margin: '6px 0 8px' }}>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: '#dc2626',
+                  textDecoration: 'line-through',
+                  background: '#fee2e2',
+                  padding: '3px 12px',
+                  borderRadius: 4,
+                  display: 'inline-block'
+                }}>
+                  {dp.namaPesertaLama || 'Nadia Amelya'}
+                </div>
+                <div style={{ fontSize: 10, color: '#b91c1c', marginTop: 3 }}>
+                  ⚠️ Kesalahan ejaan nama peserta
+                </div>
+              </div>
+            ) : (
+              <div style={{ margin: '6px 0 8px' }}>
+                <div className="cert-nama" style={{
+                  background: '#f0fdf4',
+                  color: 'var(--mitra-green)',
+                  padding: '3px 12px',
+                  borderRadius: 4,
+                  display: 'inline-block'
+                }}>
+                  {dp.namaPeserta}
+                </div>
+                <div style={{ fontSize: 10, color: 'var(--mitra-green)', marginTop: 3 }}>
+                  ✓ Ejaan nama telah diperbaiki
+                </div>
+              </div>
+            )}
             <div className="cert-atas">atas partisipasinya sebagai peserta dalam kegiatan</div>
-            <div className="cert-kegiatan" style={{ color: activeView === 'baru' ? 'var(--mitra-green)' : '#111827' }}>
-              {activeView === 'baru' ? (dp.namaKegiatanBaru || dp.namaKegiatan) : dp.namaKegiatan}
+            <div className="cert-kegiatan">
+              {dp.namaKegiatan}
             </div>
             <div className="cert-tanggal">{dp.tanggalKegiatan || '15 April 2026'} · {dp.penyelenggara}</div>
 

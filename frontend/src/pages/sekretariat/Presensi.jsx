@@ -147,7 +147,7 @@ export default function Presensi() {
                 <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--gray-900)' }}>{selectedWorkshop.pendaftar}</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', color: 'var(--gray-500)', marginBottom: '4px' }}>Peserta Hadir Valid</div>
+                <div style={{ fontSize: '12px', color: 'var(--gray-500)', marginBottom: '4px' }}>Peserta Hadir</div>
                 <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--green-700)' }}>{selectedWorkshop.hadir}</div>
               </div>
               <div>
@@ -176,7 +176,7 @@ export default function Presensi() {
               onChange={e => setPesertaStatusFilter(e.target.value)}
             >
               <option value="">Semua status kehadiran</option>
-              <option value="hadir-valid">Hadir valid</option>
+              <option value="hadir-valid">Hadir</option>
               <option value="belum-hadir">Belum hadir</option>
             </select>
           </div>
@@ -209,7 +209,7 @@ export default function Presensi() {
                       </td>
                       <td>
                         <span className={p.statusKehadiran === 'hadir-valid' ? 'badge badge-green' : 'badge badge-amber'}>
-                          {p.statusKehadiran === 'hadir-valid' ? 'Hadir valid' : 'Belum hadir'}
+                          {p.statusKehadiran === 'hadir-valid' ? 'Hadir' : 'Belum hadir'}
                         </span>
                       </td>
                     </tr>
@@ -295,7 +295,7 @@ export default function Presensi() {
                   <th>TANGGAL</th>
                   <th>PENYELENGGARA / MITRA</th>
                   <th>PENDAFTAR</th>
-                  <th>HADIR VALID</th>
+                  <th>HADIR</th>
                   <th>RASIO KEHADIRAN</th>
                   <th>AKSI</th>
                 </tr>
@@ -330,12 +330,12 @@ export default function Presensi() {
                             {ratio}%
                           </span>
                         </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                             {/* Tombol Lihat Peserta Presensi Kegiatan Ini */}
                             <button
                               type="button"
-                              className="btn-lihat-dokumen-figma"
+                              className="btn-table-action"
                               onClick={() => setSelectedWorkshopId(w.id)}
                             >
                               Lihat Presensi
@@ -344,24 +344,11 @@ export default function Presensi() {
                             {/* Tombol Unduh CSV Kegiatan Ini */}
                             <button
                               type="button"
+                              className="btn-table-icon"
                               title="Unduh Rekap Presensi (CSV)"
                               onClick={() => handleDownload(w)}
-                              style={{
-                                padding: '7px 10px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--gray-300)',
-                                background: 'white',
-                                color: 'var(--green-800)',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'all 0.15s ease'
-                              }}
-                              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green-600)'; e.currentTarget.style.background = 'var(--green-50)'; }}
-                              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--gray-300)'; e.currentTarget.style.background = 'white'; }}
                             >
-                              <Download size={14} />
+                              <Download size={13} />
                             </button>
                           </div>
                         </td>

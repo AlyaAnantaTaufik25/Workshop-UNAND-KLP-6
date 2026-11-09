@@ -13,7 +13,7 @@ const kegiatanOptions = [
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
 
 function StatusHadirBadge({ status }) {
-  if (status === 'hadir-valid') return <span className="mitra-badge-status mitra-badge-status--berlangsung"><i></i> Hadir valid</span>;
+  if (status === 'hadir-valid') return <span className="mitra-badge-status mitra-badge-status--berlangsung"><i></i> Hadir</span>;
   return <span className="mitra-badge-status mitra-badge-status--gray"><i></i> Belum hadir</span>;
 }
 
@@ -65,7 +65,7 @@ export default function PesertaMitra() {
         </select>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
-          <option value="hadir-valid">Hadir valid</option>
+          <option value="hadir-valid">Hadir</option>
           <option value="belum-hadir">Belum hadir</option>
         </select>
       </div>

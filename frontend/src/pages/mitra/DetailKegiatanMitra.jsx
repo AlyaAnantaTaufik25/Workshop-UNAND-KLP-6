@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CalendarDays, Clock, MapPin, ArrowLeft, Users, CheckCircle2, UserCheck, Calendar } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, ArrowLeft, Users, CheckCircle2, UserCheck, Calendar, Download } from 'lucide-react';
 import { mitraKegiatan, mitraDetailData } from './data';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
@@ -11,7 +11,7 @@ const statusConfig = {
 };
 
 function StatusHadirBadge({ status }) {
-  if (status === 'hadir-valid') return <span className="mitra-badge mitra-badge-hadir">● Hadir valid</span>;
+  if (status === 'hadir-valid') return <span className="mitra-badge mitra-badge-hadir">● Hadir</span>;
   return <span className="mitra-badge mitra-badge-belum-hadir">● Belum hadir</span>;
 }
 
@@ -158,6 +158,35 @@ export default function DetailKegiatanMitra() {
         {/* Tab: Peserta */}
         {activeTab === 'Peserta' && (
           <div className="mitra-tab-content">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '14px' }}>
+              <button
+                type="button"
+                className="mitra-btn mitra-btn--secondary"
+                onClick={() => {
+                  const list = detail?.peserta ?? [];
+                  const headers = ['No', 'Nama Peserta', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran'];
+                  const rows = list.map((p, i) => [
+                    i + 1,
+                    `"${p.nama}"`,
+                    `"${p.jenis || 'Mahasiswa'}"`,
+                    `"${p.kegiatan || kegiatan.nama}"`,
+                    `"${p.statusPendaftaran || 'Terdaftar'}"`
+                  ]);
+                  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+                  const encodedUri = encodeURI(csvContent);
+                  const link = document.createElement('a');
+                  link.setAttribute('href', encodedUri);
+                  link.setAttribute('download', `Daftar_Peserta_${kegiatan.nama.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}
+              >
+                <Download size={14} />
+                Unduh Data Peserta (CSV)
+              </button>
+            </div>
             <div className="mitra-table-card">
               <table className="mitra-table">
                 <thead>

@@ -77,7 +77,7 @@ export default function DetailRiwayatRektor() {
                   }}>
                     Mitra Terverifikasi
                   </div>
-                  <p className="cert-sig-role">Tahap kedua simulasi</p>
+                  <p className="cert-sig-role">Telah Ditandatangani</p>
                 </div>
                 <div className="cert-sig-item">
                   <p className="cert-sig-line">Rektor UNAND</p>
@@ -92,7 +92,7 @@ export default function DetailRiwayatRektor() {
                   }}>
                     Andani Eka Putra
                   </div>
-                  <p className="cert-sig-role">Tahap ketiga simulasi</p>
+                  <p className="cert-sig-role">Telah Ditandatangani</p>
                 </div>
               </div>
             </div>

@@ -1,43 +1,47 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Upload, Check, Search } from 'lucide-react';
-import { sertifikatData, presensiData, dokumenPengganti } from '../../data/mockData';
+import { Upload, Check, CheckCircle } from 'lucide-react';
+import { sertifikatData, humasTemplates } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
-import UnandLogo from '../../components/UnandLogo';
+import CertificateTemplateRenderer from '../../components/CertificateTemplateRenderer';
 
 /* ─── Status maps ─────────────────────────────────────── */
 const sertStatusClass = {
   'menunggu-rektor': 'badge badge-orange',
-  'menunggu-mitra':  'badge badge-amber',
-  'diterbitkan':     'badge badge-green',
+  'menunggu-mitra': 'badge badge-amber',
+  'diterbitkan': 'badge badge-green',
 };
 const sertStatusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
-  'menunggu-mitra':  'Menunggu Mitra',
-  'diterbitkan':     'Diterbitkan',
+  'menunggu-mitra': 'Menunggu Mitra',
+  'diterbitkan': 'Diterbitkan',
 };
-const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
-const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
 
 /* ─── Process steps ───────────────────────────────────── */
 function getSteps(status) {
   return [
-    { label: 'Template oleh Humas',         done: true },
-    { label: 'Rektor UNAND',                done: status === 'diterbitkan' },
-    { label: 'Pimpinan Mitra',              done: status === 'diterbitkan' },
-    { label: 'Penerbitan oleh Sekretariat', done: status === 'diterbitkan',
-      note: 'Setelah semua tanda tangan lengkap.' },
+    { label: 'Template Sertifikat', done: true },
+    { label: 'Rektor UNAND', done: status === 'diterbitkan' },
+    { label: 'Pimpinan Mitra', done: status === 'diterbitkan' },
+    {
+      label: 'Penerbitan oleh Sekretariat', done: status === 'diterbitkan',
+      note: 'Setelah semua tanda tangan lengkap.'
+    },
   ];
 }
 
 /* ─── Main Component ──────────────────────────────────── */
 export default function DetailKegiatan() {
-  const { id }    = useParams();
-  const navigate  = useNavigate();
-  const [dpSearch, setDpSearch] = useState('');
-  const [dpStatus, setDpStatus] = useState('');
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [toastMessage, setToastMessage] = useState('');
 
   const sert = sertifikatData.find(s => String(s.id) === id);
+
+  const [selectedTemplate, setSelectedTemplate] = useState(() => {
+    if (!sert) return humasTemplates[0];
+    return humasTemplates.find(t => t.nama === sert.template) || humasTemplates[0];
+  });
 
   if (!sert) {
     return (
@@ -45,8 +49,10 @@ export default function DetailKegiatan() {
         <p>Data tidak ditemukan.</p>
         <button
           onClick={() => navigate('/sekretariat/sertifikat')}
-          style={{ marginTop: '16px', color: 'var(--green-700)', background: 'none',
-                   border: 'none', cursor: 'pointer', fontWeight: 600 }}
+          style={{
+            marginTop: '16px', color: 'var(--green-700)', background: 'none',
+            border: 'none', cursor: 'pointer', fontWeight: 600
+          }}
         >
           ← Kembali ke Sertifikat
         </button>
@@ -56,23 +62,31 @@ export default function DetailKegiatan() {
 
   const steps = getSteps(sert.statusTandaTangan);
 
-  /* Peserta valid: dari presensiData yang hadir valid untuk workshop id ini */
-  const pesertaValid = presensiData.filter(
-    p => p.kegiatanId === sert.id && p.statusKehadiran === 'hadir-valid'
-  );
-
-  /* Dokumen pengganti terkait sertifikat ini */
-  const filteredDp = dokumenPengganti.filter(d => {
-    const matchSearch = !dpSearch ||
-      d.namaPeserta.toLowerCase().includes(dpSearch.toLowerCase()) ||
-      d.namaKegiatan.toLowerCase().includes(dpSearch.toLowerCase()) ||
-      d.nomorSertifikat.toLowerCase().includes(dpSearch.toLowerCase());
-    const matchStatus = !dpStatus || d.status === dpStatus;
-    return matchSearch && matchStatus;
-  });
-
   return (
     <div>
+      {/* ── TOAST NOTIFIKASI TEMPLATE ── */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '24px',
+          right: '24px',
+          background: '#14532d',
+          color: 'white',
+          padding: '12px 20px',
+          borderRadius: '8px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontSize: '13px',
+          fontWeight: 600,
+        }}>
+          <CheckCircle size={18} color="#86efac" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* ── Back button ── */}
       <BackButton to="/sekretariat/sertifikat" label="Kembali ke Daftar Sertifikat" />
 
@@ -93,63 +107,64 @@ export default function DetailKegiatan() {
       {/* ── Two-column: Preview + Info panel ── */}
       <div className="detail-layout">
 
-        {/* LEFT: Certificate preview */}
+        {/* LEFT: Certificate preview (Dinamis Sesuai Desain Template Terpilih) */}
         <div className="detail-preview-panel">
           <div className="detail-preview-header">
-            <span className="detail-preview-label">Pratinjau dokumen contoh</span>
-            <button className="btn-perbesar">
-              <Eye size={14} /> Perbesar
-            </button>
+            <span className="detail-preview-label">Pratinjau Sertifikat</span>
           </div>
 
-          <div className="certificate-preview">
-            <div className="certificate-doc">
-              <div className="cert-header-row">
-                <UnandLogo className="cert-logo" />
-                <div className="cert-univ-name">UNIVERSITAS<br />ANDALAS</div>
-              </div>
-              <p style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '20px' }}>
-                Pratinjau contoh · bukan PDF resmi
-              </p>
-              <p className="cert-title">Sertifikat</p>
-              <p className="cert-given">Diberikan kepada</p>
-              <p className="cert-recipient">Nadia Amelia</p>
-              <p className="cert-participation">atas partisipasinya sebagai peserta dalam</p>
-              <p className="cert-event-name">{sert.namaKegiatan}</p>
-              <p className="cert-date-place">
-                {sert.tanggalPengajuan} · Universitas Andalas
-              </p>
-              <div className="cert-signatures">
-                <div className="cert-sig-item">
-                  <p className="cert-sig-line">Pimpinan Mitra</p>
-                  <div style={{ height: 32, borderBottom: '1px solid var(--gray-300)', margin: '6px 24px', opacity: 0.4 }} />
-                  <p className="cert-sig-role">Menunggu</p>
-                </div>
-                <div className="cert-sig-item">
-                  <p className="cert-sig-line">Rektor UNAND</p>
-                  <div style={{ height: 32, borderBottom: '1px solid var(--gray-300)', margin: '6px 24px', opacity: 0.4 }} />
-                  <p className="cert-sig-role">Menunggu</p>
-                </div>
-              </div>
-            </div>
+          {/* RENDER DESAIN SERTIFIKAT DINAMIS */}
+          <div style={{ padding: '4px' }}>
+            <CertificateTemplateRenderer
+              desainKey={selectedTemplate.desainKey || 'klasik'}
+              namaKegiatan={sert.namaKegiatan}
+              namaPeserta="Nadia Amelia"
+              tanggal={sert.tanggalPengajuan}
+              penyelenggara={sert.penyelenggara}
+            />
           </div>
         </div>
 
         {/* RIGHT: Info + Process + Actions */}
         <div className="detail-right-panel">
 
-          {/* Info dokumen */}
+          {/* Info dokumen & Pemilihan Desain Template */}
           <div className="info-card">
-            <p className="info-card-title">Informasi dokumen</p>
-            <div className="info-row">
-              <span className="info-row-label">Template</span>
-              <span className="info-row-value" style={{ maxWidth: '160px', textAlign: 'right', fontSize: '12px' }}>
-                {sert.template}
-              </span>
+            <p className="info-card-title">Informasi Dokumen</p>
+
+            <div className="info-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
+              <span className="info-row-label">Template Sertifikat</span>
+              <select
+                className="filter-select"
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  fontSize: '13px',
+                  background: '#ffffff',
+                  borderColor: 'var(--gray-300)',
+                  color: 'var(--gray-900)',
+                }}
+                value={selectedTemplate.id}
+                onChange={(e) => {
+                  const chosen = humasTemplates.find(t => t.id === Number(e.target.value));
+                  if (chosen) {
+                    setSelectedTemplate(chosen);
+                    setToastMessage(`Template "${chosen.nama}" berhasil diterapkan!`);
+                    setTimeout(() => setToastMessage(''), 3500);
+                  }
+                }}
+              >
+                {humasTemplates.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.nama}
+                  </option>
+                ))}
+              </select>
             </div>
+
             <div className="info-row">
               <span className="info-row-label">Dokumen</span>
-              <span className="info-row-value" style={{ color: 'var(--green-700)' }}>
+              <span className="info-row-value" style={{ color: 'var(--green-700)', fontWeight: 600 }}>
                 {sert.jumlahSertifikat} peserta hadir
               </span>
             </div>
@@ -157,7 +172,12 @@ export default function DetailKegiatan() {
               <span className="info-row-label">Penyelenggara</span>
               <span className="info-row-value">{sert.penyelenggara}</span>
             </div>
-            <button className="btn-daftar-dok">Daftar Dokumen</button>
+            <div className="info-row">
+              <span className="info-row-label">Format Dokumen</span>
+              <span className="info-row-value" style={{ fontWeight: 600, color: 'var(--gray-900)' }}>
+                PDF
+              </span>
+            </div>
           </div>
 
           {/* Process flow */}
@@ -197,132 +217,6 @@ export default function DetailKegiatan() {
           </div>
         </div>
       </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          SECTION: Peserta dengan presensi valid
-          ══════════════════════════════════════════════════════════ */}
-      <div className="sert-section">
-        <h3 className="sert-section-heading">Peserta dengan presensi valid</h3>
-        <p className="sert-section-sub">
-          Hanya peserta yang memenuhi syarat kehadiran dapat menerima sertifikat.
-        </p>
-
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nama Peserta</th>
-                <th>Kegiatan</th>
-                <th>Waktu Presensi</th>
-                <th>Status Kehadiran</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pesertaValid.length === 0 ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '28px' }}>
-                    Belum ada peserta dengan presensi valid untuk kegiatan ini.
-                  </td>
-                </tr>
-              ) : (
-                pesertaValid.map(p => (
-                  <tr key={p.id}>
-                    <td><span className="table-name-bold">{p.namaPeserta}</span></td>
-                    <td>{p.kegiatan}</td>
-                    <td style={{ color: p.waktuPresensi ? 'var(--gray-700)' : 'var(--gray-400)' }}>
-                      {p.waktuPresensi ?? '—'}
-                    </td>
-                    <td>
-                      <span className="badge badge-green">Hadir valid</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════
-          SECTION: Dokumen Pengganti
-          ══════════════════════════════════════════════════════════ */}
-      <div className="sert-section">
-        <p className="section-divider-label">Dokumen Pengganti</p>
-        <h3 className="sert-section-heading">Pemrosesan Sertifikat Hasil Perbaikan</h3>
-        <p className="sert-section-sub">
-          Periksa pengajuan dan lanjutkan dokumen pengganti sesuai alur penerbitan.
-        </p>
-
-        {/* Filter bar */}
-        <div className="filter-bar" style={{ marginBottom: '16px' }}>
-          <div className="search-wrap" style={{ maxWidth: '340px' }}>
-            <Search size={15} className="search-icon" />
-            <input
-              className="search-input"
-              placeholder="Cari peserta, kegiatan, no..."
-              value={dpSearch}
-              onChange={e => setDpSearch(e.target.value)}
-            />
-          </div>
-          <select
-            className="filter-select"
-            value={dpStatus}
-            onChange={e => setDpStatus(e.target.value)}
-          >
-            <option value="">Semua status</option>
-            <option value="sedang-diproses">Sedang Diproses</option>
-          </select>
-        </div>
-
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Nama Peserta</th>
-                <th>Nama Kegiatan</th>
-                <th>Nomor Sertifikat</th>
-                <th>Jenis Perbaikan</th>
-                <th>Tanggal Pengajuan</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDp.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '28px' }}>
-                    Tidak ada pengajuan dokumen pengganti.
-                  </td>
-                </tr>
-              ) : (
-                filteredDp.map(d => (
-                  <tr key={d.id}>
-                    <td><span className="table-name-bold">{d.namaPeserta}</span></td>
-                    <td>
-                      <div style={{ fontWeight: 600, color: 'var(--gray-800)', fontSize: '13px' }}>
-                        {d.namaKegiatan}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--gray-400)' }}>{d.penyelenggara}</div>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{d.nomorSertifikat}</td>
-                    <td>{d.jenisPerbaikan}</td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{d.tanggalPengajuan}</td>
-                    <td>
-                      <span className={dpStatusClass[d.status]}>
-                        {dpStatusLabel[d.status]}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="table-action-link">Lihat Detail</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
   );
 }

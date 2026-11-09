@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Pencil, Bell, CalendarDays, Clock, MapPin, QrCode, AlertTriangle } from 'lucide-react';
+import { Pencil, Bell, CalendarDays, Clock, MapPin, QrCode, AlertTriangle, Download } from 'lucide-react';
 import { humasKegiatan } from './data';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
@@ -116,7 +116,7 @@ const detailData = {
 };
 
 function StatusHadirBadge({ status }) {
-  if (status === 'hadir-valid') return <span className="humas-badge humas-badge-publik">● Hadir valid</span>;
+  if (status === 'hadir-valid') return <span className="humas-badge humas-badge-publik">● Hadir</span>;
   return <span className="humas-badge humas-badge-selesai">● Belum hadir</span>;
 }
 
@@ -281,6 +281,36 @@ export default function DetailKegiatanHumas() {
         {/* ── Tab: Peserta ── */}
         {activeTab === 'Peserta' && (
           <div className="humas-tab-content">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '14px' }}>
+              <button
+                type="button"
+                className="btn-outline-green"
+                onClick={() => {
+                  const list = detail?.peserta ?? [];
+                  const headers = ['No', 'Nama Peserta', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran', 'Status Kehadiran'];
+                  const rows = list.map((p, i) => [
+                    i + 1,
+                    `"${p.nama}"`,
+                    `"${p.jenis || 'Mahasiswa'}"`,
+                    `"${p.kegiatan || kegiatan.nama}"`,
+                    `"${p.statusDaftar || 'Terdaftar'}"`,
+                    `"${p.statusHadir === 'hadir-valid' ? 'Hadir' : 'Belum hadir'}"`
+                  ]);
+                  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+                  const encodedUri = encodeURI(csvContent);
+                  const link = document.createElement('a');
+                  link.setAttribute('href', encodedUri);
+                  link.setAttribute('download', `Daftar_Peserta_${kegiatan.nama.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 14px', fontSize: '12.5px' }}
+              >
+                <Download size={14} />
+                Unduh Data Peserta (CSV)
+              </button>
+            </div>
             <div className="table-container">
               <table className="data-table">
                 <thead>

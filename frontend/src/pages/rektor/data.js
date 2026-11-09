@@ -7,4 +7,6 @@ export const currentRektor = {
   jabatan: 'Rektor Universitas Andalas',
   email: 'rektor@unand.ac.id',
   telepon: '0812 6789 4321',
+  nip: '19720406 199903 1 002',
+  unitKerja: 'Pimpinan Universitas Andalas',
 };

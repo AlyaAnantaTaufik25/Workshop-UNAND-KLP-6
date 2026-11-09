@@ -244,6 +244,9 @@ export default function PerbaikanSertifikatMitra() {
                   className="mitra-profil-input mitra-profil-input--readonly"
                   style={{ fontFamily: 'monospace' }}
                 />
+                <span style={{ fontSize: 11, color: '#6B7280', marginTop: 4, display: 'block' }}>
+                  Nomor sertifikat ter-generate otomatis dan berurutan oleh sistem.
+                </span>
               </div>
             </div>
 

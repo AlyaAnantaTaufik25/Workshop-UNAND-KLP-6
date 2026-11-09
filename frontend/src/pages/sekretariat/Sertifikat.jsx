@@ -40,30 +40,33 @@ export default function Sertifikat() {
           </div>
         </div>
 
-        {/* Tombol ke Laman Sertifikat Perbaikan */}
-        <button
-          onClick={() => navigate('/sekretariat/sertifikat-perbaikan')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 18px',
-            borderRadius: '8px',
-            border: '1.5px solid #fcd34d',
-            background: '#fffbeb',
-            color: '#b45309',
-            fontWeight: 700,
-            fontSize: '13px',
-            cursor: 'pointer',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            transition: 'all 0.15s ease'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = '#fef3c7'}
-          onMouseLeave={e => e.currentTarget.style.background = '#fffbeb'}
-        >
-          <AlertTriangle size={16} color="#d97706" />
-          <span>Sertifikat yang Perlu Diperbaiki ({dokumenPengganti.length})</span>
-        </button>
+        {/* Action Button: Sertifikat Perbaikan */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Tombol ke Laman Sertifikat Perbaikan */}
+          <button
+            onClick={() => navigate('/sekretariat/sertifikat-perbaikan')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '9px 18px',
+              borderRadius: '8px',
+              border: '1.5px solid #fcd34d',
+              background: '#fffbeb',
+              color: '#b45309',
+              fontWeight: 700,
+              fontSize: '13px',
+              cursor: 'pointer',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#fef3c7'}
+            onMouseLeave={e => e.currentTarget.style.background = '#fffbeb'}
+          >
+            <AlertTriangle size={16} color="#d97706" />
+            <span>Sertifikat yang Perlu Diperbaiki ({dokumenPengganti.length})</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Filter Bar ── */}

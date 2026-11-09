@@ -1,6 +1,7 @@
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
-  FileText, Clock, User, LogOut, ChevronDown
+  FileText, Clock, User, LogOut, Bell, Award
 } from 'lucide-react';
 import { currentRektor } from './data';
 import UnandLogo from '../../components/UnandLogo';
@@ -22,6 +23,31 @@ const pageTitles = {
 export default function LayoutRektor() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifRead, setNotifRead] = useState(false);
+  const notifRef = useRef(null);
+
+  useEffect(() => {
+    setNotifOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleOutside = (event) => {
+      if (!notifRef.current?.contains(event.target)) {
+        setNotifOpen(false);
+      }
+    };
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setNotifOpen(false);
+    };
+    if (!notifOpen) return;
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [notifOpen]);
 
   const isDetail = location.pathname.includes('/pengajuan/') || location.pathname.includes('/riwayat/');
   const isDokumenPengganti = location.pathname.includes('/dokumen-pengganti/') || location.pathname.includes('/sertifikat-perbaikan');
@@ -34,27 +60,25 @@ export default function LayoutRektor() {
 
   return (
     <div className="app-layout role-rektor">
-      {/* ── SIDEBAR REKTOR ── */}
-      <aside className="sidebar">
-        {/* Logo */}
-        <div className="sidebar-logo">
-          <UnandLogo className="sidebar-logo-icon" />
-          <div className="sidebar-logo-text">
-            <span className="sidebar-logo-name">Workshop UNAND</span>
-            <span className="sidebar-logo-sub">Sistem Informasi Manajemen Kegiatan</span>
+      {/* ── SIDEBAR REKTOR (Selaras dengan Peserta) ── */}
+      <aside className="sidebar" aria-label="Navigasi Rektor">
+        {/* Brand */}
+        <div className="sidebar-brand">
+          <UnandLogo className="sidebar-brandmark" />
+          <div>
+            <strong>Workshop UNAND</strong>
+            <span>Sistem Informasi Workshop</span>
           </div>
         </div>
 
-        {/* Role info */}
-        <div className="sidebar-role-section">
-          <p className="sidebar-role-label">PORTAL REKTOR</p>
-          <div className="sidebar-role-badge-box">
-            {currentRektor.role}
-          </div>
+        {/* Role badge */}
+        <div className="sidebar-role-badge">
+          <span>MASUK SEBAGAI</span>
+          <strong>Rektor</strong>
         </div>
 
         {/* Navigation */}
-        <nav className="sidebar-nav">
+        <nav aria-label="Navigasi Menu">
           {navItems.map(({ to, label, icon: Icon }) => {
             const isActive = to === '/rektor/pengajuan'
               ? location.pathname.startsWith('/rektor/pengajuan') || 
@@ -66,40 +90,29 @@ export default function LayoutRektor() {
               <NavLink
                 key={to}
                 to={to}
-                className={
-                  'sidebar-nav-item-rektor' + (isActive ? ' active' : '')
-                }
+                className={isActive ? 'is-active' : ''}
               >
-                <Icon size={17} />
+                <Icon size={20} />
                 <span>{label}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        {/* User preview & Logout */}
-        <div className="sidebar-bottom">
-          <div className="sidebar-user-bottom-card">
-            <div className="sidebar-user-avatar-mini">{currentRektor.inisialAvatar}</div>
-            <div className="sidebar-user-bottom-info">
-              <div className="sidebar-user-bottom-name">{currentRektor.namaPendek}</div>
-              <div className="sidebar-user-bottom-role">{currentRektor.jabatan}</div>
-            </div>
-          </div>
-          <button
-            className="sidebar-logout-btn"
-            onClick={() => navigate('/')}
-          >
-            <LogOut size={18} />
-            Keluar
-          </button>
-        </div>
+        {/* Logout */}
+        <button
+          className="sidebar-logout"
+          onClick={() => navigate('/')}
+        >
+          <LogOut size={20} />
+          <span>Keluar</span>
+        </button>
       </aside>
 
       {/* ── MAIN CONTENT AREA ── */}
       <div className="main-content">
 
-        {/* Top Header */}
+        {/* Top Header (Selaras dengan Peserta) */}
         <header className="top-header">
           <div className="top-header-left">
             <span className="top-header-crumb">WORKSHOP UNAND</span>
@@ -107,16 +120,52 @@ export default function LayoutRektor() {
           </div>
 
           <div className="top-header-right">
-            <div className="user-profile-btn" onClick={() => navigate('/rektor/profil')}>
-              <div className="user-avatar" style={{ background: 'var(--green-50)', color: 'var(--green-700)', border: '1px solid var(--green-200)' }}>
-                {currentRektor.inisialAvatar}
-              </div>
+            {/* Notifikasi Bell */}
+            <div style={{ position: 'relative' }} ref={notifRef}>
+              <button
+                className="top-header-icon-btn"
+                aria-label="Notifikasi"
+                title="Notifikasi"
+                onClick={() => {
+                  setNotifOpen(prev => !prev);
+                  setNotifRead(true);
+                }}
+              >
+                <Bell size={20} />
+                {!notifRead && <i className="top-header-notif-dot" />}
+              </button>
+
+              {notifOpen && (
+                <div className="header-notif-popover">
+                  <h2>Notifikasi</h2>
+                  <NavLink
+                    to="/rektor/sertifikat-perbaikan"
+                    className="header-notif-item"
+                    onClick={() => setNotifOpen(false)}
+                  >
+                    <Award size={18} />
+                    <div>
+                      <strong>Menunggu TTE Sertifikat Perbaikan</strong>
+                      <p>Sertifikat perbaikan Nadia Amelia menunggu persetujuan Anda.</p>
+                      <small>17 Mei 2026 · Baru</small>
+                    </div>
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
+            {/* Profile User */}
+            <button
+              className="user-profile-btn"
+              onClick={() => navigate('/rektor/profil')}
+              title={`Profil ${currentRektor.nama}`}
+            >
+              <div className="user-avatar">{currentRektor.inisialAvatar}</div>
               <div className="user-info">
                 <span className="user-name">{currentRektor.nama}</span>
                 <span className="user-role">{currentRektor.role}</span>
               </div>
-              <ChevronDown size={14} className="user-chevron" />
-            </div>
+            </button>
           </div>
         </header>
 

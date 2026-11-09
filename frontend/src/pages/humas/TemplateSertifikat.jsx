@@ -1,15 +1,8 @@
 import { useState } from 'react';
 import { Search, Bell, Plus, Eye, Pencil, Trash2, X, AlertCircle, Upload } from 'lucide-react';
+import { humasTemplates } from '../../data/mockData';
 
-const initialTemplates = [
-  {
-    id: 1,
-    nama: 'Template UNAND — Data Science',
-    kegiatanTerkait: 'Workshop Data Science untuk Riset Akademik',
-    penerbit: 'UNAND',
-    status: 'dapat-dipakai',
-  },
-];
+const initialTemplates = humasTemplates;
 
 const kegiatanOptions = [
   'Workshop Data Science untuk Riset Akademik',

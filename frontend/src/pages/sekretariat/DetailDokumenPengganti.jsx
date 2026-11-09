@@ -45,7 +45,14 @@ export default function DetailDokumenPengganti() {
             <tbody>
               <tr>
                 <td className="dp-info-table-label">Nama peserta</td>
-                <td className="dp-info-table-val">{dp.namaPeserta}</td>
+                <td className="dp-info-table-val">
+                  <strong>{dp.namaPeserta}</strong>
+                  {dp.namaPesertaLama && (
+                    <span style={{ fontSize: '12px', color: 'var(--gray-500)', marginLeft: '8px' }}>
+                      (Sebelumnya: <span style={{ textDecoration: 'line-through', color: '#dc2626' }}>{dp.namaPesertaLama}</span>)
+                    </span>
+                  )}
+                </td>
               </tr>
               <tr>
                 <td className="dp-info-table-label">Nama kegiatan</td>
@@ -79,10 +86,10 @@ export default function DetailDokumenPengganti() {
                 {dpStatusLabel[dp.status]}
               </span>
             </div>
-            <div className="dp-reason-title">{dp.jenisPerbaikan}</div>
+            <div className="dp-reason-title">Perbaikan {dp.jenisPerbaikan}</div>
             <div className="dp-reason-text">
               {dp.jenisPerbaikanDetail ||
-                `Judul pada sertifikat tertulis "${dp.namaKegiatan}", seharusnya "${dp.namaKegiatanBaru || dp.namaKegiatan}".`}
+                `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || 'Nadia Amelya'}", seharusnya "${dp.namaPeserta}".`}
             </div>
           </div>
         </div>
@@ -160,14 +167,8 @@ export default function DetailDokumenPengganti() {
           </div>
         </div>
 
-        {/* ── Kartu Alur Penerbitan Ulang & Pratinjau Sertifikat ── */}
+        {/* ── Kartu Pratinjau Sertifikat ── */}
         <div className="dp-section-card">
-          <div className="dp-alur-simulasi-title">Alur Penerbitan Ulang · Simulasi</div>
-          <div className="dp-alur-simulasi-sub">
-            {dp.alurPenerbitan ||
-              'Mitra -> Mitra -> Rektor -> Sekretariat menerbitkan. Sekretariat dan Rektor tidak dapat mengedit isi sertifikat.'}
-          </div>
-
           {/* Banner Indikator Tampilan Dokumen yang Aktif */}
           {activeView === 'lama' ? (
             <div style={{
@@ -185,7 +186,7 @@ export default function DetailDokumenPengganti() {
             }}>
               <AlertTriangle size={18} color="#dc2626" />
               <span>
-                <strong>Sertifikat Asli yang Keliru:</strong> Bagian judul kegiatan tertulis <em>"Manajemen Proyek Kolaboratif"</em> (tanpa kata Workshop).
+                <strong>Kesalahan Ejaan Nama:</strong> Tertulis <em>"{dp.namaPesertaLama || 'Nadia Amelya'}"</em>, seharusnya <em>"{dp.namaPeserta}"</em>.
               </span>
             </div>
           ) : (
@@ -204,7 +205,7 @@ export default function DetailDokumenPengganti() {
             }}>
               <CheckCircle size={18} color="var(--green-700)" />
               <span>
-                <strong>Draf Sertifikat Hasil Perbaikan:</strong> Judul kegiatan telah diperbarui menjadi <em>"Workshop Manajemen Proyek Kolaboratif"</em>.
+                <strong>Hasil Perbaikan:</strong> Ejaan nama peserta telah diperbaiki menjadi <em>"{dp.namaPeserta}"</em>.
               </span>
             </div>
           )}
@@ -212,9 +213,7 @@ export default function DetailDokumenPengganti() {
           {/* Box Pratinjau Sertifikat */}
           <div className="dp-cert-preview-box">
             <div className="dp-cert-preview-tag">
-              {activeView === 'lama'
-                ? 'Pratinjau sertifikat lama yang akan diperbaiki — HTML simulasi'
-                : 'Pratinjau sertifikat hasil perbaikan — HTML simulasi, bukan PDF resmi'}
+              Pratinjau
             </div>
 
             <div className="dp-cert-paper" style={{
@@ -225,48 +224,59 @@ export default function DetailDokumenPengganti() {
                 <div className="dp-cert-partner-name">{dp.penyelenggara.toUpperCase()}</div>
               </div>
               <div style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '14px' }}>
-                {activeView === 'lama' ? 'Dokumen Lama (Mengandung Kesalahan)' : 'Pratinjau contoh - bukan PDF resmi'}
+                {activeView === 'lama' ? 'Dokumen Awal (Ejaan Salah)' : 'Dokumen Pengganti (Ejaan Benar)'}
               </div>
 
               <div className="dp-cert-title">SERTIFIKAT</div>
+              <div style={{ fontSize: '11px', color: 'var(--gray-500)', fontFamily: 'monospace', marginBottom: '10px' }}>
+                No: {dp.nomorSertifikat}
+              </div>
               <div className="dp-cert-given">Diberikan kepada</div>
-              <div className="dp-cert-name">{dp.namaPeserta.toUpperCase()}</div>
-              <div className="dp-cert-desc">atas partisipasinya sebagai peserta dalam</div>
 
-              {/* TAMPILAN NAMA KEGIATAN SESUAI VERSI DOKUMEN */}
+              {/* TAMPILAN NAMA PESERTA SESUAI VERSI DOKUMEN */}
               {activeView === 'lama' ? (
                 <div style={{ margin: '8px 0 10px' }}>
                   <div style={{
-                    fontSize: '14px',
-                    fontWeight: 700,
+                    fontSize: '18px',
+                    fontWeight: 800,
                     color: '#dc2626',
                     textDecoration: 'line-through',
                     background: '#fee2e2',
-                    padding: '4px 12px',
+                    padding: '4px 14px',
                     borderRadius: '4px',
-                    display: 'inline-block'
+                    display: 'inline-block',
+                    letterSpacing: '0.5px'
                   }}>
-                    {dp.namaKegiatan}
+                    {(dp.namaPesertaLama || 'Nadia Amelya').toUpperCase()}
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#b91c1c', marginTop: '4px' }}>
-                    ⚠️ Bagian yang keliru (perlu diperbaiki)
+                  <div style={{ fontSize: '10.5px', color: '#b91c1c', marginTop: '4px', fontWeight: 600 }}>
+                    ⚠️ Kesalahan ejaan nama (akan diganti)
                   </div>
                 </div>
               ) : (
                 <div style={{ margin: '8px 0 10px' }}>
-                  <div className="dp-cert-workshop-title" style={{
+                  <div className="dp-cert-name" style={{
                     background: '#f0fdf4',
-                    padding: '4px 12px',
+                    padding: '4px 14px',
                     borderRadius: '4px',
                     display: 'inline-block'
                   }}>
-                    {dp.namaKegiatanBaru || `Workshop ${dp.namaKegiatan}`}
+                    {dp.namaPeserta.toUpperCase()}
                   </div>
-                  <div style={{ fontSize: '10.5px', color: 'var(--green-700)', marginTop: '4px' }}>
-                    ✓ Judul telah diperbaiki
+                  <div style={{ fontSize: '10.5px', color: 'var(--green-700)', marginTop: '4px', fontWeight: 600 }}>
+                    ✓ Ejaan nama peserta telah benar
                   </div>
                 </div>
               )}
+
+              <div className="dp-cert-desc">atas partisipasinya sebagai peserta dalam</div>
+
+              {/* TAMPILAN NAMA KEGIATAN (VALID & TETAP) */}
+              <div style={{ margin: '8px 0 10px' }}>
+                <div className="dp-cert-workshop-title">
+                  {dp.namaKegiatan}
+                </div>
+              </div>
 
               <div className="dp-cert-date">
                 {dp.tanggalKegiatan || '15 April 2026'} · Universitas Andalas
@@ -276,12 +286,12 @@ export default function DetailDokumenPengganti() {
                 <div className="dp-cert-sig-block">
                   <div className="dp-cert-sig-title">Pimpinan Mitra</div>
                   <div style={{ height: 26, borderBottom: '1px solid var(--gray-300)', margin: '4px 16px', opacity: 0.5 }} />
-                  <div className="dp-cert-sig-status">Tahap kedua simulasi</div>
+                  <div className="dp-cert-sig-status">Menunggu TTE Mitra</div>
                 </div>
                 <div className="dp-cert-sig-block">
                   <div className="dp-cert-sig-title">Rektor UNAND</div>
                   <div style={{ height: 26, borderBottom: '1px solid var(--gray-300)', margin: '4px 16px', opacity: 0.5 }} />
-                  <div className="dp-cert-sig-status">Tahap ketiga simulasi</div>
+                  <div className="dp-cert-sig-status">Menunggu TTE Rektor</div>
                 </div>
               </div>
             </div>
@@ -296,10 +306,10 @@ export default function DetailDokumenPengganti() {
                 className="dp-btn-proses"
                 onClick={() => setProcessed(true)}
               >
-                {processed ? 'PDF Telah Diproses' : 'Proses PDF Pengganti (Simulasi)'}
+                {processed ? 'PDF Telah Diproses' : 'Proses PDF Pengganti'}
               </button>
               <button className="dp-btn-terbitkan-disabled" disabled>
-                Terbitkan Sertifikat Pengganti (Simulasi)
+                Terbitkan Sertifikat Pengganti
               </button>
             </div>
           </div>

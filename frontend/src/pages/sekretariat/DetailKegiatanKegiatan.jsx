@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, Users, Check, Download } from 'lucide-react';
 import { workshops } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
-import { downloadPresensiCSV } from './utils/exportHelper';
+import { downloadPresensiCSV, downloadPesertaCSV } from './utils/exportHelper';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -116,7 +116,7 @@ function TabPeserta({ w }) {
       jenis: 'Umum',
       kegiatan: w.nama,
       statusPendaftaran: 'Terdaftar',
-      statusKehadiran: 'Hadir valid',
+      statusKehadiran: 'Hadir',
     },
     {
       id: 3,
@@ -129,37 +129,53 @@ function TabPeserta({ w }) {
   ];
 
   return (
-    <div className="table-container">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>NAMA PESERTA</th>
-            <th>JENIS PESERTA</th>
-            <th>KEGIATAN</th>
-            <th>STATUS PENDAFTARAN</th>
-            <th>STATUS KEHADIRAN</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pesertaList.map(p => (
-            <tr key={p.id}>
-              <td><span className="table-name-bold">{p.nama}</span></td>
-              <td>{p.jenis}</td>
-              <td>{p.kegiatan}</td>
-              <td>
-                <span className="badge badge-green">
-                  {p.statusPendaftaran}
-                </span>
-              </td>
-              <td>
-                <span className={p.statusKehadiran === 'Hadir valid' ? 'badge badge-green' : 'badge badge-amber'}>
-                  {p.statusKehadiran}
-                </span>
-              </td>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+        <p style={{ margin: 0, fontSize: '13px', color: 'var(--gray-600)' }}>
+          Daftar seluruh peserta terdaftar kegiatan <strong>{w.nama}</strong>
+        </p>
+        <button
+          onClick={() => downloadPesertaCSV(w.nama, pesertaList)}
+          className="btn-outline-green"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 14px', fontSize: '12.5px' }}
+        >
+          <Download size={14} />
+          Unduh Data Peserta (CSV)
+        </button>
+      </div>
+
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>NAMA PESERTA</th>
+              <th>JENIS PESERTA</th>
+              <th>KEGIATAN</th>
+              <th>STATUS PENDAFTARAN</th>
+              <th>STATUS KEHADIRAN</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {pesertaList.map(p => (
+              <tr key={p.id}>
+                <td><span className="table-name-bold">{p.nama}</span></td>
+                <td>{p.jenis}</td>
+                <td>{p.kegiatan}</td>
+                <td>
+                  <span className="badge badge-green">
+                    {p.statusPendaftaran}
+                  </span>
+                </td>
+                <td>
+                  <span className={p.statusKehadiran === 'Hadir' ? 'badge badge-green' : 'badge badge-amber'}>
+                    {p.statusKehadiran}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -177,7 +193,7 @@ function TabPresensi({ w }) {
       id: 2,
       nama: 'Rafi Pratama',
       waktu: '18 Mei 2026 - 08.47 WIB',
-      status: 'Hadir valid',
+      status: 'Hadir',
     },
     {
       id: 3,
@@ -220,7 +236,7 @@ function TabPresensi({ w }) {
                   {p.waktu ?? '—'}
                 </td>
                 <td>
-                  <span className={p.status === 'Hadir valid' ? 'badge badge-green' : 'badge badge-amber'}>
+                  <span className={p.status === 'Hadir' ? 'badge badge-green' : 'badge badge-amber'}>
                     {p.status}
                   </span>
                 </td>
@@ -262,7 +278,7 @@ function TabRekap({ w }) {
         <button
           onClick={() => downloadPresensiCSV(w.nama, [
             { nama: 'Nadia Amelia', status: 'Belum hadir' },
-            { nama: 'Rafi Pratama', waktu: '18 Mei 2026 - 08.47 WIB', status: 'Hadir valid' },
+            { nama: 'Rafi Pratama', waktu: '18 Mei 2026 - 08.47 WIB', status: 'Hadir' },
             { nama: 'Siti Rahmah', status: 'Belum hadir' },
           ])}
           className="btn-primary"

@@ -87,7 +87,11 @@ export default function SertifikatPerbaikan() {
                       <div style={{ fontSize: '12px', color: 'var(--gray-400)' }}>{d.penyelenggara}</div>
                     </td>
                     <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{d.nomorSertifikat}</td>
-                    <td>{d.jenisPerbaikan}</td>
+                    <td>
+                      <span className="badge badge-amber" style={{ fontWeight: 600 }}>
+                        {d.jenisPerbaikan}
+                      </span>
+                    </td>
                     <td style={{ whiteSpace: 'nowrap' }}>{d.tanggalPengajuan}</td>
                     <td>
                       <span className={dpStatusClass[d.status]}>

@@ -1,185 +1,139 @@
-import { User, Lock, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { currentRektor } from './data';
 
+function initials(name) {
+  if (!name) return 'AR';
+  return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+}
+
 export default function ProfilRektor() {
+  const [form, setForm] = useState({ ...currentRektor });
+  const [savedMessage, setSavedMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const update = event => {
+    setForm(val => ({ ...val, [event.target.name]: event.target.value }));
+  };
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    const next = Object.fromEntries(
+      Object.entries(form).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
+    );
+    if (!next.nama || !next.email || !next.telepon) {
+      setError('Lengkapi semua data profil sebelum menyimpan.');
+      return;
+    }
+    setError('');
+    setForm(next);
+    setSavedMessage('Perubahan profil berhasil disimpan.');
+    setTimeout(() => setSavedMessage(''), 3500);
+  };
+
   return (
-    <div style={{ width: '100%' }}>
-      {/* Page section heading */}
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--gray-900)', marginBottom: '4px' }}>
-          Profil pribadi
-        </h2>
-        <p style={{ fontSize: '13px', color: 'var(--gray-500)' }}>
-          Informasi akun Rektor. Identitas resmi bersifat read-only dan tidak dapat diubah.
-        </p>
-      </div>
+    <div className="peserta-stack">
+      <section className="peserta-intro">
+        <h2>Informasi pribadi</h2>
+        <p>Pastikan data Anda benar untuk kebutuhan penandatanganan dan pengesahan sertifikat resmi.</p>
+      </section>
 
-      {/* Main Profile Card (Full Width) */}
-      <div style={{
-        background: 'white',
-        border: '1px solid var(--gray-200)',
-        borderRadius: '12px',
-        width: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-      }}>
-
-        {/* Avatar + info row */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px',
-          padding: '24px 32px',
-        }}>
-          <div style={{
-            width: '54px',
-            height: '54px',
-            borderRadius: '50%',
-            background: 'var(--green-50)',
-            border: '1.5px solid var(--green-200)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <User size={26} strokeWidth={1.75} color="var(--green-700)" />
-          </div>
+      <form className="peserta-profile-form" onSubmit={handleSubmit}>
+        <div className="peserta-profile-heading">
+          <span className="peserta-avatar peserta-avatar--large">
+            {currentRektor.inisialAvatar || initials(form.nama)}
+          </span>
           <div>
-            <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--gray-900)', lineHeight: 1.3 }}>
-              {currentRektor.nama}
-            </p>
-            <p style={{ fontSize: '13px', color: 'var(--gray-500)', marginTop: '3px' }}>
-              {currentRektor.role} · {currentRektor.jabatan}
-            </p>
-          </div>
-          <div style={{
-            marginLeft: 'auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'var(--green-50)',
-            color: 'var(--green-800)',
-            border: '1px solid var(--green-200)',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: 600
-          }}>
-            <ShieldCheck size={14} color="var(--green-700)" />
-            <span>Akun Resmi Terverifikasi</span>
+            <h3>{form.nama}</h3>
+            <p>{form.role} · {form.jabatan || form.unitKerja}</p>
           </div>
         </div>
 
-        {/* Divider line */}
-        <div style={{ height: '1px', background: 'var(--gray-200)', width: '100%' }} />
+        <div className="peserta-form-grid">
+          <label>
+            <span>Nama lengkap & Gelar</span>
+            <input
+              name="nama"
+              autoComplete="name"
+              value={form.nama}
+              onChange={update}
+              required
+              maxLength={100}
+            />
+          </label>
 
-        {/* Form body (Read-Only) */}
-        <div style={{ padding: '28px 32px 32px' }}>
+          <label>
+            <span>Email resmi</span>
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={update}
+              required
+              maxLength={254}
+            />
+          </label>
 
-          {/* Row 1: Nama lengkap & Email resmi */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
-            marginBottom: '24px'
-          }}>
-            {/* Nama lengkap (read-only) */}
-            <div>
-              <label style={labelStyle}>Nama lengkap</label>
-              <input
-                style={readOnlyInputStyle}
-                type="text"
-                value={currentRektor.nama}
-                readOnly
-                tabIndex={-1}
-              />
-            </div>
+          <label>
+            <span>Jabatan</span>
+            <input
+              name="jabatan"
+              value={form.jabatan}
+              onChange={update}
+              required
+              maxLength={100}
+            />
+          </label>
 
-            {/* Email resmi (read-only) */}
-            <div>
-              <label style={labelStyle}>Email resmi</label>
-              <input
-                style={readOnlyInputStyle}
-                type="email"
-                value={currentRektor.email}
-                readOnly
-                tabIndex={-1}
-              />
-            </div>
-          </div>
+          <label>
+            <span>Nomor HP</span>
+            <input
+              name="telepon"
+              type="tel"
+              autoComplete="tel"
+              pattern="[+0-9 ()-]{8,20}"
+              title="Nomor telepon 8 hingga 20 karakter"
+              value={form.telepon}
+              onChange={update}
+              required
+              maxLength={20}
+            />
+          </label>
 
-          {/* Row 2: Nomor telepon & Jabatan */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
-            marginBottom: '28px'
-          }}>
-            <div>
-              <label style={labelStyle}>Nomor telepon</label>
-              <input
-                style={readOnlyInputStyle}
-                type="tel"
-                value={currentRektor.telepon}
-                readOnly
-                tabIndex={-1}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Peran / Jabatan</label>
-              <input
-                style={readOnlyInputStyle}
-                type="text"
-                value={`${currentRektor.role} - Universitas Andalas`}
-                readOnly
-                tabIndex={-1}
-              />
-            </div>
-          </div>
+          <label>
+            <span>NIP</span>
+            <input
+              name="nip"
+              value={form.nip}
+              onChange={update}
+              maxLength={30}
+            />
+          </label>
 
-          {/* Notice: Read-only info */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            background: 'var(--gray-50)',
-            border: '1px solid var(--gray-200)',
-            borderRadius: '8px',
-            padding: '14px 18px',
-            color: 'var(--gray-600)',
-            fontSize: '13px',
-            lineHeight: 1.5
-          }}>
-            <Lock size={17} color="var(--gray-500)" style={{ flexShrink: 0 }} />
-            <div>
-              Data profil resmi bersifat <strong>read-only</strong> dan tidak dapat diubah oleh aktor. Pembaruan data akun hanya dapat dilakukan melalui Administrator Sistem UNAND.
-            </div>
-          </div>
-
+          <label>
+            <span>Instansi / Unit kerja</span>
+            <input
+              name="unitKerja"
+              value={form.unitKerja}
+              onChange={update}
+              maxLength={100}
+            />
+          </label>
         </div>
-      </div>
+
+        {error && <p className="peserta-form-error" role="alert">{error}</p>}
+        {savedMessage && (
+          <p style={{ marginTop: '15px', color: '#15803d', fontSize: '13px', fontWeight: 600 }} role="status">
+            ✓ {savedMessage}
+          </p>
+        )}
+
+        <div className="peserta-form-actions">
+          <button className="peserta-button" type="submit">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
-
-const labelStyle = {
-  display: 'block',
-  fontSize: '13px',
-  fontWeight: 600,
-  color: 'var(--gray-700)',
-  marginBottom: '8px',
-};
-
-const readOnlyInputStyle = {
-  width: '100%',
-  padding: '11px 16px',
-  border: '1px solid var(--gray-200)',
-  borderRadius: '8px',
-  fontSize: '14px',
-  color: 'var(--gray-700)',
-  background: 'var(--gray-50)',
-  cursor: 'not-allowed',
-  outline: 'none',
-  fontFamily: 'inherit',
-  boxSizing: 'border-box',
-};
