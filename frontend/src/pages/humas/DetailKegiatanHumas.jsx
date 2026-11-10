@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Pencil, Bell, CalendarDays, Clock, MapPin, QrCode, AlertTriangle, Download } from 'lucide-react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { Pencil, Bell, CalendarDays, Clock, MapPin, Check, Download } from 'lucide-react';
 import { humasKegiatan } from './data';
+import TambahKegiatanModal from './components/TambahKegiatanModal';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
 
@@ -12,104 +13,75 @@ const statusConfig = {
   draft:       { label: 'Draft',       className: 'humas-badge humas-badge-draft'       },
 };
 
-const detailData = {
+// Detail tambahan per kegiatan (peserta, presensi, rekap, foto)
+const extraDetail = {
   1: {
-    tema: 'Teknologi & Riset',
-    waktu: '09:00–15:30 WIB',
     periodePendaftaran: '1 Mei 2026 – 18 Mei 2026',
     statusSertifikat: 'Menunggu Rektor',
-    tentang: 'Pelajari pengolahan dan interpretasi data untuk menghasilkan riset yang bermakna, bersama akademisi dan praktisi industri.',
-    manfaat: 'Diskusi bersama ahli, kunjungan, dan sertifikat bagi peserta dengan presensi valid.',
-    targetPeserta: 'Mahasiswa dan umum',
-    narasumber: ['Dr. Rina Alfiyan, M.Kps.'],
-    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=640&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
     peserta: [
       { id: 1, nama: 'Nadia Amelia', jenis: 'Mahasiswa', kegiatan: 'Workshop Data Science untuk Riset Akademik', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
       { id: 2, nama: 'Rafi Pratama', jenis: 'Umum',      kegiatan: 'Workshop Data Science untuk Riset Akademik', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
       { id: 3, nama: 'Siti Rahmah',  jenis: 'Mahasiswa', kegiatan: 'Workshop Data Science untuk Riset Akademik', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
     ],
     presensi: [
-      { id: 1, nama: 'Nadia Amelia', kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: null,                      status: 'belum-hadir' },
-      { id: 2, nama: 'Rafi Pratama', kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: '18 Mei 2026 - 06.17 WIB',  status: 'hadir-valid' },
-      { id: 3, nama: 'Siti Rahmah',  kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: null,                      status: 'belum-hadir' },
+      { id: 1, nama: 'Nadia Amelia', kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: null,                     status: 'belum-hadir' },
+      { id: 2, nama: 'Rafi Pratama', kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: '18 Mei 2026 - 06.17 WIB', status: 'hadir-valid' },
+      { id: 3, nama: 'Siti Rahmah',  kegiatan: 'Workshop Data Science untuk Riset Akademik', waktu: null,                     status: 'belum-hadir' },
     ],
     rekap: { totalKegiatan: 1, totalPendaftar: 108, pesertaHadir: 88 },
   },
   2: {
-    tema: 'Inovasi & Kebijakan',
-    waktu: '08:00–17:00 WIB',
     periodePendaftaran: '5 Mei 2026 – 24 Mei 2026',
     statusSertifikat: 'Menunggu Mitra',
-    tentang: 'Seminar nasional membahas strategi hilirisasi hasil riset perguruan tinggi menuju ekosistem inovasi berkelanjutan.',
-    manfaat: 'Networking dengan pemangku kebijakan, insight industri, dan sertifikat kehadiran.',
-    targetPeserta: 'Dosen, peneliti, dan mahasiswa pascasarjana',
-    narasumber: ['Prof. Dr. Budi Santoso', 'Ir. Dewi Kusuma, M.T.'],
-    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
     peserta: [
-      { id: 1, nama: 'Ahmad Yusuf',    jenis: 'Dosen', kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
-      { id: 2, nama: 'Rina Wulandari', jenis: 'Umum',  kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+      { id: 1, nama: 'Ahmad Yusuf',    jenis: 'Dosen', kegiatan: 'Seminar Transformasi Digital', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+      { id: 2, nama: 'Rina Wulandari', jenis: 'Umum',  kegiatan: 'Seminar Transformasi Digital', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
     ],
     presensi: [
-      { id: 1, nama: 'Ahmad Yusuf',    kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', waktu: null, status: 'belum-hadir' },
-      { id: 2, nama: 'Rina Wulandari', kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', waktu: null, status: 'belum-hadir' },
+      { id: 1, nama: 'Ahmad Yusuf',    kegiatan: 'Seminar Transformasi Digital', waktu: null, status: 'belum-hadir' },
+      { id: 2, nama: 'Rina Wulandari', kegiatan: 'Seminar Transformasi Digital', waktu: null, status: 'belum-hadir' },
     ],
     rekap: { totalKegiatan: 1, totalPendaftar: 90, pesertaHadir: 0 },
   },
   3: {
-    tema: 'Kepemimpinan & SDM',
-    waktu: '08:30–14:00 WIB',
     periodePendaftaran: '10 Mei 2026 – 2 Jun 2026',
     statusSertifikat: 'Belum Diterbitkan',
-    tentang: 'Kuliah umum tentang kepemimpinan muda yang berdampak nyata bagi masyarakat dan lingkungan kampus.',
-    manfaat: 'Inspirasi dari tokoh nasional, insight karir, dan sertifikat kehadiran.',
-    targetPeserta: 'Mahasiswa aktif semua jurusan',
-    narasumber: ['Dr. Hj. Fatimah Zahra, M.Si.'],
-    imageUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=640&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80',
     peserta: [
-      { id: 1, nama: 'Budi Santoso', jenis: 'Mahasiswa', kegiatan: 'Kepemimpinan Muda Berdampak', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+      { id: 1, nama: 'Budi Santoso', jenis: 'Mahasiswa', kegiatan: 'Seminar Kolaborasi Riset Lintas Disiplin', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
     ],
     presensi: [
-      { id: 1, nama: 'Budi Santoso', kegiatan: 'Kepemimpinan Muda Berdampak', waktu: null, status: 'belum-hadir' },
+      { id: 1, nama: 'Budi Santoso', kegiatan: 'Seminar Kolaborasi Riset Lintas Disiplin', waktu: null, status: 'belum-hadir' },
     ],
     rekap: { totalKegiatan: 1, totalPendaftar: 62, pesertaHadir: 0 },
   },
   4: {
-    tema: 'Manajemen & Kolaborasi',
-    waktu: '07:30–16:00 WIB',
-    periodePendaftaran: '1 April 2026 – 15 April 2026',
-    statusSertifikat: 'Diterbitkan',
-    tentang: 'Workshop intensif pengelolaan proyek lintas tim menggunakan metodologi agile dan kolaborasi digital.',
-    manfaat: 'Praktik langsung menggunakan tools manajemen proyek, studi kasus nyata, dan sertifikat.',
-    targetPeserta: 'Profesional muda dan mahasiswa tingkat akhir',
-    narasumber: ['Ahmad Fauzi, P.M.P.'],
-    imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=640&q=80',
+    periodePendaftaran: '1 Mei 2026 – 22 Mei 2026',
+    statusSertifikat: 'Menunggu Mitra',
+    imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
     peserta: [
-      { id: 1, nama: 'Dewi Putri',   jenis: 'Profesional', kegiatan: 'Manajemen Proyek Kolaboratif', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
-      { id: 2, nama: 'Eko Prasetyo', jenis: 'Mahasiswa',   kegiatan: 'Manajemen Proyek Kolaboratif', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
+      { id: 1, nama: 'Rafi Pratama', jenis: 'Umum',      kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+      { id: 2, nama: 'Nadia Amelia', jenis: 'Mahasiswa', kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
     ],
     presensi: [
-      { id: 1, nama: 'Dewi Putri',   kegiatan: 'Manajemen Proyek Kolaboratif', waktu: '15 Apr 2026 - 08.02 WIB', status: 'hadir-valid' },
-      { id: 2, nama: 'Eko Prasetyo', kegiatan: 'Manajemen Proyek Kolaboratif', waktu: '15 Apr 2026 - 08.11 WIB', status: 'hadir-valid' },
+      { id: 1, nama: 'Rafi Pratama', kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', waktu: null, status: 'belum-hadir' },
+      { id: 2, nama: 'Nadia Amelia', kegiatan: 'Strategi Hilirisasi Riset dan Inovasi', waktu: null, status: 'belum-hadir' },
     ],
-    rekap: { totalKegiatan: 1, totalPendaftar: 82, pesertaHadir: 75 },
+    rekap: { totalKegiatan: 1, totalPendaftar: 80, pesertaHadir: 0 },
   },
   5: {
-    tema: 'Industri & Keberlanjutan',
-    waktu: '08:00–15:00 WIB',
     periodePendaftaran: '25 April 2026 – 12 Mei 2026',
     statusSertifikat: 'Diterbitkan',
-    tentang: 'Seminar tentang transformasi industri menuju praktik berkelanjutan yang ramah lingkungan dan efisien.',
-    manfaat: 'Studi kasus industri, diskusi panel, dan sertifikat kehadiran.',
-    targetPeserta: 'Profesional industri dan akademisi',
-    narasumber: ['Dr. Hendra Wijaya, M.Eng.'],
-    imageUrl: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=640&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=800&q=80',
     peserta: [
-      { id: 1, nama: 'Sari Indah',    jenis: 'Profesional', kegiatan: 'Inovasi Industri Berkelanjutan', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
-      { id: 2, nama: 'Wahyu Hidayat', jenis: 'Umum',        kegiatan: 'Inovasi Industri Berkelanjutan', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
+      { id: 1, nama: 'Sari Indah',    jenis: 'Profesional', kegiatan: 'Kepemimpinan Muda Berdampak', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
+      { id: 2, nama: 'Wahyu Hidayat', jenis: 'Umum',        kegiatan: 'Kepemimpinan Muda Berdampak', statusDaftar: 'Terdaftar', statusHadir: 'hadir-valid' },
     ],
     presensi: [
-      { id: 1, nama: 'Sari Indah',    kegiatan: 'Inovasi Industri Berkelanjutan', waktu: '12 Mei 2026 - 08.05 WIB', status: 'hadir-valid' },
-      { id: 2, nama: 'Wahyu Hidayat', kegiatan: 'Inovasi Industri Berkelanjutan', waktu: '12 Mei 2026 - 08.18 WIB', status: 'hadir-valid' },
+      { id: 1, nama: 'Sari Indah',    kegiatan: 'Kepemimpinan Muda Berdampak', waktu: '12 Mei 2026 - 08.05 WIB', status: 'hadir-valid' },
+      { id: 2, nama: 'Wahyu Hidayat', kegiatan: 'Kepemimpinan Muda Berdampak', waktu: '12 Mei 2026 - 08.18 WIB', status: 'hadir-valid' },
     ],
     rekap: { totalKegiatan: 1, totalPendaftar: 76, pesertaHadir: 70 },
   },
@@ -123,14 +95,23 @@ function StatusHadirBadge({ status }) {
 export default function DetailKegiatanHumas() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Informasi');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'presensi' ? 'Presensi' : 'Informasi';
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [showEdit, setShowEdit] = useState(false);
+  const [absensiOpen, setAbsensiOpen] = useState(false);
+  const [showKehadiran, setShowKehadiran] = useState(true);
 
   const kegiatan = humasKegiatan.find(k => k.id === Number(id));
-  const detail   = detailData[Number(id)] ?? {
-    tema: '-', waktu: '-', periodePendaftaran: '-', statusSertifikat: '-',
-    tentang: '-', manfaat: '-', targetPeserta: '-', narasumber: [],
-    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=640&q=80',
-    peserta: [], presensi: [],
+  const extra = extraDetail[Number(id)] ?? {
+    periodePendaftaran: '-',
+    statusSertifikat: '-',
+    imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
+    peserta: [
+      { id: 1, nama: 'Rafi Pratama', jenis: 'Umum', kegiatan: kegiatan?.nama || '', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+      { id: 2, nama: 'Nadia Amelia', jenis: 'Mahasiswa', kegiatan: kegiatan?.nama || '', statusDaftar: 'Terdaftar', statusHadir: 'belum-hadir' },
+    ],
+    presensi: [],
     rekap: { totalKegiatan: 1, totalPendaftar: kegiatan?.pendaftar || 0, pesertaHadir: 0 },
   };
 
@@ -146,18 +127,33 @@ export default function DetailKegiatanHumas() {
   }
 
   const cfg = statusConfig[kegiatan.status] ?? statusConfig.draft;
+  const waktuDisplay = kegiatan.waktuMulai && kegiatan.waktuSelesai
+    ? `${kegiatan.waktuMulai}–${kegiatan.waktuSelesai} WIB`
+    : '08:30–12:00 WIB';
+
+  // Sample data kehadiran untuk tab Kelola Absensi
+  const daftarKehadiranSeminar = [
+    {
+      id: 1,
+      nama: 'Rafi Pratama',
+      hariTanggal: `Hari 1 — ${kegiatan.tanggal}`,
+      bukti: 'QR dinamis, waktu, dan GPS',
+      status: 'Belum Absen',
+      aksi: 'Tidak ada tindakan'
+    },
+    {
+      id: 2,
+      nama: 'Nadia Amelia',
+      hariTanggal: `Hari 1 — ${kegiatan.tanggal}`,
+      bukti: 'QR dinamis, waktu, dan GPS',
+      status: 'Belum Absen',
+      aksi: 'Tidak ada tindakan'
+    }
+  ];
 
   return (
+    <>
     <div className="humas-detail-page">
-
-      {/* ── Prototype Banner ── */}
-      <div className="humas-prototype-banner">
-        <span className="humas-prototype-tag">Mode Prototipe</span>
-        <span className="humas-prototype-text">
-          Data contoh, perubahan hanya selama sesi. OFS, OTF, tanda tangan electronic dan PDF resmi belum terintegrasi.
-        </span>
-        <span className="humas-prototype-date">Referensi demo: 10 Mei 2026</span>
-      </div>
 
       {/* ── Notif + Back link row ── */}
       <div className="humas-detail-toprow">
@@ -179,18 +175,18 @@ export default function DetailKegiatanHumas() {
         {/* Event Header */}
         <div className="humas-detail-header">
           <div className="humas-detail-header-left">
-            <span className="humas-jenis-badge">{kegiatan.jenis.toUpperCase()}</span>
+            <div className="humas-detail-header-badges">
+              <span className="humas-jenis-badge">{kegiatan.jenis.toUpperCase()}</span>
+              <span className="humas-pelaksanaan-badge">{kegiatan.jenisPelaksanaan || 'Offline'}</span>
+            </div>
             <h2 className="humas-detail-title">{kegiatan.nama}</h2>
             <div className="humas-detail-meta">
               <span><CalendarDays size={13} /> {kegiatan.tanggal}</span>
-              {detail?.waktu && <span><Clock size={13} /> {detail.waktu}</span>}
+              <span><Clock size={13} /> {waktuDisplay}</span>
               <span><MapPin size={13} /> {kegiatan.lokasi}</span>
             </div>
           </div>
-          <button
-            className="humas-edit-btn"
-            onClick={() => navigate(`/humas/kelola-kegiatan/${kegiatan.id}/edit`)}
-          >
+          <button className="humas-edit-btn" onClick={() => setShowEdit(true)}>
             <Pencil size={14} />
             Edit Kegiatan
           </button>
@@ -213,26 +209,38 @@ export default function DetailKegiatanHumas() {
         {activeTab === 'Informasi' && (
           <div className="humas-detail-body">
             <div className="humas-detail-main">
-              {detail?.imageUrl && (
-                <img src={detail.imageUrl} alt={kegiatan.nama} className="humas-detail-img" />
+              {extra?.imageUrl && (
+                <img src={extra.imageUrl} alt={kegiatan.nama} className="humas-detail-img" />
               )}
               <div className="humas-detail-section">
                 <h3 className="humas-detail-section-title">Tentang kegiatan</h3>
-                <p className="humas-detail-text">{detail?.tentang || '-'}</p>
+                <p className="humas-detail-text">{kegiatan.deskripsi || '-'}</p>
               </div>
               <div className="humas-detail-section">
                 <h3 className="humas-detail-section-title">Manfaat / benefit</h3>
-                <p className="humas-detail-text">{detail?.manfaat || '-'}</p>
+                <p className="humas-detail-text">{kegiatan.manfaat || '-'}</p>
               </div>
               <div className="humas-detail-section">
                 <h3 className="humas-detail-section-title">Target peserta</h3>
-                <p className="humas-detail-text humas-link">{detail?.targetPeserta || '-'}</p>
+                <p className="humas-detail-text humas-link">{kegiatan.targetPeserta || '-'}</p>
               </div>
               <div className="humas-detail-section">
                 <h3 className="humas-detail-section-title">Narasumber</h3>
-                {detail?.narasumber?.map((n, i) => (
-                  <p key={i} className="humas-detail-text humas-link">{n}</p>
-                ))}
+                <p className="humas-detail-text humas-link">{kegiatan.pemateri || '-'}</p>
+              </div>
+
+              {/* Jadwal Seminar */}
+              <div className="humas-detail-section jadwal-seminar-section">
+                <h3 className="humas-detail-section-title">
+                  Jadwal {kegiatan.jenis || 'Seminar'} · 1 hari
+                </h3>
+                <p className="jadwal-seminar-note">
+                  Pendaftaran satu kali berlaku untuk seluruh hari kegiatan.
+                </p>
+                <div className="jadwal-seminar-item">
+                  <span className="jadwal-seminar-day">Hari 1</span>
+                  <span className="jadwal-seminar-time">{kegiatan.tanggal} · {waktuDisplay}</span>
+                </div>
               </div>
             </div>
 
@@ -247,7 +255,11 @@ export default function DetailKegiatanHumas() {
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Tema</span>
-                    <span className="humas-info-value">{detail?.tema || '-'}</span>
+                    <span className="humas-info-value">{kegiatan.tema || '-'}</span>
+                  </div>
+                  <div className="humas-info-row">
+                    <span className="humas-info-label">Jenis Pelaksanaan</span>
+                    <span className="humas-info-value">{kegiatan.jenisPelaksanaan || 'Offline'}</span>
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Lokasi</span>
@@ -255,7 +267,7 @@ export default function DetailKegiatanHumas() {
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Periode pendaftaran</span>
-                    <span className="humas-info-value">{detail?.periodePendaftaran || '-'}</span>
+                    <span className="humas-info-value">{extra?.periodePendaftaran || '-'}</span>
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Kuota</span>
@@ -266,13 +278,22 @@ export default function DetailKegiatanHumas() {
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Status sertifikat</span>
-                    <span className="humas-info-value">{detail?.statusSertifikat || '-'}</span>
+                    <span className="humas-info-value">{extra?.statusSertifikat || '-'}</span>
                   </div>
                   <div className="humas-info-row">
                     <span className="humas-info-label">Status</span>
                     <span className={cfg.className}>● {cfg.label}</span>
                   </div>
                 </div>
+
+                {/* Tombol Kelola Absensi Seminar */}
+                <button
+                  type="button"
+                  className="btn-kelola-absensi"
+                  onClick={() => setActiveTab('Presensi')}
+                >
+                  <Check size={16} /> Kelola Absensi {kegiatan.jenis || 'Seminar'}
+                </button>
               </div>
             </div>
           </div>
@@ -286,7 +307,7 @@ export default function DetailKegiatanHumas() {
                 type="button"
                 className="btn-outline-green"
                 onClick={() => {
-                  const list = detail?.peserta ?? [];
+                  const list = extra?.peserta ?? [];
                   const headers = ['No', 'Nama Peserta', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran', 'Status Kehadiran'];
                   const rows = list.map((p, i) => [
                     i + 1,
@@ -323,14 +344,14 @@ export default function DetailKegiatanHumas() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(detail?.peserta ?? []).length === 0 ? (
+                  {(extra?.peserta ?? []).length === 0 ? (
                     <tr>
                       <td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
                         Belum ada data peserta.
                       </td>
                     </tr>
                   ) : (
-                    detail.peserta.map(p => (
+                    extra.peserta.map(p => (
                       <tr key={p.id}>
                         <td><span className="table-name-bold">{p.nama}</span></td>
                         <td>{p.jenis}</td>
@@ -352,105 +373,178 @@ export default function DetailKegiatanHumas() {
           </div>
         )}
 
-        {/* ── Tab: Presensi ── */}
+        {/* ── Tab: Presensi (Kelola Absensi Seminar) ── */}
         {activeTab === 'Presensi' && (
-          <div className="humas-tab-content">
-            {/* QR Info box */}
-            <div className="humas-qr-info-box">
-              <div className="humas-qr-info-header">
-                <QrCode size={16} />
-                <span className="humas-qr-info-title">Informasi presensi QR dinamis</span>
+          <div className="kelola-absensi-container">
+            {/* Header */}
+            <div className="kelola-absensi-header">
+              <h2 className="kelola-absensi-title">
+                Kelola Absensi {kegiatan.jenis || 'Seminar'}
+              </h2>
+              <p className="kelola-absensi-sub">{kegiatan.nama}</p>
+            </div>
+
+            {/* Card Daftar Hari */}
+            <div className="kelola-absensi-card">
+              <div className="kelola-absensi-card-top">
+                <span className="humas-pelaksanaan-badge">● {kegiatan.jenisPelaksanaan || 'Offline'}</span>
+                <span className="kelola-absensi-card-meta">{kegiatan.tanggal} · 1 hari</span>
               </div>
-              <p className="humas-qr-info-text">
-                {kegiatan.tanggal}, {detail?.waktu} · Radius 150 meter · QR diperbarui berkala dan divalidasi bersama waktu serta lokasi.
+              <p className="kelola-absensi-card-desc">
+                Pendaftaran hanya satu kali untuk seluruh kegiatan. Setiap hari memiliki absensi terpisah dan secara awal ditutup.
               </p>
-              <div className="humas-qr-warning">
-                <AlertTriangle size={14} />
-                <span>
-                  Penanggung jawab aktivasi dan penayangan QR belum ditetapkan. Tidak ada tindakan membuka presensi atau menampilkan QR untuk role ini.
-                </span>
+
+              {/* Box Hari 1 */}
+              <div className="kelola-absensi-day-row">
+                <div className="kelola-absensi-day-left">
+                  <h4 className="kelola-absensi-day-title">Hari 1</h4>
+                  <p className="kelola-absensi-day-date">{kegiatan.tanggal}</p>
+                  {absensiOpen ? (
+                    <span className="badge-absensi-dibuka">● Absensi Dibuka</span>
+                  ) : (
+                    <span className="badge-absensi-ditutup">● Absensi Ditutup</span>
+                  )}
+                </div>
+                <div className="kelola-absensi-day-actions">
+                  <button
+                    type="button"
+                    className={absensiOpen ? 'btn-tutup-absensi' : 'btn-buka-absensi'}
+                    onClick={() => setAbsensiOpen(!absensiOpen)}
+                  >
+                    {absensiOpen ? 'Tutup Absensi' : 'Buka Absensi'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-lihat-kehadiran"
+                    onClick={() => setShowKehadiran(true)}
+                  >
+                    Lihat Kehadiran
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Presensi Table */}
-            <div className="table-container">
+            {/* Section Detail Kehadiran Hari */}
+            {showKehadiran && (
+              <div className="kelola-absensi-kehadiran-section">
+                <div className="kelola-absensi-kehadiran-header">
+                  <h3 className="kelola-absensi-kehadiran-title">
+                    Hari 1 — {kegiatan.tanggal}
+                  </h3>
+                  {absensiOpen ? (
+                    <span className="badge-absensi-dibuka">● Absensi Dibuka</span>
+                  ) : (
+                    <span className="badge-absensi-ditutup">● Absensi Ditutup</span>
+                  )}
+                </div>
+
+                {/* 4 Stat Cards */}
+                <div className="kelola-absensi-stats-grid">
+                  <div className="kelola-absensi-stat-card">
+                    <span className="kelola-absensi-stat-num">2</span>
+                    <span className="kelola-absensi-stat-label">Belum Absen</span>
+                  </div>
+                  <div className="kelola-absensi-stat-card">
+                    <span className="kelola-absensi-stat-num">0</span>
+                    <span className="kelola-absensi-stat-label">Menunggu Verifikasi</span>
+                  </div>
+                  <div className="kelola-absensi-stat-card">
+                    <span className="kelola-absensi-stat-num">0</span>
+                    <span className="kelola-absensi-stat-label">Hadir</span>
+                  </div>
+                  <div className="kelola-absensi-stat-card">
+                    <span className="kelola-absensi-stat-num">0</span>
+                    <span className="kelola-absensi-stat-label">Ditolak</span>
+                  </div>
+                </div>
+
+                {/* Tabel Kehadiran */}
+                <div className="table-container" style={{ margin: 0, boxShadow: 'none' }}>
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>NAMA PESERTA</th>
+                        <th>HARI / TANGGAL</th>
+                        <th>BUKTI KEHADIRAN</th>
+                        <th>STATUS VERIFIKASI</th>
+                        <th>AKSI</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {daftarKehadiranSeminar.map(p => (
+                        <tr key={p.id}>
+                          <td><span className="table-name-bold">{p.nama}</span></td>
+                          <td>{p.hariTanggal}</td>
+                          <td>{p.bukti}</td>
+                          <td>
+                            <span className="badge-absensi-ditutup">● {p.status}</span>
+                          </td>
+                          <td style={{ color: '#64748b', fontSize: '13px' }}>
+                            {p.aksi}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Tab: Rekap ── */}
+        {activeTab === 'Rekap' && (
+          <div className="rekap-kehadiran-container">
+            <h3 className="rekap-kehadiran-title">
+              Rekap Kehadiran {kegiatan.jenis || 'Seminar'} Per Hari
+            </h3>
+
+            <div className="table-container" style={{ margin: 0, boxShadow: 'none' }}>
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Nama Peserta</th>
-                    <th>Kegiatan</th>
-                    <th>Waktu Presensi</th>
-                    <th>Status Kehadiran</th>
+                    <th>KEGIATAN</th>
+                    <th>PELAKSANAAN</th>
+                    <th>HARI</th>
+                    <th>TANGGAL</th>
+                    <th>ABSENSI</th>
+                    <th style={{ textAlign: 'center' }}>BELUM ABSEN</th>
+                    <th style={{ textAlign: 'center' }}>MENUNGGU VERIFIKASI</th>
+                    <th style={{ textAlign: 'center' }}>HADIR</th>
+                    <th style={{ textAlign: 'center' }}>DITOLAK</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(detail?.presensi ?? []).length === 0 ? (
-                    <tr>
-                      <td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                        Belum ada data presensi.
-                      </td>
-                    </tr>
-                  ) : (
-                    detail.presensi.map(p => (
-                      <tr key={p.id}>
-                        <td><span className="table-name-bold">{p.nama}</span></td>
-                        <td>
-                          <span className="humas-link" style={{ fontSize: '13px' }}>{p.kegiatan}</span>
-                        </td>
-                        <td style={{ color: p.waktu ? 'var(--gray-700)' : 'var(--gray-300)' }}>
-                          {p.waktu || '—'}
-                        </td>
-                        <td>
-                          <StatusHadirBadge status={p.status} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                  <tr>
+                    <td>
+                      <span className="table-name-bold">{kegiatan.nama}</span>
+                    </td>
+                    <td>{kegiatan.jenisPelaksanaan || 'Offline'}</td>
+                    <td>Hari 1</td>
+                    <td style={{ whiteSpace: 'nowrap' }}>{kegiatan.tanggal}</td>
+                    <td>{absensiOpen ? 'Dibuka' : 'Ditutup'}</td>
+                    <td style={{ textAlign: 'center' }}>2</td>
+                    <td style={{ textAlign: 'center' }}>0</td>
+                    <td style={{ textAlign: 'center' }}>0</td>
+                    <td style={{ textAlign: 'center' }}>0</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* ── Tab: Rekap ── */}
-        {activeTab === 'Rekap' && (
-          <div className="humas-tab-content">
-            <div className="humas-stats-grid">
-              <div className="humas-stat-card">
-                <div className="humas-stat-icon humas-stat-icon--green">
-                  <CalendarDays size={22} />
-                </div>
-                <div className="humas-stat-body">
-                  <span className="humas-stat-label">Total kegiatan</span>
-                  <span className="humas-stat-value">{detail?.rekap?.totalKegiatan ?? 1}</span>
-                  <span className="humas-stat-note">Data contoh dalam sesi demo</span>
-                </div>
-              </div>
-              <div className="humas-stat-card">
-                <div className="humas-stat-icon humas-stat-icon--blue">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <div className="humas-stat-body">
-                  <span className="humas-stat-label">Total pendaftar</span>
-                  <span className="humas-stat-value">{detail?.rekap?.totalPendaftar ?? kegiatan.pendaftar}</span>
-                  <span className="humas-stat-note">Data contoh dalam sesi demo</span>
-                </div>
-              </div>
-              <div className="humas-stat-card">
-                <div className="humas-stat-icon humas-stat-icon--teal">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <div className="humas-stat-body">
-                  <span className="humas-stat-label">Peserta hadir</span>
-                  <span className="humas-stat-value">{detail?.rekap?.pesertaHadir ?? 0}</span>
-                  <span className="humas-stat-note">Data contoh dalam sesi demo</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
       </div>{/* end white card */}
     </div>
+
+    {/* ── Modal Edit Kegiatan ── */}
+    {showEdit && (
+      <TambahKegiatanModal
+        onClose={() => setShowEdit(false)}
+        onSave={() => setShowEdit(false)}
+        editData={kegiatan}
+      />
+    )}
+    </>
   );
 }

@@ -279,7 +279,8 @@ input, select, textarea {
    ============================================================ */
 
 .role-sekretariat,
-.role-rektor {
+.role-rektor,
+.role-humas {
   min-height: 100vh;
   color: #263238;
   background: #f7f8fa;
@@ -291,7 +292,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar,
-.role-rektor .sidebar {
+.role-rektor .sidebar,
+.role-humas .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
   z-index: 100;
@@ -306,14 +308,16 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-brand,
-.role-rektor .sidebar-brand {
+.role-rektor .sidebar-brand,
+.role-humas .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 11px;
 }
 
 .role-sekretariat .sidebar-brandmark,
-.role-rektor .sidebar-brandmark {
+.role-rektor .sidebar-brandmark,
+.role-humas .sidebar-brandmark {
   display: grid;
   place-items: center;
   width: 39px;
@@ -327,7 +331,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-brand strong,
-.role-rektor .sidebar-brand strong {
+.role-rektor .sidebar-brand strong,
+.role-humas .sidebar-brand strong {
   display: block;
   font-size: 14px;
   color: #14532d;
@@ -336,7 +341,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-brand div > span,
-.role-rektor .sidebar-brand div > span {
+.role-rektor .sidebar-brand div > span,
+.role-humas .sidebar-brand div > span {
   display: block;
   margin-top: 2px;
   font-size: 10px;
@@ -345,7 +351,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-role-badge,
-.role-rektor .sidebar-role-badge {
+.role-rektor .sidebar-role-badge,
+.role-humas .sidebar-role-badge {
   margin: 28px 4px 18px;
   padding: 11px 12px;
   border-radius: 8px;
@@ -354,7 +361,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-role-badge > span,
-.role-rektor .sidebar-role-badge > span {
+.role-rektor .sidebar-role-badge > span,
+.role-humas .sidebar-role-badge > span {
   display: block;
   font-size: 9px;
   color: #66736c;
@@ -364,7 +372,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-role-badge > strong,
-.role-rektor .sidebar-role-badge > strong {
+.role-rektor .sidebar-role-badge > strong,
+.role-humas .sidebar-role-badge > strong {
   display: block;
   margin-top: 4px;
   color: #14532d;
@@ -373,7 +382,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar nav,
-.role-rektor .sidebar nav {
+.role-rektor .sidebar nav,
+.role-humas .sidebar nav {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -381,7 +391,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar nav a,
-.role-rektor .sidebar nav a {
+.role-rektor .sidebar nav a,
+.role-humas .sidebar nav a {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -401,27 +412,32 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar nav a svg,
-.role-rektor .sidebar nav a svg {
+.role-rektor .sidebar nav a svg,
+.role-humas .sidebar nav a svg {
   flex-shrink: 0;
   color: #52605a;
   transition: color 0.15s ease;
 }
 
 .role-sekretariat .sidebar nav a:hover,
-.role-rektor .sidebar nav a:hover {
+.role-rektor .sidebar nav a:hover,
+.role-humas .sidebar nav a:hover {
   background: #f4f7f5;
   color: #14532d;
 }
 
 .role-sekretariat .sidebar nav a:hover svg,
-.role-rektor .sidebar nav a:hover svg {
+.role-rektor .sidebar nav a:hover svg,
+.role-humas .sidebar nav a:hover svg {
   color: #14532d;
 }
 
 .role-sekretariat .sidebar nav a.is-active,
 .role-sekretariat .sidebar nav a.active,
 .role-rektor .sidebar nav a.is-active,
-.role-rektor .sidebar nav a.active {
+.role-rektor .sidebar nav a.active,
+.role-humas .sidebar nav a.is-active,
+.role-humas .sidebar nav a.active {
   color: #ffffff;
   background: #14532d;
   box-shadow: 0 4px 12px rgba(20, 83, 45, 0.17);
@@ -430,12 +446,15 @@ input, select, textarea {
 .role-sekretariat .sidebar nav a.is-active svg,
 .role-sekretariat .sidebar nav a.active svg,
 .role-rektor .sidebar nav a.is-active svg,
-.role-rektor .sidebar nav a.active svg {
+.role-rektor .sidebar nav a.active svg,
+.role-humas .sidebar nav a.is-active svg,
+.role-humas .sidebar nav a.active svg {
   color: #ffffff;
 }
 
 .role-sekretariat .sidebar-logout,
-.role-rektor .sidebar-logout {
+.role-rektor .sidebar-logout,
+.role-humas .sidebar-logout {
   margin-top: auto;
   padding: 17px 12px 0;
   border: 0;
@@ -455,12 +474,14 @@ input, select, textarea {
 }
 
 .role-sekretariat .sidebar-logout svg,
-.role-rektor .sidebar-logout svg {
+.role-rektor .sidebar-logout svg,
+.role-humas .sidebar-logout svg {
   flex-shrink: 0;
 }
 
 .role-sekretariat .sidebar-logout:hover,
-.role-rektor .sidebar-logout:hover {
+.role-rektor .sidebar-logout:hover,
+.role-humas .sidebar-logout:hover {
   color: #a52d2d;
   background: transparent;
 }
@@ -469,7 +490,9 @@ input, select, textarea {
 .role-sekretariat .main-content,
 .role-sekretariat .main-area,
 .role-rektor .main-content,
-.role-rektor .main-area {
+.role-rektor .main-area,
+.role-humas .main-content,
+.role-humas .main-area {
   margin-left: 240px;
   min-width: 0;
   min-height: 100vh;
@@ -481,7 +504,8 @@ input, select, textarea {
 
 /* TOP HEADER */
 .role-sekretariat .top-header,
-.role-rektor .top-header {
+.role-rektor .top-header,
+.role-humas .top-header {
   position: sticky;
   top: 0;
   z-index: 30;
@@ -498,14 +522,16 @@ input, select, textarea {
 }
 
 .role-sekretariat .top-header-left,
-.role-rektor .top-header-left {
+.role-rektor .top-header-left,
+.role-humas .top-header-left {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
 .role-sekretariat .top-header-crumb,
-.role-rektor .top-header-crumb {
+.role-rektor .top-header-crumb,
+.role-humas .top-header-crumb {
   color: #228b45;
   font-size: 9px;
   font-weight: 700;
@@ -514,7 +540,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .top-header-title,
-.role-rektor .top-header-title {
+.role-rektor .top-header-title,
+.role-humas .top-header-title {
   margin: 3px 0 0;
   font-size: 21px;
   line-height: 1.5;
@@ -523,7 +550,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .top-header-right,
-.role-rektor .top-header-right {
+.role-rektor .top-header-right,
+.role-humas .top-header-right {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -562,7 +590,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .user-profile-btn,
-.role-rektor .user-profile-btn {
+.role-rektor .user-profile-btn,
+.role-humas .user-profile-btn {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -576,13 +605,15 @@ input, select, textarea {
 }
 
 .role-sekretariat .user-profile-btn:hover,
-.role-rektor .user-profile-btn:hover {
+.role-rektor .user-profile-btn:hover,
+.role-humas .user-profile-btn:hover {
   background: transparent;
   opacity: 0.85;
 }
 
 .role-sekretariat .user-avatar,
-.role-rektor .user-avatar {
+.role-rektor .user-avatar,
+.role-humas .user-avatar {
   display: grid;
   place-items: center;
   flex: none;
@@ -596,7 +627,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .user-info,
-.role-rektor .user-info {
+.role-rektor .user-info,
+.role-humas .user-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -604,7 +636,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .user-name,
-.role-rektor .user-name {
+.role-rektor .user-name,
+.role-humas .user-name {
   display: block;
   max-width: 190px;
   overflow-wrap: anywhere;
@@ -615,7 +648,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .user-role,
-.role-rektor .user-role {
+.role-rektor .user-role,
+.role-humas .user-role {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -626,7 +660,8 @@ input, select, textarea {
 
 /* NOTIF POPOVER */
 .role-sekretariat .header-notif-popover,
-.role-rektor .header-notif-popover {
+.role-rektor .header-notif-popover,
+.role-humas .header-notif-popover {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
@@ -640,7 +675,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .header-notif-popover h2,
-.role-rektor .header-notif-popover h2 {
+.role-rektor .header-notif-popover h2,
+.role-humas .header-notif-popover h2 {
   font-size: 13px;
   font-weight: 700;
   color: #263238;
@@ -648,7 +684,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .header-notif-item,
-.role-rektor .header-notif-item {
+.role-rektor .header-notif-item,
+.role-humas .header-notif-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -663,13 +700,15 @@ input, select, textarea {
 }
 
 .role-sekretariat .header-notif-item:hover,
-.role-rektor .header-notif-item:hover {
+.role-rektor .header-notif-item:hover,
+.role-humas .header-notif-item:hover {
   background: #edf7ef;
 }
 
 /* CONTENT CONTAINER & TYPOGRAPHY */
 .role-sekretariat .content-container,
-.role-rektor .content-container {
+.role-rektor .content-container,
+.role-humas .content-container {
   max-width: 1440px;
   margin: 0 auto;
   padding: 30px 34px 54px;
@@ -679,7 +718,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .section-heading,
-.role-rektor .section-heading {
+.role-rektor .section-heading,
+.role-humas .section-heading {
   font-size: 18px;
   font-weight: 600;
   color: #263238;
@@ -687,7 +727,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .section-subheading,
-.role-rektor .section-subheading {
+.role-rektor .section-subheading,
+.role-humas .section-subheading {
   font-size: 13px;
   color: #66736c;
   margin: 0 0 20px;
@@ -697,10 +738,13 @@ input, select, textarea {
 /* FILTER BAR, INPUTS, TABLES (Selaras dengan Peserta) */
 .role-sekretariat .filter-bar,
 .role-rektor .filter-bar,
+.role-humas .filter-bar,
 .role-sekretariat .search-bar,
 .role-rektor .search-bar,
+.role-humas .search-bar,
 .role-sekretariat .search-filter-card,
-.role-rektor .search-filter-card {
+.role-rektor .search-filter-card,
+.role-humas .search-filter-card {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -715,7 +759,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .search-wrap,
-.role-rektor .search-wrap {
+.role-rektor .search-wrap,
+.role-humas .search-wrap {
   position: relative;
   display: flex;
   align-items: center;
@@ -724,7 +769,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .search-icon,
-.role-rektor .search-icon {
+.role-rektor .search-icon,
+.role-humas .search-icon {
   position: absolute;
   left: 14px;
   top: 50%;
@@ -736,7 +782,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .search-input,
-.role-rektor .search-input {
+.role-rektor .search-input,
+.role-humas .search-input {
   width: 100%;
   height: 42px;
   min-height: 42px;
@@ -752,12 +799,14 @@ input, select, textarea {
 }
 
 .role-sekretariat .search-input::placeholder,
-.role-rektor .search-input::placeholder {
+.role-rektor .search-input::placeholder,
+.role-humas .search-input::placeholder {
   color: #87918c;
 }
 
 .role-sekretariat .search-input:focus,
-.role-rektor .search-input:focus {
+.role-rektor .search-input:focus,
+.role-humas .search-input:focus {
   border-color: #228b45;
   outline: 2px solid #228b45;
   outline-offset: 1px;
@@ -766,8 +815,10 @@ input, select, textarea {
 
 .role-sekretariat select,
 .role-rektor select,
+.role-humas select,
 .role-sekretariat .filter-select,
-.role-rektor .filter-select {
+.role-rektor .filter-select,
+.role-humas .filter-select {
   height: 42px;
   min-height: 42px;
   border: 1px solid #d5ddd8;
@@ -793,16 +844,20 @@ input, select, textarea {
 
 .role-sekretariat select:hover,
 .role-rektor select:hover,
+.role-humas select:hover,
 .role-sekretariat .filter-select:hover,
-.role-rektor .filter-select:hover {
+.role-rektor .filter-select:hover,
+.role-humas .filter-select:hover {
   border-color: #b9cec0;
   background-color: #fafbfb;
 }
 
 .role-sekretariat select:focus,
 .role-rektor select:focus,
+.role-humas select:focus,
 .role-sekretariat .filter-select:focus,
-.role-rektor .filter-select:focus {
+.role-rektor .filter-select:focus,
+.role-humas .filter-select:focus {
   border-color: #228b45;
   outline: 2px solid #228b45;
   outline-offset: 1px;
@@ -810,7 +865,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .table-container,
-.role-rektor .table-container {
+.role-rektor .table-container,
+.role-humas .table-container {
   background: white;
   border: 1px solid #dfe6e1;
   border-radius: 8px;
@@ -820,13 +876,15 @@ input, select, textarea {
 }
 
 .role-sekretariat table,
-.role-rektor table {
+.role-rektor table,
+.role-humas table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .role-sekretariat table th,
-.role-rektor table th {
+.role-rektor table th,
+.role-humas table th {
   background: #fafbfb;
   color: #66736c;
   font-size: 11px;
@@ -839,7 +897,8 @@ input, select, textarea {
 }
 
 .role-sekretariat table td,
-.role-rektor table td {
+.role-rektor table td,
+.role-humas table td {
   padding: 14px 16px;
   font-size: 13px;
   color: #263238;
@@ -848,7 +907,8 @@ input, select, textarea {
 
 /* TABLE ACTIONS (Lihat Presensi, Unduh, dll — Ringkas & Rapi) */
 .role-sekretariat .btn-table-action,
-.role-rektor .btn-table-action {
+.role-rektor .btn-table-action,
+.role-humas .btn-table-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -868,14 +928,16 @@ input, select, textarea {
 }
 
 .role-sekretariat .btn-table-action:hover,
-.role-rektor .btn-table-action:hover {
+.role-rektor .btn-table-action:hover,
+.role-humas .btn-table-action:hover {
   background: #edf7ef;
   border-color: #228b45;
   color: #14532d;
 }
 
 .role-sekretariat .btn-table-icon,
-.role-rektor .btn-table-icon {
+.role-rektor .btn-table-icon,
+.role-humas .btn-table-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -893,7 +955,8 @@ input, select, textarea {
 }
 
 .role-sekretariat .btn-table-icon:hover,
-.role-rektor .btn-table-icon:hover {
+.role-rektor .btn-table-icon:hover,
+.role-humas .btn-table-icon:hover {
   background: #edf7ef;
   border-color: #228b45;
   color: #14532d;

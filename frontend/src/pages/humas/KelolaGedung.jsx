@@ -1,158 +1,651 @@
 import { useState } from 'react';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Bell, Plus, X, Eye, Pencil, Trash2 } from 'lucide-react';
 
 const initialGedung = [
-  { id: 1, gedung: 'Convention Hall',  ruangan: 'Ruang Utama',            lokasi: 'Kampus Limau Manis, Padang', lat: '-0.9142', lng: '100.4580', radius: 150 },
-  { id: 2, gedung: 'Gedung Rektorat',  ruangan: 'Ruang Sidang Lantai 4',   lokasi: 'Kampus Limau Manis, Padang', lat: '-0.9147', lng: '100.4592', radius: 100 },
+  {
+    id: 1,
+    gedung: 'Convention Hall',
+    ruangan: 'Ruang Utama',
+    lokasi: 'Kampus Limau Manis, Padang',
+    lat: '-0.9142',
+    lng: '100.4580',
+    radius: 150,
+  },
+  {
+    id: 2,
+    gedung: 'Gedung Rektorat',
+    ruangan: 'Ruang Sidang Lantai 4',
+    lokasi: 'Kampus Limau Manis, Padang',
+    lat: '-0.9147',
+    lng: '100.4592',
+    radius: 100,
+  },
 ];
 
-const defaultForm = { gedung: '', ruangan: '', lokasi: '', lat: '', lng: '', radius: '' };
+const defaultForm = {
+  gedung: '',
+  ruangan: '',
+  lokasi: '',
+  lat: '',
+  lng: '',
+  radius: '',
+};
 
 export default function KelolaGedung() {
-  const [gedung, setGedung]     = useState(initialGedung);
-  const [search, setSearch]     = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm]         = useState(defaultForm);
+  const navigate = useNavigate();
+  const [gedung, setGedung] = useState(initialGedung);
+  const [search, setSearch] = useState('');
 
-  const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+  // Modals state
+  const [showTambah, setShowTambah] = useState(false);
+  const [tambahForm, setTambahForm] = useState(defaultForm);
 
-  const filtered = gedung.filter(g =>
-    g.gedung.toLowerCase().includes(search.toLowerCase()) ||
-    g.ruangan.toLowerCase().includes(search.toLowerCase())
+  const [detailData, setDetailData] = useState(null);
+
+  const [editData, setEditData] = useState(null);
+  const [editForm, setEditForm] = useState(defaultForm);
+
+  const filtered = gedung.filter(
+    g =>
+      g.gedung.toLowerCase().includes(search.toLowerCase()) ||
+      g.ruangan.toLowerCase().includes(search.toLowerCase()) ||
+      g.lokasi.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSimpan = () => {
-    if (!form.gedung || !form.ruangan) return;
-    setGedung(prev => [...prev, { ...form, id: Date.now(), radius: Number(form.radius) }]);
-    setForm(defaultForm);
-    setShowModal(false);
+  // ── Handlers Tambah ──
+  const handleSimpanTambah = () => {
+    if (!tambahForm.gedung || !tambahForm.ruangan) return;
+    setGedung(prev => [
+      ...prev,
+      {
+        ...tambahForm,
+        id: Date.now(),
+        radius: Number(tambahForm.radius) || 100,
+      },
+    ]);
+    setTambahForm(defaultForm);
+    setShowTambah(false);
   };
 
-  const handleHapus = (id) => {
-    if (window.confirm('Yakin hapus gedung/ruangan ini?')) setGedung(prev => prev.filter(g => g.id !== id));
+  // ── Handlers Edit ──
+  const handleOpenEdit = g => {
+    setDetailData(null);
+    setEditData(g);
+    setEditForm({
+      gedung: g.gedung,
+      ruangan: g.ruangan,
+      lokasi: g.lokasi,
+      lat: g.lat,
+      lng: g.lng,
+      radius: g.radius,
+    });
+  };
+
+  const handleSimpanEdit = () => {
+    if (!editForm.gedung || !editForm.ruangan) return;
+    setGedung(prev =>
+      prev.map(g =>
+        g.id === editData.id
+          ? {
+              ...g,
+              ...editForm,
+              radius: Number(editForm.radius) || g.radius,
+            }
+          : g
+      )
+    );
+    setEditData(null);
+  };
+
+  // ── Handlers Hapus ──
+  const handleHapus = id => {
+    setGedung(prev => prev.filter(g => g.id !== id));
   };
 
   return (
     <>
       <div className="humas-list-page">
-
-        {/* Prototype Banner */}
-        <div className="humas-prototype-banner">
-          <span className="humas-prototype-tag">Mode Prototipe</span>
-          <span className="humas-prototype-text">
-            Data contoh, perubahan hanya selama sesi. OFS, OTF, tanda tangan electronic dan PDF resmi belum terintegrasi.
-          </span>
-          <span className="humas-prototype-date">Referensi demo: 10 Mei 2026</span>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="humas-notif-btn"><Bell size={15} /> Notifikasi perbaikan (1)</button>
-        </div>
-
-        <div className="humas-list-header">
+        {/* Top Header Row */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: 20,
+          }}
+        >
           <div>
             <h2 className="humas-section-title">Kelola Gedung & Ruangan</h2>
             <p className="humas-section-sub">
-              Master lokasi geofencing yang digunakan kembali.{' '}
-              <a href="#" className="humas-link">Peminjaman</a> tetap melalui SIPRAS.
+              Master lokasi geofencing yang digunakan kembali. Peminjaman tetap melalui SIPRAS.
             </p>
           </div>
-          <button className="humas-tambah-btn" onClick={() => setShowModal(true)}>
-            <Plus size={15} /> Tambah Gedung / Ruangan
-          </button>
-        </div>
-
-        <div className="filter-bar">
-          <div className="search-wrap" style={{ flex: 1 }}>
-            <Search size={15} className="search-icon" />
-            <input className="search-input" placeholder="Cari data..." value={search} onChange={e => setSearch(e.target.value)} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+            <button
+              className="humas-notif-btn"
+              onClick={() => navigate('/humas/perbaikan-sertifikat')}
+            >
+              <Bell size={15} /> Notifikasi perbaikan (1)
+            </button>
+            <button
+              className="humas-tambah-btn"
+              style={{
+                background: '#14532d',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 600,
+                borderRadius: 6,
+                padding: '8px 16px',
+                cursor: 'pointer',
+              }}
+              onClick={() => {
+                setTambahForm(defaultForm);
+                setShowTambah(true);
+              }}
+            >
+              <Plus size={15} /> Tambah Gedung / Ruangan
+            </button>
           </div>
         </div>
 
+        {/* Search Bar Full Width */}
+        <div className="filter-bar" style={{ marginBottom: 16 }}>
+          <div className="search-wrap" style={{ flex: 1, width: '100%' }}>
+            <Search size={15} className="search-icon" />
+            <input
+              className="search-input"
+              placeholder="Cari data..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ width: '100%' }}
+            />
+          </div>
+        </div>
+
+        {/* Table */}
         <div className="table-container">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Nama Gedung</th>
-                <th>Nama Ruangan</th>
-                <th>Lokasi</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Radius Geofencing (Meter)</th>
-                <th>Tindakan</th>
+                <th>NAMA GEDUNG</th>
+                <th>NAMA RUANGAN</th>
+                <th>LOKASI</th>
+                <th>LATITUDE</th>
+                <th>LONGITUDE</th>
+                <th>RADIUS GEOFENCING (METER)</th>
+                <th>TINDAKAN</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>Belum ada data gedung.</td></tr>
-              )}
-              {filtered.map(g => (
-                <tr key={g.id}>
-                  <td><span className="table-name-bold humas-link">{g.gedung}</span></td>
-                  <td>{g.ruangan}</td>
-                  <td>{g.lokasi}</td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{g.lat}</td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{g.lng}</td>
-                  <td style={{ textAlign: 'center' }}>{g.radius}</td>
-                  <td>
-                    <div className="humas-tindakan-group">
-                      <button className="humas-tindakan-btn humas-tindakan-view"><Eye size={12} /> Lihat Detail</button>
-                      <button className="humas-tindakan-btn humas-tindakan-edit"><Pencil size={12} /> Edit</button>
-                      <button className="humas-tindakan-btn humas-tindakan-delete" onClick={() => handleHapus(g.id)}><Trash2 size={12} /> Hapus</button>
-                    </div>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', color: '#9ca3af', padding: '32px' }}>
+                    Belum ada data gedung & ruangan.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map(g => (
+                  <tr key={g.id}>
+                    <td>{g.gedung}</td>
+                    <td>{g.ruangan}</td>
+                    <td>{g.lokasi}</td>
+                    <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{g.lat}</td>
+                    <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{g.lng}</td>
+                    <td style={{ textAlign: 'center' }}>{g.radius}</td>
+                    <td>
+                      <div className="humas-tindakan-group">
+                        <button
+                          type="button"
+                          className="humas-tindakan-btn humas-tindakan-view"
+                          onClick={() => setDetailData(g)}
+                        >
+                          <Eye size={12} /> Detail
+                        </button>
+                        <button
+                          type="button"
+                          className="humas-tindakan-btn humas-tindakan-edit"
+                          onClick={() => handleOpenEdit(g)}
+                        >
+                          <Pencil size={12} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="humas-tindakan-btn humas-tindakan-delete"
+                          onClick={() => handleHapus(g.id)}
+                        >
+                          <Trash2 size={12} /> Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+      {/* ────────────────────────────────────────────────────────── */}
+      {/* 1. MODAL TAMBAH GEDUNG / RUANGAN                          */}
+      {/* ────────────────────────────────────────────────────────── */}
+      {showTambah && (
+        <div className="modal-overlay" onClick={() => setShowTambah(false)}>
+          <div
+            className="modal-box"
+            style={{ maxWidth: 540, width: '100%', borderRadius: 8 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-header" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: 12 }}>
               <div>
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Tambah Gedung / Ruangan</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setShowModal(false)}><X size={16} /></button>
+              <button className="modal-close-btn" onClick={() => setShowTambah(false)}>
+                <X size={16} />
+              </button>
             </div>
-            <div className="modal-body" style={{ gap: 14 }}>
-              <div className="modal-grid-2">
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 16 }}>
+              {/* Row 1 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div className="form-group">
-                  <label className="form-label">Nama gedung <span className="req">*</span></label>
-                  <input className="form-input" value={form.gedung} onChange={e => set('gedung', e.target.value)} placeholder="Contoh: Convention Hall" />
+                  <label className="form-label">
+                    Nama gedung <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={tambahForm.gedung}
+                    onChange={e => setTambahForm(prev => ({ ...prev, gedung: e.target.value }))}
+                  />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Nama ruangan <span className="req">*</span></label>
-                  <input className="form-input" value={form.ruangan} onChange={e => set('ruangan', e.target.value)} placeholder="Contoh: Ruang Utama" />
+                  <label className="form-label">
+                    Nama ruangan <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={tambahForm.ruangan}
+                    onChange={e => setTambahForm(prev => ({ ...prev, ruangan: e.target.value }))}
+                  />
                 </div>
               </div>
-              <div className="modal-grid-2">
+
+              {/* Row 2 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div className="form-group">
-                  <label className="form-label">Lokasi <span className="req">*</span></label>
-                  <input className="form-input" value={form.lokasi} onChange={e => set('lokasi', e.target.value)} placeholder="Kampus Limau Manis..." />
+                  <label className="form-label">
+                    Lokasi <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={tambahForm.lokasi}
+                    onChange={e => setTambahForm(prev => ({ ...prev, lokasi: e.target.value }))}
+                  />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Latitude <span className="req">*</span></label>
-                  <input className="form-input" value={form.lat} onChange={e => set('lat', e.target.value)} placeholder="-0.9142" />
+                  <label className="form-label">
+                    Latitude <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={tambahForm.lat}
+                    onChange={e => setTambahForm(prev => ({ ...prev, lat: e.target.value }))}
+                  />
                 </div>
               </div>
-              <div className="modal-grid-2">
+
+              {/* Row 3 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <div className="form-group">
-                  <label className="form-label">Longitude <span className="req">*</span></label>
-                  <input className="form-input" value={form.lng} onChange={e => set('lng', e.target.value)} placeholder="100.4580" />
+                  <label className="form-label">
+                    Longitude <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={tambahForm.lng}
+                    onChange={e => setTambahForm(prev => ({ ...prev, lng: e.target.value }))}
+                  />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Radius geofencing (meter) <span className="req">*</span></label>
-                  <input className="form-input" type="number" value={form.radius} onChange={e => set('radius', e.target.value)} placeholder="150" />
+                  <label className="form-label">
+                    Radius geofencing (meter) <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    value={tambahForm.radius}
+                    onChange={e => setTambahForm(prev => ({ ...prev, radius: e.target.value }))}
+                  />
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="modal-btn modal-btn-batal" onClick={() => setShowModal(false)}>Batal</button>
-              <button className="modal-btn modal-btn-publish" onClick={handleSimpan}>Simpan Perubahan</button>
+
+            <div
+              className="modal-footer"
+              style={{
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: 14,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 10,
+              }}
+            >
+              <button
+                type="button"
+                className="modal-btn modal-btn-batal"
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: 6,
+                  border: '1px solid #d1d5db',
+                  background: '#ffffff',
+                  color: '#374151',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setShowTambah(false)}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className="modal-btn modal-btn-publish"
+                style={{
+                  background: '#14532d',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 20px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={handleSimpanTambah}
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────── */}
+      {/* 2. MODAL DETAIL DATA                                       */}
+      {/* ────────────────────────────────────────────────────────── */}
+      {detailData && (
+        <div className="modal-overlay" onClick={() => setDetailData(null)}>
+          <div
+            className="modal-box"
+            style={{ maxWidth: 520, width: '100%', borderRadius: 8 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-header" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: 12 }}>
+              <div>
+                <p className="modal-header-crumb">WORKSHOP UNAND</p>
+                <h2 className="modal-header-title">Detail Data</h2>
+              </div>
+              <button className="modal-close-btn" onClick={() => setDetailData(null)}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', fontSize: '13px', paddingTop: 16 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                  borderBottom: '1px solid #f1f5f9',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Nama gedung</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.gedung}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                  borderBottom: '1px solid #f1f5f9',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Nama ruangan</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.ruangan}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                  borderBottom: '1px solid #f1f5f9',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Lokasi</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.lokasi}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                  borderBottom: '1px solid #f1f5f9',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Latitude</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.lat}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                  borderBottom: '1px solid #f1f5f9',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Longitude</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.lng}</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '11px 0',
+                }}
+              >
+                <span style={{ color: '#4b5563' }}>Radius geofencing (meter)</span>
+                <span style={{ color: '#111827', fontWeight: 500 }}>{detailData.radius}</span>
+              </div>
+            </div>
+
+            <div
+              className="modal-footer"
+              style={{
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: 14,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 10,
+              }}
+            >
+              <button
+                type="button"
+                className="modal-btn modal-btn-batal"
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: 6,
+                  border: '1px solid #d1d5db',
+                  background: '#ffffff',
+                  color: '#374151',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setDetailData(null)}
+              >
+                Kembali ke Daftar
+              </button>
+              <button
+                type="button"
+                className="modal-btn modal-btn-publish"
+                style={{
+                  background: '#14532d',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 20px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={() => handleOpenEdit(detailData)}
+              >
+                Edit Data
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────── */}
+      {/* 3. MODAL EDIT LOKASI                                      */}
+      {/* ────────────────────────────────────────────────────────── */}
+      {editData && (
+        <div className="modal-overlay" onClick={() => setEditData(null)}>
+          <div
+            className="modal-box"
+            style={{ maxWidth: 540, width: '100%', borderRadius: 8 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-header" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: 12 }}>
+              <div>
+                <p className="modal-header-crumb">WORKSHOP UNAND</p>
+                <h2 className="modal-header-title">Edit Lokasi</h2>
+              </div>
+              <button className="modal-close-btn" onClick={() => setEditData(null)}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 16 }}>
+              {/* Row 1 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="form-group">
+                  <label className="form-label">
+                    Nama gedung <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={editForm.gedung}
+                    onChange={e => setEditForm(prev => ({ ...prev, gedung: e.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    Nama ruangan <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={editForm.ruangan}
+                    onChange={e => setEditForm(prev => ({ ...prev, ruangan: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Row 2 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="form-group">
+                  <label className="form-label">
+                    Lokasi <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={editForm.lokasi}
+                    onChange={e => setEditForm(prev => ({ ...prev, lokasi: e.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    Latitude <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={editForm.lat}
+                    onChange={e => setEditForm(prev => ({ ...prev, lat: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Row 3 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div className="form-group">
+                  <label className="form-label">
+                    Longitude <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    value={editForm.lng}
+                    onChange={e => setEditForm(prev => ({ ...prev, lng: e.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">
+                    Radius geofencing (meter) <span className="req">*</span>
+                  </label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    value={editForm.radius}
+                    onChange={e => setEditForm(prev => ({ ...prev, radius: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="modal-footer"
+              style={{
+                borderTop: '1px solid #f1f5f9',
+                paddingTop: 14,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 10,
+              }}
+            >
+              <button
+                type="button"
+                className="modal-btn modal-btn-batal"
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: 6,
+                  border: '1px solid #d1d5db',
+                  background: '#ffffff',
+                  color: '#374151',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={() => setEditData(null)}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className="modal-btn modal-btn-publish"
+                style={{
+                  background: '#14532d',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '8px 20px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                onClick={handleSimpanEdit}
+              >
+                Simpan Perubahan
+              </button>
             </div>
           </div>
         </div>

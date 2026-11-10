@@ -1,3 +1,14 @@
+:where(.role-humas) {
+  --green-900: #0f3d21;
+  --green-800: #14532d;
+  --green-700: #14532d;
+  --green-600: #15803d;
+  --green-500: #228b45;
+  --green-200: #b9cec0;
+  --green-100: #dfe6e1;
+  --green-50:  #edf7ef;
+}
+
 /* PROFIL PAGE */
 :where(.role-humas) .profil-card {
   background: white;
@@ -38,85 +49,89 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 12.5px;
-  color: #065f46;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  color: #87918c;
+  margin-bottom: 14px;
+}
+
+:where(.role-humas) .humas-prototype-text-subtle {
+  font-size: 11px;
+  color: #87918c;
+  margin-bottom: 14px;
+  line-height: 1.4;
 }
 
 :where(.role-humas) .humas-prototype-tag {
-  font-weight: 700;
-  font-size: 12px;
-  background: #d1fae5;
-  color: #047857;
-  border-radius: 4px;
-  padding: 2px 8px;
-  white-space: nowrap;
+  display: none;
 }
 
 :where(.role-humas) .humas-prototype-text {
   flex: 1;
-  color: #065f46;
+  color: #87918c;
 }
 
 :where(.role-humas) .humas-prototype-date {
   white-space: nowrap;
-  font-size: 11.5px;
-  color: #059669;
+  font-size: 11px;
+  color: #87918c;
   font-weight: 500;
 }
 
 :where(.role-humas) .humas-notif-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: 1.5px solid var(--gray-200);
-  border-radius: 8px;
-  background: white;
+  gap: 7px;
+  padding: 0;
+  border: none;
+  background: transparent;
   font-size: 13px;
-  color: var(--gray-700);
+  font-weight: 500;
+  color: #37474f;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: color 0.15s ease;
+  white-space: nowrap;
 }
 
 :where(.role-humas) .humas-notif-btn:hover {
-  border-color: var(--green-500);
-  color: var(--green-700);
+  color: #14532d;
 }
 
 :where(.role-humas) .humas-tambah-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 18px;
+  padding: 10px 20px;
   border-radius: 8px;
-  background: var(--green-700);
+  background: #14532d;
   border: none;
-  color: white;
+  color: #ffffff;
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s ease;
+  white-space: nowrap;
 }
 
 :where(.role-humas) .humas-tambah-btn:hover {
-  background: var(--green-600);
+  background: #0f3d21;
 }
 
 :where(.role-humas) .humas-section-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
-  color: var(--gray-900);
-  margin-bottom: 0;
+  color: #111827;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
 }
 
 :where(.role-humas) .humas-section-sub {
   font-size: 13px;
-  color: var(--gray-500);
-  margin-top: -8px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
 }
 
 :where(.role-humas) .humas-link {
@@ -263,43 +278,55 @@
 :where(.role-humas) .humas-tindakan-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 5px;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  border: none;
-  background: none;
-  transition: all 0.12s;
+  border: 1px solid #d5ddd8;
+  background: #ffffff;
+  color: #14532d;
+  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
-:where(.role-humas) .humas-tindakan-view {
-  color: var(--green-700);
-  background: #d1fae5;
+:where(.role-humas) .humas-tindakan-btn:hover {
+  background: #edf7ef;
+  border-color: #228b45;
+  color: #14532d;
 }
 
-:where(.role-humas) .humas-tindakan-view:hover {
-  background: #a7f3d0;
+:where(.role-humas) .humas-tindakan-view {
+  color: #14532d;
 }
 
 :where(.role-humas) .humas-tindakan-edit {
-  color: #1d4ed8;
-  background: #dbeafe;
+  color: #14532d;
 }
-
 :where(.role-humas) .humas-tindakan-edit:hover {
-  background: #bfdbfe;
+  background: #edf7ef;
+  border-color: #228b45;
+  color: #14532d;
 }
 
 :where(.role-humas) .humas-tindakan-delete {
   color: #dc2626;
-  background: #fee2e2;
+}
+:where(.role-humas) .humas-tindakan-delete:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #b91c1c;
 }
 
-:where(.role-humas) .humas-tindakan-delete:hover {
-  background: #fecaca;
+:where(.role-humas) .humas-tindakan-draft {
+  color: #92400e;
+}
+:where(.role-humas) .humas-tindakan-draft:hover {
+  background: #fefce8;
+  border-color: #facc15;
+  color: #854d0e;
 }
 
 :where(.role-humas) .humas-tindakan-draft {
@@ -331,9 +358,9 @@
 
 :where(.role-humas) .modal-box {
   background: white;
-  border-radius: 14px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 680px;
+  max-width: 660px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
@@ -345,58 +372,64 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--gray-100);
+  border-bottom: 1px solid #dfe6e1;
   flex-shrink: 0;
 }
 
 :where(.role-humas) .modal-header-crumb {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--green-700);
+  color: #228b45;
   margin-bottom: 4px;
 }
 
 :where(.role-humas) .modal-header-title {
   font-size: 20px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #1f2937;
 }
 
 :where(.role-humas) .modal-close-btn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  border: 1px solid #d5ddd8;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gray-500);
+  color: #66736c;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
 :where(.role-humas) .modal-close-btn:hover {
-  background: var(--gray-100);
-  color: var(--gray-800);
+  background: #f7f8fa;
+  color: #1f2937;
 }
 
 :where(.role-humas) .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 22px;
 }
 
 :where(.role-humas) .modal-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+}
+
+:where(.role-humas) .modal-section-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px;
 }
 
 :where(.role-humas) .modal-section-header {
@@ -426,13 +459,14 @@
 :where(.role-humas) .modal-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
 :where(.role-humas) .modal-body .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   margin-bottom: 0;
 }
 
@@ -450,14 +484,27 @@
 }
 
 :where(.role-humas) .form-label-opt {
-  font-size: 11.5px;
-  color: var(--gray-400);
+  font-size: 12px;
+  color: #66736c;
   font-weight: 400;
+}
+
+:where(.role-humas) select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 16px 16px !important;
+  padding-right: 36px !important;
+  cursor: pointer;
 }
 
 :where(.role-humas) .form-textarea {
   resize: vertical;
   min-height: 80px;
+  line-height: 1.4;
 }
 
 :where(.role-humas) .form-textarea--sm {
@@ -468,30 +515,65 @@
   max-width: 50%;
 }
 
-:where(.role-humas) .form-hint {
-  font-size: 12px;
-  color: var(--gray-400);
-  margin-top: 4px;
-}
-
-:where(.role-humas) .file-upload-label {
+:where(.role-humas) .custom-file-input-box {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border: 1px solid var(--gray-300);
+  border: 1px solid #d5ddd8;
   border-radius: 8px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px;
   font-size: 13px;
-  color: var(--gray-500);
+  color: #374151;
+  background: #ffffff;
   cursor: pointer;
-  transition: all 0.15s;
-  background: white;
+  transition: border-color 0.15s ease;
 }
 
-:where(.role-humas) .file-upload-label:hover {
-  border-color: var(--green-500);
-  color: var(--green-700);
-  background: var(--green-50);
+:where(.role-humas) .custom-file-input-box:hover {
+  border-color: #228b45;
+}
+
+:where(.role-humas) .file-box-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(.role-humas) .input-with-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+:where(.role-humas) .input-with-icon-wrap .form-input {
+  width: 100%;
+  padding-right: 36px;
+}
+
+:where(.role-humas) .input-with-icon-wrap .input-field-icon {
+  position: absolute;
+  right: 12px;
+  color: #66736c;
+  pointer-events: none;
+}
+
+:where(.role-humas) .modal-info-box {
+  background: #edf7ef;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #14532d;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+:where(.role-humas) .modal-info-subtext {
+  font-size: 11.5px;
+  color: #66736c;
+  margin-top: 6px;
+  line-height: 1.4;
 }
 
 :where(.role-humas) .modal-footer {
@@ -500,48 +582,51 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px;
-  border-top: 1px solid var(--gray-100);
+  border-top: 1px solid #dfe6e1;
   flex-shrink: 0;
 }
 
 :where(.role-humas) .modal-btn {
-  padding: 9px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 13.5px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 :where(.role-humas) .modal-btn-batal {
-  border: 1.5px solid var(--gray-200);
+  border: 1px solid #d5ddd8;
   background: white;
-  color: var(--gray-700);
+  color: #263238;
+  font-weight: 500;
 }
 
 :where(.role-humas) .modal-btn-batal:hover {
-  border-color: var(--gray-400);
-  background: var(--gray-50);
+  border-color: #b9cec0;
+  background: #f7f8fa;
 }
 
 :where(.role-humas) .modal-btn-draft {
-  border: 1.5px solid var(--green-600);
+  border: 1px solid #14532d;
   background: white;
-  color: var(--green-700);
+  color: #14532d;
+  font-weight: 600;
 }
 
 :where(.role-humas) .modal-btn-draft:hover {
-  background: var(--green-50);
+  background: #edf7ef;
 }
 
 :where(.role-humas) .modal-btn-publish {
-  border: none;
-  background: var(--green-700);
+  border: 1px solid #14532d;
+  background: #14532d;
   color: white;
+  font-weight: 600;
+  padding: 8px 24px;
 }
 
 :where(.role-humas) .modal-btn-publish:hover {
-  background: var(--green-600);
+  background: #0f3d21;
 }
 
 /* ============================================================
@@ -583,6 +668,26 @@
   border-radius: 4px;
   padding: 2px 8px;
   width: fit-content;
+}
+
+:where(.role-humas) .humas-pelaksanaan-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #37474f;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 8px;
+  width: fit-content;
+}
+
+:where(.role-humas) .humas-detail-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 :where(.role-humas) .humas-detail-title {
@@ -1206,197 +1311,214 @@
    HUMAS - RINGKASAN PAGE
    ============================================================ */
 
+:where(.role-humas) .humas-ringkasan-page {
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.role-humas) .ringkasan-header-area {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+:where(.role-humas) .ringkasan-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .ringkasan-header-actions,
+:where(.role-humas) .ringkasan-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 :where(.role-humas) .ringkasan-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--gray-900);
-  margin-bottom: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #263238;
+  margin: 0;
 }
 
 :where(.role-humas) .ringkasan-sub {
-  font-size: 13px;
-  color: var(--gray-500);
+  font-size: 13.5px;
+  color: #66736c;
+  margin: 0;
 }
 
 /* Stats row */
 :where(.role-humas) .ringkasan-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 :where(.role-humas) .ringkasan-stat-card {
-  background: white;
-  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  border: 1px solid #dfe6e1;
   border-radius: 12px;
-  padding: 20px 22px;
+  padding: 22px 24px;
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  transition: box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(30, 60, 40, 0.02);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 :where(.role-humas) .ringkasan-stat-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 4px 14px rgba(30, 60, 40, 0.06);
+  border-color: #b9cec0;
 }
 
 :where(.role-humas) .ringkasan-stat-icon {
   width: 44px;
   height: 44px;
   border-radius: 10px;
+  background: #edf7ef;
+  color: #14532d;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-:where(.role-humas) .ringkasan-stat-icon--green { background: var(--green-50); color: var(--green-700); }
-:where(.role-humas) .ringkasan-stat-icon--blue  { background: #eff6ff;         color: #1d4ed8; }
-:where(.role-humas) .ringkasan-stat-icon--teal  { background: #f0fdfa;         color: #0f766e; }
-
 :where(.role-humas) .ringkasan-stat-body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
 }
 
 :where(.role-humas) .ringkasan-stat-label {
-  font-size: 12.5px;
-  color: var(--gray-500);
+  font-size: 13px;
+  color: #66736c;
   font-weight: 500;
 }
 
 :where(.role-humas) .ringkasan-stat-value {
-  font-size: 30px;
-  font-weight: 800;
-  color: var(--gray-900);
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
   line-height: 1.1;
+  margin: 4px 0 2px;
 }
 
 :where(.role-humas) .ringkasan-stat-note {
-  font-size: 11.5px;
-  color: var(--gray-400);
-  margin-top: 2px;
+  font-size: 11px;
+  color: #87918c;
+  line-height: 1.35;
 }
 
-/* Section */
-:where(.role-humas) .ringkasan-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* Card Container (Kegiatan Terdekat, dll) */
+:where(.role-humas) .ringkasan-card-container {
+  background: #ffffff;
+  border: 1px solid #dfe6e1;
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 8px rgba(30, 60, 40, 0.02);
 }
 
-:where(.role-humas) .ringkasan-section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--gray-800);
+:where(.role-humas) .ringkasan-card-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #263238;
+  margin-bottom: 14px;
 }
 
-/* Kegiatan Terdekat cards */
 :where(.role-humas) .ringkasan-terdekat-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
-:where(.role-humas) .ringkasan-terdekat-card {
-  background: white;
-  border: 1px solid var(--gray-200);
-  border-radius: 10px;
-  padding: 14px 18px;
+:where(.role-humas) .ringkasan-terdekat-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  padding: 16px 0;
+  border-top: 1px solid #edf2ef;
 }
 
-:where(.role-humas) .ringkasan-terdekat-card:hover {
-  border-color: var(--green-300);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+:where(.role-humas) .ringkasan-terdekat-item:first-child {
+  border-top: none;
+  padding-top: 4px;
 }
 
-/* Date badge (calendar-style) */
 :where(.role-humas) .ringkasan-date-badge {
-  min-width: 62px;
-  max-width: 62px;
-  border: 1.5px solid;
+  width: 58px;
+  height: 52px;
+  background: #edf7ef;
+  border: none;
   border-radius: 8px;
-  padding: 8px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   flex-shrink: 0;
 }
 
 :where(.role-humas) .ringkasan-date-day {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
+  color: #14532d;
   line-height: 1;
 }
 
 :where(.role-humas) .ringkasan-date-jenis {
-  font-size: 9.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  text-align: center;
-  line-height: 1.2;
+  font-size: 10px;
+  font-weight: 600;
+  color: #14532d;
+  line-height: 1;
 }
 
-/* Info block */
 :where(.role-humas) .ringkasan-terdekat-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 :where(.role-humas) .ringkasan-terdekat-nama {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: var(--green-700);
+  color: #111827;
   cursor: pointer;
+  margin: 0;
+  transition: color 0.15s ease;
 }
 
 :where(.role-humas) .ringkasan-terdekat-nama:hover {
-  text-decoration: underline;
+  color: #14532d;
 }
 
 :where(.role-humas) .ringkasan-terdekat-meta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-:where(.role-humas) .ringkasan-terdekat-meta span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
   font-size: 12.5px;
-  color: var(--gray-500);
+  color: #66736c;
+  margin: 0;
 }
 
-/* Lihat detail button in terdekat cards */
 :where(.role-humas) .ringkasan-lihat-btn {
-  padding: 7px 16px;
-  border: 1.5px solid var(--gray-300);
-  border-radius: 7px;
-  background: white;
-  color: var(--gray-700);
+  background: #ffffff;
+  border: 1px solid #d5ddd8;
+  border-radius: 6px;
+  padding: 7px 18px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #14532d;
   cursor: pointer;
+  transition: all 0.15s ease;
   white-space: nowrap;
-  transition: all 0.15s;
-  flex-shrink: 0;
 }
 
 :where(.role-humas) .ringkasan-lihat-btn:hover {
-  border-color: var(--green-500);
-  color: var(--green-700);
-  background: var(--green-50);
+  background: #edf7ef;
+  border-color: #14532d;
 }
 
 /* -- Notifikasi Modal -- */
@@ -1592,9 +1714,374 @@
   border-radius: 12px;
 }
 
-/* Rekap grid */
-:where(.role-humas) .humas-rekap-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* Rekap Kehadiran Per Hari di Tab Rekap */
+:where(.role-humas) .rekap-kehadiran-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+:where(.role-humas) .rekap-kehadiran-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Detail Data Mitra & Gedung & Pengguna Modal */
+:where(.role-humas) .mitra-detail-row,
+:where(.role-humas) .gedung-detail-row,
+:where(.role-humas) .pengguna-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13.5px;
+}
+
+:where(.role-humas) .mitra-detail-label,
+:where(.role-humas) .gedung-detail-label,
+:where(.role-humas) .pengguna-detail-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+:where(.role-humas) .mitra-detail-value,
+:where(.role-humas) .gedung-detail-value,
+:where(.role-humas) .pengguna-detail-value {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+:where(.role-humas) .mitra-detail-note {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+:where(.role-humas) .modal-btn-outline {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+:where(.role-humas) .modal-btn-outline:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+
+
+/* ============================================================
+   KELOLA ABSENSI SEMINAR & JADWAL
+   ============================================================ */
+
+/* Jadwal Seminar di Tab Informasi */
+:where(.role-humas) .jadwal-seminar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+:where(.role-humas) .jadwal-seminar-note {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+}
+
+:where(.role-humas) .jadwal-seminar-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+}
+
+:where(.role-humas) .jadwal-seminar-day {
+  font-weight: 700;
+  color: #14532d;
+}
+
+:where(.role-humas) .jadwal-seminar-time {
+  color: var(--gray-700);
+}
+
+/* Tombol Kelola Absensi di Sidebar */
+:where(.role-humas) .btn-kelola-absensi {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #14532d;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.15s ease;
+}
+
+:where(.role-humas) .btn-kelola-absensi:hover {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+/* Container Kelola Absensi Seminar di Tab Presensi */
+:where(.role-humas) .kelola-absensi-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+:where(.role-humas) .kelola-absensi-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .kelola-absensi-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+:where(.role-humas) .kelola-absensi-sub {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+:where(.role-humas) .kelola-absensi-banner {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+:where(.role-humas) .kelola-absensi-card {
+  background: #ffffff;
+  border: 1px solid #86efac;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+:where(.role-humas) .kelola-absensi-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:where(.role-humas) .kelola-absensi-card-meta {
+  font-size: 13px;
+  color: #64748b;
+}
+
+:where(.role-humas) .kelola-absensi-card-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0;
+}
+
+:where(.role-humas) .kelola-absensi-day-row {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
 }
+
+:where(.role-humas) .kelola-absensi-day-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .kelola-absensi-day-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #14532d;
+  margin: 0;
+}
+
+:where(.role-humas) .kelola-absensi-day-date {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+:where(.role-humas) .badge-absensi-ditutup {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 2px 10px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+:where(.role-humas) .badge-absensi-dibuka {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #15803d;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  padding: 2px 10px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+:where(.role-humas) .kelola-absensi-day-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+:where(.role-humas) .btn-buka-absensi {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .btn-buka-absensi:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+:where(.role-humas) .btn-tutup-absensi {
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .btn-tutup-absensi:hover {
+  background: #fef2f2;
+}
+
+:where(.role-humas) .btn-lihat-kehadiran {
+  background: #14532d;
+  border: 1px solid #14532d;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+:where(.role-humas) .btn-lihat-kehadiran:hover {
+  background: #0f3d21;
+}
+
+/* Detail Kehadiran Section */
+:where(.role-humas) .kelola-absensi-kehadiran-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+:where(.role-humas) .kelola-absensi-kehadiran-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:where(.role-humas) .kelola-absensi-kehadiran-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+:where(.role-humas) .kelola-absensi-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+:where(.role-humas) .kelola-absensi-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:where(.role-humas) .kelola-absensi-stat-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+:where(.role-humas) .kelola-absensi-stat-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+:where(.role-humas) .kelola-absensi-rekap-subtext {
+  font-size: 12.5px;
+  color: #64748b;
+  margin: 0;
+}
+

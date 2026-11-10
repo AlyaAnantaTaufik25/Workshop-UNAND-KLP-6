@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, Bell, Plus, Eye, Pencil, Trash2, X, Check } from 'lucide-react';
 import { humasKegiatan } from './data';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 
@@ -13,13 +13,21 @@ const statusConfig = {
 
 export default function KelolaKegiatan() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialMitra = searchParams.get('mitra') || searchParams.get('q') || '';
+
   const [kegiatan, setKegiatan]         = useState(humasKegiatan);
-  const [search, setSearch]             = useState('');
+  const [search, setSearch]             = useState(initialMitra);
   const [filterJenis, setFilterJenis]   = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [showTambah, setShowTambah]     = useState(false);
   const [editTarget, setEditTarget]     = useState(null);
   const [draftTarget, setDraftTarget]   = useState(null);
+
+  useEffect(() => {
+    const m = searchParams.get('mitra') || searchParams.get('q') || '';
+    if (m) setSearch(m);
+  }, [searchParams]);
 
   const filtered = kegiatan.filter(k => {
     const q = search.toLowerCase();
@@ -43,7 +51,7 @@ export default function KelolaKegiatan() {
         jenis: payload.jenis,
         tanggal: payload.tanggal || '-',
         penyelenggara: payload.penyelenggara,
-        lokasi: `${payload.gedung} - ${payload.ruangan}`,
+        lokasi: payload.lokasi || (payload.gedung ? `${payload.gedung} · ${payload.ruangan || 'Ruang Utama'}` : 'Online'),
         pendaftar: 0,
         kuota: payload.kuotaJenis === 'Terbatas' ? Number(payload.kuota) : null,
         status: payload.status,
@@ -66,14 +74,7 @@ export default function KelolaKegiatan() {
     <>
       <div className="humas-list-page">
 
-        {/* Notif row */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="humas-notif-btn">
-            <Bell size={15} /> Notifikasi perbaikan (1)
-          </button>
-        </div>
-
-        {/* Page heading */}
+        {/* Page heading + actions */}
         <div className="humas-list-header">
           <div>
             <h2 className="humas-section-title">Kelola Kegiatan</h2>
@@ -81,9 +82,14 @@ export default function KelolaKegiatan() {
               Kelola informasi, pendaftaran, dan publikasi seluruh jenis kegiatan.
             </p>
           </div>
-          <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
-            <Plus size={15} /> Tambah Kegiatan
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+            <button className="humas-notif-btn">
+              <Bell size={15} /> Notifikasi perbaikan (1)
+            </button>
+            <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
+              <Plus size={15} /> Tambah Kegiatan
+            </button>
+          </div>
         </div>
 
         {/* Filter bar */}
@@ -147,7 +153,14 @@ export default function KelolaKegiatan() {
                         {k.nama}
                       </span>
                     </td>
-                    <td>{k.jenis}</td>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span>{k.jenis}</span>
+                        <span className="humas-pelaksanaan-badge" style={{ fontSize: '10.5px', padding: '1px 6px' }}>
+                          ● {k.jenisPelaksanaan || (k.lokasi?.toLowerCase().includes('online') ? 'Online' : 'Offline')}
+                        </span>
+                      </div>
+                    </td>
                     <td style={{ whiteSpace: 'nowrap' }}>{k.tanggal}</td>
                     <td>{k.penyelenggara}</td>
                     <td>{k.lokasi}</td>
@@ -165,11 +178,20 @@ export default function KelolaKegiatan() {
                     <td>
                       <div className="humas-tindakan-group">
                         <button className="humas-tindakan-btn humas-tindakan-view" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}>
-                          <Eye size={12} /> Lihat Detail
+                          <Eye size={12} /> Detail
                         </button>
                         <button className="humas-tindakan-btn humas-tindakan-edit" onClick={() => { setEditTarget(k); setShowTambah(true); }}>
                           <Pencil size={12} /> Edit
                         </button>
+                        {k.jenis === 'Seminar' && (
+                          <button
+                            className="humas-tindakan-btn humas-tindakan-view"
+                            style={{ color: '#15803d', fontWeight: 600 }}
+                            onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}?tab=presensi`)}
+                          >
+                            <Check size={12} /> Kelola Absensi Seminar
+                          </button>
+                        )}
                         <button className="humas-tindakan-btn humas-tindakan-delete" onClick={() => handleHapus(k.id)}>
                           <Trash2 size={12} /> Hapus
                         </button>

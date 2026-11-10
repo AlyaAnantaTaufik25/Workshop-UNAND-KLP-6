@@ -255,19 +255,19 @@ function TabRekap({ w }) {
     {
       label: 'Total kegiatan',
       value: '1',
-      sub: 'Data contoh dalam sesi demo',
+      sub: '',
       icon: Briefcase,
     },
     {
       label: 'Total pendaftar',
       value: String(w.pendaftar || 108),
-      sub: 'Data contoh dalam sesi demo',
+      sub: '',
       icon: Users,
     },
     {
       label: 'Peserta hadir',
       value: String(w.hadir || 88),
-      sub: 'Data contoh dalam sesi demo',
+      sub: '',
       icon: Check,
     },
   ];

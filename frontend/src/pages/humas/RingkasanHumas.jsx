@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  CalendarDays, Users, CheckCircle, Bell, Plus, Eye, Pencil,
-  Trash2, X, MapPin, Clock
+  Briefcase, Users, Check, Bell, Plus, Eye, Pencil,
+  Trash2, X, MapPin, CalendarDays
 } from 'lucide-react';
 import { humasStats, humasKegiatan, humasKegiatanTerdekat } from './data';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
@@ -13,14 +13,6 @@ const statusConfig = {
   publik:      { label: 'Publik',      className: 'humas-badge humas-badge-publik'      },
   selesai:     { label: 'Selesai',     className: 'humas-badge humas-badge-selesai'     },
   draft:       { label: 'Draft',       className: 'humas-badge humas-badge-draft'       },
-};
-
-const jenisColorMap = {
-  'Workshop':     { bg: '#e8f5e9', color: '#2e7d32', borderColor: '#a5d6a7' },
-  'Seminar':      { bg: '#e3f2fd', color: '#1565c0', borderColor: '#90caf9' },
-  'Kuliah Umum':  { bg: '#fff3e0', color: '#e65100', borderColor: '#ffcc80' },
-  'Pelatihan':    { bg: '#f3e5f5', color: '#6a1b9a', borderColor: '#ce93d8' },
-  'Konferensi':   { bg: '#e8eaf6', color: '#283593', borderColor: '#9fa8da' },
 };
 
 // Notifikasi mock data
@@ -49,10 +41,6 @@ function NotifikasiModal({ onClose, onNavigate }) {
         </div>
 
         <div className="modal-body" style={{ gap: 12 }}>
-          <p style={{ fontSize: 13, color: 'var(--gray-400)', fontStyle: 'italic' }}>
-            Notifikasi dalam aplikasi – simulasi sesi, tanpa pengiriman eksternal
-          </p>
-
           {notifikasiData.map(n => (
             <div key={n.id} className="notif-item">
               <div className="notif-item-icon">
@@ -82,14 +70,13 @@ export default function RingkasanHumas() {
   const navigate = useNavigate();
   const [kegiatan, setKegiatan]     = useState(humasKegiatan);
   const [showTambah, setShowTambah] = useState(false);
-  const [editTarget, setEditTarget] = useState(null);   // kegiatan obj saat edit
+  const [editTarget, setEditTarget] = useState(null);
   const [showNotif, setShowNotif]   = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  // Tambah
+  // Tambah / Edit kegiatan
   const handleSaveKegiatan = (payload) => {
     if (payload.id) {
-      // Edit mode
       setKegiatan(prev => prev.map(k =>
         k.id === payload.id
           ? {
@@ -103,7 +90,6 @@ export default function RingkasanHumas() {
           : k
       ));
     } else {
-      // Tambah baru
       setKegiatan(prev => [{
         id: Date.now(),
         nama: payload.judul || 'Kegiatan Baru',
@@ -121,142 +107,124 @@ export default function RingkasanHumas() {
   // Stats computed
   const totalPendaftar = kegiatan.reduce((s, k) => s + (k.pendaftar || 0), 0);
   const totalKegiatan  = kegiatan.length;
-  const pesertaHadir   = Math.round(totalPendaftar * 0.58); // simulasi
+  const pesertaHadir   = 173; // sesuai dengan data sampel desain
 
   // Kegiatan terdekat (3 pertama yg belum selesai)
   const kegiatanTerdekat = kegiatan.filter(k => k.status !== 'selesai').slice(0, 3);
-  // Kegiatan terbaru (semua)
   const kegiatanTerbaru  = kegiatan;
 
   const getDayLabel = (tanggal) => {
     const parts = tanggal?.split(' ');
-    return parts?.[0] || '?';
+    return parts?.[0] || '18';
   };
 
   return (
     <>
-      <div className="humas-list-page">
+      <div className="humas-ringkasan-page">
 
-        {/* Prototype Banner */}
-        <div className="humas-prototype-banner">
-          <span className="humas-prototype-tag">Mode Prototipe</span>
-          <span className="humas-prototype-text">
-            Data contoh, perubahan hanya selama sesi. OFS, OTF, tanda tangan electronic dan PDF resmi belum terintegrasi.
-          </span>
-          <span className="humas-prototype-date">Referensi demo: 10 Mei 2026</span>
-        </div>
-
-        {/* Notif row */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="humas-notif-btn" onClick={() => setShowNotif(true)}>
-            <Bell size={15} />
-            <span>Notifikasi perbaikan ({notifikasiData.length})</span>
-          </button>
-        </div>
-
-        {/* Page heading + Tambah button */}
-        <div className="humas-list-header">
-          <div>
+        {/* Page Heading & Actions area */}
+        <div className="ringkasan-header-area">
+          <div className="ringkasan-header-left">
             <h2 className="ringkasan-title">Ringkasan kegiatan</h2>
             <p className="ringkasan-sub">
-              Sistem{' '}
-              <a href="#" className="humas-link">Informasi Manajemen Workshop</a>{' '}
-              <a href="#" className="humas-link">Universitas Andalas</a>.
+              Sistem Informasi Manajemen Workshop Universitas Andalas
             </p>
           </div>
-          <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
-            <Plus size={15} /> Tambah Kegiatan
-          </button>
+          <div className="ringkasan-header-right">
+            <button className="humas-notif-btn" onClick={() => setShowNotif(true)}>
+              <Bell size={16} />
+              <span>Notifikasi perbaikan ({notifikasiData.length})</span>
+            </button>
+            <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
+              <Plus size={16} />
+              <span>Tambah Kegiatan</span>
+            </button>
+          </div>
         </div>
 
         {/* ── Stats Cards ── */}
         <div className="ringkasan-stats-row">
           <div className="ringkasan-stat-card">
-            <div className="ringkasan-stat-icon ringkasan-stat-icon--green">
-              <CalendarDays size={22} />
+            <div className="ringkasan-stat-icon">
+              <Briefcase size={22} />
             </div>
             <div className="ringkasan-stat-body">
               <p className="ringkasan-stat-label">Total kegiatan</p>
               <p className="ringkasan-stat-value">{totalKegiatan}</p>
-              <p className="ringkasan-stat-note">Data contoh dalam sesi demo</p>
             </div>
           </div>
 
           <div className="ringkasan-stat-card">
-            <div className="ringkasan-stat-icon ringkasan-stat-icon--blue">
+            <div className="ringkasan-stat-icon">
               <Users size={22} />
             </div>
             <div className="ringkasan-stat-body">
               <p className="ringkasan-stat-label">Total pendaftar</p>
               <p className="ringkasan-stat-value">{totalPendaftar}</p>
-              <p className="ringkasan-stat-note">Data contoh dalam sesi demo</p>
             </div>
           </div>
 
           <div className="ringkasan-stat-card">
-            <div className="ringkasan-stat-icon ringkasan-stat-icon--teal">
-              <CheckCircle size={22} />
+            <div className="ringkasan-stat-icon">
+              <Check size={22} strokeWidth={2.5} />
             </div>
             <div className="ringkasan-stat-body">
               <p className="ringkasan-stat-label">Peserta hadir</p>
               <p className="ringkasan-stat-value">{pesertaHadir}</p>
-              <p className="ringkasan-stat-note">Data contoh dalam sesi demo</p>
             </div>
           </div>
         </div>
 
         {/* ── Kegiatan Terdekat ── */}
-        <div className="ringkasan-section">
-          <h3 className="ringkasan-section-title">Kegiatan terdekat</h3>
+        <div className="ringkasan-card-container">
+          <h3 className="ringkasan-card-title">Kegiatan terdekat</h3>
           <div className="ringkasan-terdekat-list">
             {kegiatanTerdekat.length === 0 && (
               <p style={{ color: 'var(--gray-400)', fontSize: 13, padding: '16px 0' }}>
                 Tidak ada kegiatan terdekat.
               </p>
             )}
-            {kegiatanTerdekat.map(k => {
-              const col = jenisColorMap[k.jenis] || jenisColorMap['Workshop'];
-              return (
-                <div key={k.id} className="ringkasan-terdekat-card">
-                  {/* Date Badge */}
-                  <div
-                    className="ringkasan-date-badge"
-                    style={{ background: col.bg, borderColor: col.borderColor }}
-                  >
-                    <span className="ringkasan-date-day" style={{ color: col.color }}>
-                      {getDayLabel(k.tanggal)}
-                    </span>
-                    <span className="ringkasan-date-jenis" style={{ color: col.color }}>
-                      {k.jenis}
-                    </span>
-                  </div>
+            {kegiatanTerdekat.map(k => (
+              <div key={k.id} className="ringkasan-terdekat-item">
+                {/* Date Badge */}
+                <div className="ringkasan-date-badge">
+                  <span className="ringkasan-date-day">
+                    {getDayLabel(k.tanggal)}
+                  </span>
+                  <span className="ringkasan-date-jenis">
+                    {k.jenis}
+                  </span>
+                </div>
 
-                  {/* Info */}
-                  <div className="ringkasan-terdekat-info">
-                    <p className="ringkasan-terdekat-nama humas-link">{k.nama}</p>
-                    <div className="ringkasan-terdekat-meta">
-                      <span><CalendarDays size={12} /> {k.tanggal}</span>
-                      {k.lokasi && <span><MapPin size={12} /> {k.lokasi}</span>}
-                    </div>
-                  </div>
-
-                  {/* Action */}
-                  <button
-                    className="ringkasan-lihat-btn"
+                {/* Info */}
+                <div className="ringkasan-terdekat-info">
+                  <h4
+                    className="ringkasan-terdekat-nama"
                     onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
                   >
-                    Lihat Detail
-                  </button>
+                    {k.nama}
+                  </h4>
+                  <p className="ringkasan-terdekat-meta">
+                    {k.tanggal} · {k.lokasi}
+                  </p>
                 </div>
-              );
-            })}
+
+                {/* Action */}
+                <button
+                  className="ringkasan-lihat-btn"
+                  onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
+                >
+                  Lihat Detail
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* ── Kegiatan Terbaru ── */}
-        <div className="ringkasan-section">
-          <h3 className="ringkasan-section-title">Kegiatan terbaru</h3>
-          <div className="table-container">
+        <div className="ringkasan-card-container" style={{ marginTop: 24 }}>
+          <h3 className="ringkasan-card-title">Kegiatan terbaru</h3>
+          <div className="table-container" style={{ margin: 0, boxShadow: 'none' }}>
             <table className="data-table">
               <thead>
                 <tr>
@@ -277,7 +245,7 @@ export default function RingkasanHumas() {
                       <td>
                         <span
                           className="table-name-bold humas-link"
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: 'pointer', fontWeight: 600 }}
                           onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
                         >
                           {k.nama}
@@ -291,22 +259,23 @@ export default function RingkasanHumas() {
                       <td>
                         <div className="humas-tindakan-group">
                           <button
-                            className="humas-tindakan-btn humas-tindakan-view"
+                            className="btn-table-action"
                             onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
                           >
-                            <Eye size={12} /> Detail
+                            <Eye size={13} /> Detail
                           </button>
                           <button
-                            className="humas-tindakan-btn humas-tindakan-edit"
+                            className="btn-table-action"
                             onClick={() => { setEditTarget(k); setShowTambah(true); }}
                           >
-                            <Pencil size={12} /> Edit
+                            <Pencil size={13} /> Edit
                           </button>
                           <button
-                            className="humas-tindakan-btn humas-tindakan-delete"
+                            className="btn-table-action"
+                            style={{ color: '#dc2626' }}
                             onClick={() => setDeleteTarget(k.id)}
                           >
-                            <Trash2 size={12} /> Hapus
+                            <Trash2 size={13} /> Hapus
                           </button>
                         </div>
                       </td>
