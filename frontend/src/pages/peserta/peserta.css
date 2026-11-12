@@ -71,34 +71,24 @@
 .peserta-card-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .peserta-card-context, .peserta-detail-tags, .peserta-activity-status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .peserta-card-theme, .peserta-tag { color: var(--peserta-accent); text-transform: uppercase; font-size: 10px; font-weight: 700; }
-.peserta-workshop-mode { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 24px; padding: 2px 8px; border: 1px solid transparent; border-radius: 99px; font-size: 11px; font-weight: 600; line-height: 1.5; }
-.peserta-workshop-mode--online { background: #edf5fa; color: #0369a1; border-color: #c8dfe8; }
-.peserta-workshop-mode--offline { background: #edf7ef; color: #14532d; border-color: #b7e4c7; }
 .peserta-workshop-card h3 { min-height: 44px; margin: 13px 0 14px; font-size: 15px; line-height: 1.45; }
 .peserta-facts { margin-bottom: 16px; }
 .peserta-facts p { display: flex; align-items: flex-start; gap: 8px; margin: 8px 0; color: var(--peserta-muted); font-size: 11px; line-height: 1.45; }
 .peserta-facts p:first-child { margin-top: 0; }
 .peserta-facts p:last-child { margin-bottom: 0; }
 .peserta-facts svg { color: var(--peserta-accent); }
+.peserta-facts .peserta-link-timing, .peserta-facts .peserta-link-timing svg { color: #236483; }
 
-/* Category Pills & Category Grouping */
-.peserta-category-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.peserta-category-pill { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 18px; border: 1px solid var(--peserta-line); border-radius: 99px; background: white; color: #4b5563; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s ease-in-out; box-shadow: 0 1px 3px #0000000a; }
-.peserta-category-pill:hover { background: var(--peserta-tint); border-color: #b9cec0; color: var(--peserta-green); }
-.peserta-category-pill.is-active { background: var(--peserta-green); border-color: var(--peserta-green); color: white; box-shadow: 0 4px 12px #14532d2e; }
-.peserta-category-badge-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #f0f2f1; color: #4b5563; }
-.peserta-category-pill.is-active .peserta-category-badge-count { background: #ffffff3d; color: white; }
-.peserta-category-group { display: flex; flex-direction: column; gap: 16px; }
-.peserta-category-heading-box { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; border-radius: 8px; border: 1px solid var(--peserta-line); background: white; box-shadow: 0 2px 8px #1a362308; }
-.peserta-category-heading-left { display: flex; align-items: center; gap: 12px; }
-.peserta-category-icon-box { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 8px; flex: none; }
-.peserta-category-icon-box--offline { background: var(--peserta-tint); color: var(--peserta-green); }
-.peserta-category-icon-box--online { background: #edf5fa; color: #0284c7; }
-.peserta-category-heading-left h3 { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
-.peserta-category-heading-left p { font-size: 12px; color: var(--peserta-muted); margin: 2px 0 0; }
-.peserta-category-meta-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-.peserta-category-meta-badge--offline { background: #edf7ef; color: #14532d; border: 1px solid #b7e4c7; }
-.peserta-category-meta-badge--online { background: #edf5fa; color: #0369a1; border: 1px solid #c8dfe8; }
+.peserta-meeting-info { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--peserta-line); color: #236483; }
+.peserta-meeting-content { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.peserta-meeting-content > strong { font-size: 12px; font-weight: 650; }
+.peserta-meeting-info .peserta-meeting-content > p { margin: 0; color: var(--peserta-muted); font-size: 12px; line-height: 1.6; }
+.peserta-meeting-content > small { color: var(--peserta-muted); font-size: 11px; line-height: 1.5; }
+.peserta-meeting-info--compact { margin-top: 10px; padding-top: 10px; }
+.peserta-meeting-info--compact .peserta-meeting-content > p { font-size: 11px; }
+.peserta-activity-main > div:first-child { min-width: 0; }
+.peserta-modal-body > .peserta-registration-note { margin-bottom: 16px; color: #236483; font-size: 12px; line-height: 1.6; }
+
 .peserta-shell .peserta-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 9px 15px; border: 1px solid transparent; border-radius: 8px; background: var(--peserta-green); color: white; text-align: center; font-size: 12px; font-weight: 700; line-height: 1.5; box-shadow: 0 3px 9px #14532d24; }
 .peserta-shell .peserta-button:hover { background: #0e4725; }
 .peserta-shell .peserta-button--secondary { border-color: #b9cec0; background: white; color: var(--peserta-green); box-shadow: none; }

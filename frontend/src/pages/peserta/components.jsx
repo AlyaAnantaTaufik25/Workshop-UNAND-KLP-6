@@ -1,15 +1,8 @@
 import { useEffect, useId, useRef } from 'react';
-import { MapPin, Video, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export function Status({ children, tone = 'green' }) {
   return <span className={`peserta-status peserta-status--${tone}`}><i />{children}</span>;
-}
-
-export function WorkshopMode({ mode }) {
-  if (mode !== 'online' && mode !== 'offline') return null;
-  const label = mode === 'online' ? 'Online' : 'Offline';
-  const Icon = mode === 'online' ? Video : MapPin;
-  return <span className={`peserta-workshop-mode peserta-workshop-mode--${mode}`} aria-label={`Mode pelaksanaan: ${label}`}><Icon size={13} aria-hidden="true" />{label}</span>;
 }
 
 export function EmptyState({ icon: Icon, title, children, action }) {
