@@ -10,6 +10,7 @@ export const initialProfile = {
 export const participantWorkshops = [
   {
     id: 'data-science',
+    attendanceState: 'open',
     title: 'Workshop Data Science untuk Riset Akademik',
     mode: 'offline',
     theme: 'Teknologi',
@@ -34,6 +35,8 @@ export const participantWorkshops = [
   },
   {
     id: 'hilirisasi-riset',
+    waitingListEnabled: true,
+    waitingCount: 4,
     title: 'Strategi Hilirisasi Riset dan Inovasi',
     mode: 'online',
     theme: 'Riset & Inovasi',
@@ -43,8 +46,8 @@ export const participantWorkshops = [
     place: 'Zoom Meeting',
     shortPlace: 'Zoom Meeting',
     fullPlace: 'Online melalui Zoom Meeting',
-    quota: '28 kursi tersisa',
-    remaining: 28,
+    quota: 'Kuota penuh · Waiting list tersedia',
+    remaining: 0,
     capacity: 80,
     deadline: '22 Mei 2025',
     image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
@@ -82,6 +85,8 @@ export const participantWorkshops = [
   },
   {
     id: 'ai-transformasi-digital',
+    registrationState: 'not-open',
+    opens: '20 Mei 2025',
     title: 'Seminar Nasional AI & Transformasi Digital',
     mode: 'online',
     theme: 'Teknologi',
@@ -106,6 +111,7 @@ export const participantWorkshops = [
   },
   {
     id: 'manajemen-proyek',
+    registrationState: 'closed',
     title: 'Workshop Manajemen Proyek Kolaboratif',
     mode: 'offline',
     theme: 'Manajemen',
@@ -130,6 +136,7 @@ export const participantWorkshops = [
   },
   {
     id: 'publikasi-jurnal-scopus',
+    waitingListEnabled: false,
     title: 'Webinar Publikasi Artikel Ilmiah Bereputasi',
     mode: 'online',
     theme: 'Riset & Inovasi',
@@ -139,8 +146,8 @@ export const participantWorkshops = [
     place: 'Zoom Meeting',
     shortPlace: 'Zoom Meeting',
     fullPlace: 'Online melalui Zoom Meeting',
-    quota: '42 kursi tersisa',
-    remaining: 42,
+    quota: 'Kuota penuh',
+    remaining: 0,
     capacity: 100,
     deadline: '18 Juni 2025',
     image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80',
@@ -175,7 +182,7 @@ export const participantWorkshops = [
 export const initialRegistrations = [
   { workshopId: 'data-science', status: 'registered' },
   { workshopId: 'hilirisasi-riset', status: 'waiting', queue: 4 },
-  { workshopId: 'public-speaking', status: 'completed' },
+  { workshopId: 'public-speaking', status: 'completed', attendance: { status: 'present', method: 'qr-location', submittedAt: '2025-04-12T09:05:00+07:00' } },
 ];
 
 export const participantCertificates = [

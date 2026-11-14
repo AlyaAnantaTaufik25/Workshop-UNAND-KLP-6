@@ -1,11 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import LayoutPeserta from './pages/peserta/LayoutPeserta';
 import CariWorkshop from './pages/peserta/CariWorkshop';
 import DetailWorkshop from './pages/peserta/DetailWorkshop';
 import WorkshopSaya from './pages/peserta/WorkshopSaya';
 import SertifikatPeserta from './pages/peserta/SertifikatPeserta';
 import ProfilPeserta from './pages/peserta/ProfilPeserta';
+import PratinjauKondisi from './pages/peserta/PratinjauKondisi';
 
 // Sekretariat Rektor
 import Layout from './components/Layout';
@@ -59,6 +61,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/peserta" element={<LayoutPeserta />}>
           <Route index element={<Navigate to="cari-workshop" replace />} />
           <Route path="cari-workshop" element={<CariWorkshop />} />
@@ -66,6 +69,7 @@ function App() {
           <Route path="workshop-saya" element={<WorkshopSaya />} />
           <Route path="sertifikat" element={<SertifikatPeserta />} />
           <Route path="profil" element={<ProfilPeserta />} />
+          <Route path="pratinjau-kondisi" element={<PratinjauKondisi />} />
         </Route>
 
         {/* ── ROLE: SEKRETARIAT REKTOR ── */}

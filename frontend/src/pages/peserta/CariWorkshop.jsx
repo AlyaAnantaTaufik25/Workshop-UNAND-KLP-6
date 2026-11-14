@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { CalendarDays, Clock3, MapPin, Search, SearchX, Users } from 'lucide-react';
-import { getWorkshopLocation, participantWorkshops } from './data';
+import { getWorkshopLocation } from './data';
 import { EmptyState, Status } from './components';
+import { getRegistrationState, registrationStates } from './workshopStates';
 
 export default function CariWorkshop() {
+  const { workshops, registrations } = useOutletContext();
   const [search, setSearch] = useState('');
   const [theme, setTheme] = useState('');
   const [date, setDate] = useState('');
   const [mode, setMode] = useState('');
+  const [status, setStatus] = useState('');
 
-  const available = participantWorkshops.filter(workshop => !workshop.completed);
+  const available = workshops.filter(workshop => !workshop.completed);
 
   const filtered = useMemo(() => available.filter(workshop => {
     const matchSearch = `${workshop.title} ${workshop.speaker}`.toLocaleLowerCase('id-ID').includes(search.trim().toLocaleLowerCase('id-ID'));
@@ -20,12 +23,15 @@ export default function CariWorkshop() {
     const end = new Date(start);
     end.setDate(end.getDate() + (7 - (start.getDay() + 6) % 7));
     const matchDate = !date || (date === 'week' ? day >= start && day < end : day.getMonth() === today.getMonth() && day.getFullYear() === today.getFullYear());
-    return matchSearch && (!theme || workshop.theme === theme) && matchDate && (!mode || workshop.mode === mode);
-  }), [available, search, theme, date, mode]);
+    const registrationState = getRegistrationState(workshop, registrations.find(item => item.workshopId === workshop.id));
+    return matchSearch && (!theme || workshop.theme === theme) && matchDate && (!mode || workshop.mode === mode) && (!status || registrationState === status);
+  }), [available, registrations, search, theme, date, mode, status]);
 
-  const reset = () => { setSearch(''); setTheme(''); setDate(''); setMode(''); };
+  const reset = () => { setSearch(''); setTheme(''); setDate(''); setMode(''); setStatus(''); };
 
-  const renderCard = (workshop) => (
+  const renderCard = (workshop) => {
+    const state = registrationStates[getRegistrationState(workshop, registrations.find(item => item.workshopId === workshop.id))];
+    return (
     <article className="peserta-workshop-card" key={workshop.id}>
       <img src={workshop.image} alt={`Suasana kegiatan ${workshop.title}`} />
       <div className="peserta-card-body">
@@ -33,19 +39,20 @@ export default function CariWorkshop() {
           <div className="peserta-card-context">
             <span className="peserta-card-theme">{workshop.theme}</span>
           </div>
-          <Status tone={workshop.closing ? 'amber' : 'green'}>{workshop.closing ? 'Segera tutup' : 'Pendaftaran buka'}</Status>
+          <Status tone={state.tone}>{state.label}</Status>
         </div>
         <h3>{workshop.title}</h3>
         <div className="peserta-facts">
           <p><CalendarDays size={17} /><span>{workshop.date} &middot; {workshop.time}</span></p>
           <p><MapPin size={17} /><span>{getWorkshopLocation(workshop)}</span></p>
-          <p><Users size={17} /><span>{workshop.quota}</span></p>
+          <p><Users size={17} /><span>{workshop.remaining > 0 ? `${workshop.remaining} kursi tersisa` : workshop.waitingListEnabled === false ? 'Kuota penuh' : 'Kuota penuh · Waiting list tersedia'}</span></p>
           {workshop.mode === 'online' && <p className="peserta-link-timing"><Clock3 size={17} /><span>Link pertemuan tersedia dan dikirim H-1.</span></p>}
         </div>
         <Link className="peserta-button peserta-button--secondary" to={`/peserta/workshop/${workshop.id}`}>Lihat Detail</Link>
       </div>
     </article>
   );
+  };
 
   return (
     <div className="peserta-stack">
@@ -79,6 +86,10 @@ export default function CariWorkshop() {
           <option value="">Semua tanggal</option>
           <option value="week">Minggu ini</option>
           <option value="month">Bulan ini</option>
+        </select>
+        <select aria-label="Status pendaftaran" value={status} onChange={event => setStatus(event.target.value)}>
+          <option value="">Semua status</option>
+          {Object.entries(registrationStates).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}
         </select>
       </section>
 

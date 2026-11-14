@@ -1,16 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Award, Bell, CalendarDays, LogOut, Menu, Search, User, X } from 'lucide-react';
+import { Award, Bell, CalendarDays, LogOut, Menu, PanelsTopLeft, Search, User, X } from 'lucide-react';
 import { initialProfile, initialRegistrations, initials, participantWorkshops, readParticipantData } from './data';
 import UnandLogo from '../../components/UnandLogo';
+import { canSubmitAttendance, createRegistration, getRemainingSeats } from './workshopStates';
 import './peserta.css';
+import './workshopStates.css';
 
 const navItems = [
   { to: '/peserta/cari-workshop', label: 'Cari Workshop', icon: Search },
   { to: '/peserta/workshop-saya', label: 'Workshop Saya', icon: CalendarDays },
   { to: '/peserta/sertifikat', label: 'Sertifikat', icon: Award },
   { to: '/peserta/profil', label: 'Profil', icon: User },
+  { to: '/peserta/pratinjau-kondisi', label: 'Pratinjau Kondisi', icon: PanelsTopLeft },
 ];
+
+function loadRegistrations() {
+  const saved = readParticipantData('registrations', initialRegistrations, value =>
+    Array.isArray(value) && new Set(value.map(item => item?.workshopId)).size === value.length
+    && value.every(item => item && participantWorkshops.some(workshop => workshop.id === item.workshopId)
+      && ['registered', 'waiting', 'completed', 'cancelled'].includes(item.status)
+      && (!item.attendance || ['pending', 'present', 'rejected', 'absent'].includes(item.attendance.status))));
+  return saved.map(item => {
+    const original = initialRegistrations.find(entry => entry.workshopId === item.workshopId && entry.status === item.status);
+    return !item.attendance && original?.attendance ? { ...item, attendance: original.attendance } : item;
+  });
+}
 
 export default function LayoutPeserta() {
   const location = useLocation();
@@ -24,7 +39,8 @@ export default function LayoutPeserta() {
   const menuButtonRef = useRef();
   const sidebarRef = useRef();
   const [profile, setProfile] = useState(() => readParticipantData('profile', initialProfile, value => value && Object.keys(initialProfile).every(key => typeof value[key] === 'string') && value.nama.trim()));
-  const [registrations, setRegistrations] = useState(() => readParticipantData('registrations', initialRegistrations, value => Array.isArray(value) && new Set(value.map(item => item?.workshopId)).size === value.length && value.every(item => item && participantWorkshops.some(workshop => workshop.id === item.workshopId) && ['registered', 'waiting', 'completed'].includes(item.status))));
+  const [registrations, setRegistrations] = useState(loadRegistrations);
+  const workshops = participantWorkshops.map(workshop => ({ ...workshop, remaining: getRemainingSeats(workshop, registrations, initialRegistrations) }));
   const notify = useCallback(text => {
     setMessage(text);
     clearTimeout(timer.current);
@@ -71,8 +87,24 @@ export default function LayoutPeserta() {
   };
   const saveProfile = value => persist('profile', value, setProfile);
   const register = workshopId => {
-    if (registrations.some(item => item.workshopId === workshopId)) return false;
-    return persist('registrations', [...registrations, { workshopId, status: 'registered' }], setRegistrations);
+    const workshop = workshops.find(item => item.id === workshopId);
+    if (!workshop) return false;
+    const entry = createRegistration(workshop, registrations.find(item => item.workshopId === workshopId));
+    if (!entry) return false;
+    return persist('registrations', [...registrations.filter(item => item.workshopId !== workshopId), entry], setRegistrations);
+  };
+  const cancelRegistration = workshopId => {
+    const workshop = workshops.find(item => item.id === workshopId);
+    const entry = registrations.find(item => item.workshopId === workshopId);
+    if (!workshop || workshop.completed || workshop.cancelled || !['registered', 'waiting'].includes(entry?.status)) return false;
+    return persist('registrations', registrations.map(item => item.workshopId === workshopId ? { ...item, status: 'cancelled', cancelledAt: new Date().toISOString() } : item), setRegistrations);
+  };
+  const submitAttendance = (workshopId, evidence) => {
+    const workshop = workshops.find(item => item.id === workshopId);
+    const entry = registrations.find(item => item.workshopId === workshopId);
+    if (!workshop || !canSubmitAttendance(workshop, entry)) return false;
+    // Frontend prototype: keep evidence metadata locally until the attendance API is available.
+    return persist('registrations', registrations.map(item => item.workshopId === workshopId ? { ...item, attendance: { ...evidence, status: 'pending' } } : item), setRegistrations);
   };
   const pageTitle = location.pathname.includes('/workshop/') ? 'Detail Workshop' : navItems.find(item => location.pathname === item.to)?.label || 'Cari Workshop';
 
@@ -95,7 +127,7 @@ export default function LayoutPeserta() {
           <NavLink to="/peserta/profil" className="peserta-profile-link" aria-label={`Profil ${profile.nama}`}><span className="peserta-avatar">{initials(profile.nama)}</span><div><strong>{profile.nama}</strong><span>Peserta</span></div></NavLink>
         </div>
       </header>
-      <main id="peserta-content" className="peserta-content"><Outlet context={{ profile, saveProfile, registrations, register, notify }} /></main>
+      <main id="peserta-content" className="peserta-content"><Outlet context={{ profile, saveProfile, workshops, registrations, register, cancelRegistration, submitAttendance, notify }} /></main>
     </div>
     {message && <div className="peserta-toast" role="status">{message}<button className="peserta-icon-button" aria-label="Tutup pesan" onClick={() => setMessage('')}><X size={16} /></button></div>}
   </div>;

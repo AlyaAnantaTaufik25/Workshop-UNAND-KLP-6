@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import UnandLogo from '../components/UnandLogo';
 import './login.css';
 import {
@@ -94,7 +94,7 @@ export default function Login() {
 
           <p className="login-register-link">
             Belum punya akun peserta umum?{' '}
-            <a href="#">Daftar sekarang</a>
+            <Link to="/register">Daftar sekarang</Link>
           </p>
 
           {/* DIVIDER */}
