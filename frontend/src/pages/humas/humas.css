@@ -9,6 +9,99 @@
   --green-50:  #edf7ef;
 }
 
+/* ── Sidebar sub-menu (Kelola Sertifikat) ── */
+:where(.role-humas) .sidebar-group {
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.role-humas) .sidebar-group-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--gray-700, #374151);
+  border-radius: 8px;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+:where(.role-humas) .sidebar-group-btn:hover,
+:where(.role-humas) .sidebar-group-btn.is-active {
+  background: var(--green-50);
+  color: var(--green-800);
+}
+
+:where(.role-humas) .sidebar-sub-menu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 42px;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+:where(.role-humas) .sidebar-sub-link {
+  display: block;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: var(--gray-600, #4b5563);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+:where(.role-humas) .sidebar-sub-link:hover {
+  background: var(--green-50);
+  color: var(--green-800);
+}
+:where(.role-humas) .sidebar-sub-link.is-active {
+  background: var(--green-100);
+  color: var(--green-800);
+  font-weight: 600;
+}
+
+/* ── Layout notification bell (top-right header) ── */
+:where(.role-humas) .layout-notif-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-200, #e5e7eb);
+  background: white;
+  cursor: pointer;
+  color: var(--gray-600, #4b5563);
+  transition: background 0.15s, color 0.15s;
+  margin-right: 8px;
+}
+:where(.role-humas) .layout-notif-bell:hover {
+  background: var(--green-50);
+  color: var(--green-800);
+}
+:where(.role-humas) .layout-notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #dc2626;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+
 /* PROFIL PAGE */
 :where(.role-humas) .profil-card {
   background: white;
@@ -1374,6 +1467,19 @@
 :where(.role-humas) .ringkasan-stat-card:hover {
   box-shadow: 0 4px 14px rgba(30, 60, 40, 0.06);
   border-color: #b9cec0;
+}
+
+:where(.role-humas) .ringkasan-stat-clickable {
+  cursor: pointer;
+}
+:where(.role-humas) .ringkasan-stat-clickable:hover {
+  box-shadow: 0 4px 16px rgba(30, 60, 40, 0.1);
+  border-color: #14532d;
+  transform: translateY(-1px);
+}
+:where(.role-humas) .ringkasan-stat-clickable:hover .ringkasan-stat-value {
+  color: #14532d;
+  text-decoration: underline;
 }
 
 :where(.role-humas) .ringkasan-stat-icon {

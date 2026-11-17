@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Briefcase, Users, Check, Bell, Plus, Eye, Pencil,
-  Trash2, X, MapPin, CalendarDays
+  Briefcase, Users, Check, Plus, Eye, Pencil,
+  Trash2, X, CalendarDays
 } from 'lucide-react';
-import { humasStats, humasKegiatan, humasKegiatanTerdekat } from './data';
+import { humasKegiatan } from './data';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 
 // ─── helpers ────────────────────────────────────────────
@@ -71,7 +71,6 @@ export default function RingkasanHumas() {
   const [kegiatan, setKegiatan]     = useState(humasKegiatan);
   const [showTambah, setShowTambah] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
-  const [showNotif, setShowNotif]   = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   // Tambah / Edit kegiatan
@@ -125,16 +124,12 @@ export default function RingkasanHumas() {
         {/* Page Heading & Actions area */}
         <div className="ringkasan-header-area">
           <div className="ringkasan-header-left">
-            <h2 className="ringkasan-title">Ringkasan kegiatan</h2>
+            <h2 className="ringkasan-title">Dashboard</h2>
             <p className="ringkasan-sub">
               Sistem Informasi Manajemen Workshop Universitas Andalas
             </p>
           </div>
           <div className="ringkasan-header-right">
-            <button className="humas-notif-btn" onClick={() => setShowNotif(true)}>
-              <Bell size={16} />
-              <span>Notifikasi perbaikan ({notifikasiData.length})</span>
-            </button>
             <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
               <Plus size={16} />
               <span>Tambah Kegiatan</span>
@@ -144,7 +139,11 @@ export default function RingkasanHumas() {
 
         {/* ── Stats Cards ── */}
         <div className="ringkasan-stats-row">
-          <div className="ringkasan-stat-card">
+          <div
+            className="ringkasan-stat-card ringkasan-stat-clickable"
+            onClick={() => navigate('/humas/kelola-kegiatan')}
+            title="Lihat semua kegiatan"
+          >
             <div className="ringkasan-stat-icon">
               <Briefcase size={22} />
             </div>
@@ -154,7 +153,11 @@ export default function RingkasanHumas() {
             </div>
           </div>
 
-          <div className="ringkasan-stat-card">
+          <div
+            className="ringkasan-stat-card ringkasan-stat-clickable"
+            onClick={() => navigate('/humas/kelola-kegiatan')}
+            title="Lihat data pendaftar"
+          >
             <div className="ringkasan-stat-icon">
               <Users size={22} />
             </div>
@@ -164,7 +167,11 @@ export default function RingkasanHumas() {
             </div>
           </div>
 
-          <div className="ringkasan-stat-card">
+          <div
+            className="ringkasan-stat-card ringkasan-stat-clickable"
+            onClick={() => navigate('/humas/laporan')}
+            title="Lihat laporan kehadiran"
+          >
             <div className="ringkasan-stat-icon">
               <Check size={22} strokeWidth={2.5} />
             </div>
@@ -295,14 +302,6 @@ export default function RingkasanHumas() {
           onClose={() => { setShowTambah(false); setEditTarget(null); }}
           onSave={handleSaveKegiatan}
           editData={editTarget}
-        />
-      )}
-
-      {/* ── Notifikasi Modal ── */}
-      {showNotif && (
-        <NotifikasiModal
-          onClose={() => setShowNotif(false)}
-          onNavigate={(path) => navigate(path)}
         />
       )}
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
+import { humasKegiatan } from './data';
 
 const initialMitra = [
   {
@@ -114,9 +115,6 @@ export default function KelolaMitra() {
             </p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            <button className="humas-notif-btn">
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
             <button className="humas-tambah-btn" onClick={handleBukaTambah}>
               <Plus size={15} /> Tambah Mitra
             </button>
@@ -175,9 +173,21 @@ export default function KelolaMitra() {
                   <td style={{ whiteSpace: 'nowrap' }}>{m.kontak}</td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {m.kegiatanTerkait.map((kg, i) => (
-                        <span key={i} className="humas-link" style={{ fontSize: '12.5px' }}>{kg}</span>
-                      ))}
+                      {m.kegiatanTerkait.map((kg, i) => {
+                        const target = humasKegiatan.find(k => k.nama === kg);
+                        return target ? (
+                          <button
+                            key={i}
+                            className="humas-link"
+                            style={{ fontSize: '12.5px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+                            onClick={() => navigate(`/humas/kelola-kegiatan/${target.id}`)}
+                          >
+                            {kg}
+                          </button>
+                        ) : (
+                          <span key={i} style={{ fontSize: '12.5px', color: 'var(--gray-500)' }}>{kg}</span>
+                        );
+                      })}
                     </div>
                   </td>
                   <td>
