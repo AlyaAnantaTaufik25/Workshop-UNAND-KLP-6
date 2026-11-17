@@ -258,9 +258,6 @@ export default function PerbaikanSertifikat() {
       {mode === 'list' && (
         <>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <button className="humas-notif-btn">
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
           </div>
 
           <div>

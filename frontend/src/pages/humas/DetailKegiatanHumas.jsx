@@ -163,10 +163,6 @@ export default function DetailKegiatanHumas() {
         >
           Kembali ke daftar kegiatan
         </button>
-        <button className="humas-notif-btn">
-          <Bell size={15} />
-          <span>Notifikasi perbaikan (1)</span>
-        </button>
       </div>
 
       {/* ── White card wrapper ── */}

@@ -83,9 +83,6 @@ export default function KelolaKegiatan() {
             </p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            <button className="humas-notif-btn">
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
             <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
               <Plus size={15} /> Tambah Kegiatan
             </button>

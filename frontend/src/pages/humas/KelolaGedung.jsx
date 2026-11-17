@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Plus, X, Eye, Pencil, Trash2 } from 'lucide-react';
+import { Search, Bell, Plus, X, Eye, Pencil, Trash2, MapPin, Navigation, Compass } from 'lucide-react';
 
 const initialGedung = [
   {
@@ -40,6 +40,7 @@ export default function KelolaGedung() {
   // Modals state
   const [showTambah, setShowTambah] = useState(false);
   const [tambahForm, setTambahForm] = useState(defaultForm);
+  const [showMapPicker, setShowMapPicker] = useState(false);
 
   const [detailData, setDetailData] = useState(null);
 
@@ -123,12 +124,6 @@ export default function KelolaGedung() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
             <button
-              className="humas-notif-btn"
-              onClick={() => navigate('/humas/perbaikan-sertifikat')}
-            >
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
-            <button
               className="humas-tambah-btn"
               style={{
                 background: '#14532d',
@@ -140,7 +135,14 @@ export default function KelolaGedung() {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setTambahForm(defaultForm);
+                setTambahForm({
+                  gedung: '',
+                  ruangan: '',
+                  lokasi: 'Kampus Limau Manis, Padang',
+                  lat: '-0.914488',
+                  lng: '100.466542',
+                  radius: 50,
+                });
                 setShowTambah(true);
               }}
             >
@@ -319,6 +321,35 @@ export default function KelolaGedung() {
                   />
                 </div>
               </div>
+
+              {/* Opsi Pilih Lewat Peta */}
+              <div style={{ marginTop: 4 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMapPicker(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '8px 14px',
+                    borderRadius: 6,
+                    border: '1.5px solid #15803d',
+                    background: '#f0fdf4',
+                    color: '#15803d',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <MapPin size={15} />
+                  <span>Tentukan Titik & Radius pada Peta</span>
+                </button>
+                {tambahForm.lat && tambahForm.lng && (
+                  <span style={{ marginLeft: 10, fontSize: '12px', color: '#6b7280' }}>
+                    Terpilih: {tambahForm.lat}, {tambahForm.lng} ({tambahForm.radius || 50}m)
+                  </span>
+                )}
+              </div>
             </div>
 
             <div
@@ -364,6 +395,323 @@ export default function KelolaGedung() {
                 onClick={handleSimpanTambah}
               >
                 Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────── */}
+      {/* 1.1 MODAL TITIK PUSAT & RADIUS GEOFENCE (LEAFLET MAP)    */}
+      {/* ────────────────────────────────────────────────────────── */}
+      {showMapPicker && (
+        <div className="modal-overlay" onClick={() => setShowMapPicker(false)} style={{ zIndex: 1050 }}>
+          <div
+            className="modal-box"
+            style={{ maxWidth: 580, width: '100%', borderRadius: 12, padding: 0, overflow: 'hidden', background: '#fff' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #f1f5f9' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1f2937', margin: 0 }}>
+                  Titik Pusat & Radius Geofence Gedung (Leaflet Map)
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowMapPicker(false)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Sub-bar Hijau */}
+            <div
+              style={{
+                background: '#f0fdf4',
+                padding: '9px 18px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid #dcfce7',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#15803d', fontWeight: 600, fontSize: '12.5px' }}>
+                <Compass size={15} />
+                <span>Tentukan Koordinat Gedung pada Peta</span>
+              </div>
+              <span style={{ fontSize: '11.5px', color: '#16a34a' }}>
+                Klik atau geser pin untuk menentukan titik
+              </span>
+            </div>
+
+            {/* Container Peta Visual Leaflet */}
+            <div
+              style={{
+                position: 'relative',
+                height: 290,
+                background: '#f2efe9',
+                overflow: 'hidden',
+                cursor: 'crosshair',
+                userSelect: 'none',
+              }}
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const latOffset = ((y - 145) / 145) * -0.0012;
+                const lngOffset = ((x - (rect.width / 2)) / (rect.width / 2)) * 0.0012;
+                const newLat = (-0.914488 + latOffset).toFixed(6);
+                const newLng = (100.466542 + lngOffset).toFixed(6);
+                setTambahForm(prev => ({
+                  ...prev,
+                  lat: newLat,
+                  lng: newLng,
+                }));
+              }}
+            >
+              {/* Vektor Map jalan & gedung */}
+              <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
+                <rect width="100%" height="100%" fill="#f2efe9" />
+                <path d="M -20 75 Q 200 65 600 80" stroke="#fff" strokeWidth="22" fill="none" />
+                <path d="M 110 -20 L 130 310" stroke="#fff" strokeWidth="18" fill="none" />
+                <path d="M 380 -20 L 400 310" stroke="#fff" strokeWidth="24" fill="none" />
+                <path d="M 270 75 L 285 310" stroke="#fff" strokeWidth="16" fill="none" />
+                <path d="M -20 75 Q 200 65 600 80" stroke="#fef3c7" strokeWidth="4" fill="none" strokeDasharray="8 6" />
+
+                <rect x="25" y="105" width="90" height="65" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
+                <text x="30" y="138" fontSize="8.5" fill="#9ca3af" fontWeight="bold">Dean Engineering Faculty</text>
+
+                <rect x="160" y="125" width="120" height="60" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
+                <rect x="210" y="200" width="95" height="80" rx="3" fill="#d9d2c7" stroke="#c9c1b5" strokeWidth="1" />
+                <rect x="330" y="105" width="85" height="75" rx="3" fill="#ded7cd" stroke="#cfc7bc" strokeWidth="1" />
+                <rect x="450" y="120" width="105" height="110" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
+
+                <rect x="320" y="18" width="55" height="35" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
+                <text x="328" y="34" fontSize="9" fill="#3b82f6" fontWeight="bold">Gedung F</text>
+
+                <text x="380" y="50" fontSize="12" fill="#4b5563" fontWeight="bold" fontStyle="italic">
+                  Padang State Polytechnic
+                </text>
+              </svg>
+
+              {/* Zoom (+ / -) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 12,
+                  background: '#fff',
+                  borderRadius: 4,
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  zIndex: 10,
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  style={{ width: 28, height: 28, border: 'none', borderBottom: '1px solid #e5e7eb', background: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  style={{ width: 28, height: 28, border: 'none', background: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  –
+                </button>
+              </div>
+
+              {/* Tombol Lokasi Saya */}
+              <div
+                style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTambahForm(prev => ({
+                      ...prev,
+                      lat: '-0.914488',
+                      lng: '100.466542',
+                    }));
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    background: '#fff',
+                    borderRadius: 6,
+                    border: '1px solid #d1d5db',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    color: '#15803d',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Navigation size={13} />
+                  <span>Lokasi Saya</span>
+                </button>
+              </div>
+
+              {/* Radius Circle */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: `${Math.min(Math.max((Number(tambahForm.radius) || 50) * 2.8, 60), 240)}px`,
+                  height: `${Math.min(Math.max((Number(tambahForm.radius) || 50) * 2.8, 60), 240)}px`,
+                  borderRadius: '50%',
+                  background: 'rgba(34, 197, 94, 0.22)',
+                  border: '2px solid #16a34a',
+                  pointerEvents: 'none',
+                  zIndex: 4,
+                }}
+              />
+
+              {/* Pin Hijau */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -100%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  pointerEvents: 'none',
+                  zIndex: 5,
+                }}
+              >
+                <div
+                  style={{
+                    width: 34,
+                    height: 42,
+                    background: '#15803d',
+                    borderRadius: '50% 50% 50% 0',
+                    transform: 'rotate(-45deg)',
+                    boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 12,
+                      height: 12,
+                      background: '#fff',
+                      borderRadius: '50%',
+                      transform: 'rotate(45deg)',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Info Bar: KOORDINAT, RADIUS, & Slider */}
+            <div
+              style={{
+                padding: '12px 18px',
+                background: '#fff',
+                borderTop: '1px solid #f1f5f9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 10,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#9ca3af', fontWeight: 700, letterSpacing: 0.5 }}>
+                  KOORDINAT
+                </div>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827', marginTop: 2, fontFamily: 'monospace' }}>
+                  {tambahForm.lat || '-0.914488'}, {tambahForm.lng || '100.466542'}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#9ca3af', fontWeight: 700, letterSpacing: 0.5 }}>
+                  RADIUS GEOFENCE
+                </div>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#15803d', marginTop: 2 }}>
+                  {tambahForm.radius || 50} meter
+                </div>
+              </div>
+
+              {/* Slider Radius */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: 500 }}>Ubah Radius:</span>
+                <input
+                  type="range"
+                  min="20"
+                  max="200"
+                  step="5"
+                  value={tambahForm.radius || 50}
+                  onChange={e => setTambahForm(prev => ({ ...prev, radius: Number(e.target.value) }))}
+                  style={{
+                    accentColor: '#15803d',
+                    cursor: 'pointer',
+                    width: 100,
+                  }}
+                />
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#111827', minWidth: 28 }}>
+                  {tambahForm.radius || 50}m
+                </span>
+              </div>
+            </div>
+
+            {/* Tombol Batal & Terapkan Sesuai Gambar */}
+            <div
+              style={{
+                padding: '10px 18px 14px',
+                background: '#fafafa',
+                borderTop: '1px solid #f1f5f9',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 8,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setShowMapPicker(false)}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: 7,
+                  border: '1px solid #d1d5db',
+                  background: '#fff',
+                  color: '#374151',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowMapPicker(false)}
+                style={{
+                  padding: '7px 18px',
+                  borderRadius: 7,
+                  border: 'none',
+                  background: '#0f172a',
+                  color: '#fff',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Tambah Gedung
               </button>
             </div>
           </div>

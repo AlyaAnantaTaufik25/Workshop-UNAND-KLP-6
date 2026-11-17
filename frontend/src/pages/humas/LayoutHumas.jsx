@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, Briefcase, Handshake, MapPin,
@@ -58,6 +58,18 @@ export default function LayoutHumas() {
     location.pathname.startsWith('/humas/perbaikan-sertifikat')
   );
   const [showNotif, setShowNotif] = useState(false);
+  const notifRef = useRef(null);
+
+  // Tutup dropdown saat klik luar
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotif(false);
+      }
+    }
+    if (showNotif) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotif]);
 
   const pageTitle =
     pageTitles[location.pathname] ??
@@ -155,17 +167,46 @@ export default function LayoutHumas() {
           </div>
 
           <div className="top-header-right">
-            {/* Notification Bell */}
-            <button
-              className="layout-notif-bell"
-              onClick={() => setShowNotif(true)}
-              title="Notifikasi Perbaikan Sertifikat"
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && (
-                <span className="layout-notif-badge">{unreadCount}</span>
+            {/* Notification Bell – dropdown, bukan modal-overlay */}
+            <div className="layout-notif-wrapper" ref={notifRef}>
+              <button
+                className="layout-notif-bell"
+                onClick={() => setShowNotif(o => !o)}
+                title="Notifikasi Perbaikan Sertifikat"
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span className="layout-notif-badge">{unreadCount}</span>
+                )}
+              </button>
+
+              {showNotif && (
+                <div className="layout-notif-dropdown">
+                  <div className="layout-notif-dropdown-header">
+                    <span className="layout-notif-dropdown-title">Notifikasi Perbaikan Sertifikat</span>
+                    <button className="modal-close-btn" onClick={() => setShowNotif(false)}><X size={15} /></button>
+                  </div>
+                  <div className="layout-notif-dropdown-body">
+                    {notifikasiData.map(n => (
+                      <div key={n.id} className="notif-item">
+                        <div className="notif-item-icon"><Bell size={15} /></div>
+                        <div className="notif-item-content">
+                          <p className="notif-item-title">{n.judul}</p>
+                          <p className="notif-item-desc">{n.deskripsi}</p>
+                          <p className="notif-item-time">{n.waktu}</p>
+                          <button
+                            className="notif-item-link"
+                            onClick={() => { setShowNotif(false); navigate(n.link); }}
+                          >
+                            Lihat Detail
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
 
             <button
               className="user-profile-btn"
@@ -187,39 +228,6 @@ export default function LayoutHumas() {
           <Outlet />
         </main>
       </div>
-
-      {/* ── Notifikasi Modal ── */}
-      {showNotif && (
-        <div className="modal-overlay" onClick={() => setShowNotif(false)}>
-          <div className="modal-box" style={{ maxWidth: 480, marginTop: 70, marginLeft: 'auto', marginRight: 24 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <div>
-                <p className="modal-header-crumb">WORKSHOP UNAND</p>
-                <h2 className="modal-header-title">Notifikasi Perbaikan Sertifikat</h2>
-              </div>
-              <button className="modal-close-btn" onClick={() => setShowNotif(false)}><X size={16} /></button>
-            </div>
-            <div className="modal-body" style={{ gap: 12 }}>
-              {notifikasiData.map(n => (
-                <div key={n.id} className="notif-item">
-                  <div className="notif-item-icon"><Bell size={16} /></div>
-                  <div className="notif-item-content">
-                    <p className="notif-item-title">{n.judul}</p>
-                    <p className="notif-item-desc">{n.deskripsi}</p>
-                    <p className="notif-item-time">{n.waktu}</p>
-                    <button
-                      className="notif-item-link"
-                      onClick={() => { setShowNotif(false); navigate(n.link); }}
-                    >
-                      Lihat Detail
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

@@ -78,9 +78,6 @@ export default function KelolaPengguna() {
             </p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            <button className="humas-notif-btn">
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
             <button className="humas-tambah-btn" onClick={handleBukaTambah}>
               <Plus size={15} /> Tambah Akun
             </button>

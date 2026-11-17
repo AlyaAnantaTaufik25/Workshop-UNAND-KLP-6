@@ -32,16 +32,6 @@ export default function ProfilHumas() {
 
   return (
     <div className="humas-list-page">
-      {/* Top Notif Bar */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-        <button
-          className="humas-notif-btn"
-          onClick={() => navigate('/humas/perbaikan-sertifikat')}
-        >
-          <Bell size={15} /> Notifikasi perbaikan (1)
-        </button>
-      </div>
-
       {/* Heading di luar card */}
       <div style={{ marginBottom: 20 }}>
         <h2 className="humas-section-title">Profil pribadi</h2>

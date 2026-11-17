@@ -152,12 +152,6 @@ export default function TemplateSertifikat() {
             <p className="humas-section-sub">Kelola template sertifikat sumber UNAND.</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-            <button
-              className="humas-notif-btn"
-              onClick={() => navigate('/humas/perbaikan-sertifikat')}
-            >
-              <Bell size={15} /> Notifikasi perbaikan (1)
-            </button>
             <button className="humas-tambah-btn" onClick={() => setShowTambahModal(true)}>
               <Plus size={15} /> Tambah Template
             </button>

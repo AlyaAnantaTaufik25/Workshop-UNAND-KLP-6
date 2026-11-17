@@ -121,19 +121,13 @@ export default function RingkasanHumas() {
     <>
       <div className="humas-ringkasan-page">
 
-        {/* Page Heading & Actions area */}
+        {/* Page Heading area */}
         <div className="ringkasan-header-area">
           <div className="ringkasan-header-left">
             <h2 className="ringkasan-title">Dashboard</h2>
             <p className="ringkasan-sub">
               Sistem Informasi Manajemen Workshop Universitas Andalas
             </p>
-          </div>
-          <div className="ringkasan-header-right">
-            <button className="humas-tambah-btn" onClick={() => { setEditTarget(null); setShowTambah(true); }}>
-              <Plus size={16} />
-              <span>Tambah Kegiatan</span>
-            </button>
           </div>
         </div>
 
