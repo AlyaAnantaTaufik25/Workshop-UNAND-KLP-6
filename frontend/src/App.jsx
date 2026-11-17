@@ -6,8 +6,12 @@ import CariWorkshop from './pages/peserta/CariWorkshop';
 import DetailWorkshop from './pages/peserta/DetailWorkshop';
 import WorkshopSaya from './pages/peserta/WorkshopSaya';
 import SertifikatPeserta from './pages/peserta/SertifikatPeserta';
+import DetailSertifikatPeserta from './pages/peserta/DetailSertifikatPeserta';
+import FormPerbaikanSertifikat from './pages/peserta/FormPerbaikanSertifikat';
+import RiwayatPerbaikanSertifikat from './pages/peserta/RiwayatPerbaikanSertifikat';
+import DetailPerbaikanSertifikat from './pages/peserta/DetailPerbaikanSertifikat';
+import NotifikasiPerbaikanSertifikat from './pages/peserta/NotifikasiPerbaikanSertifikat';
 import ProfilPeserta from './pages/peserta/ProfilPeserta';
-import PratinjauKondisi from './pages/peserta/PratinjauKondisi';
 
 // Sekretariat Rektor
 import Layout from './components/Layout';
@@ -68,8 +72,13 @@ function App() {
           <Route path="workshop/:id" element={<DetailWorkshop />} />
           <Route path="workshop-saya" element={<WorkshopSaya />} />
           <Route path="sertifikat" element={<SertifikatPeserta />} />
+          <Route path="sertifikat/notifikasi" element={<NotifikasiPerbaikanSertifikat />} />
+          <Route path="sertifikat/perbaikan" element={<RiwayatPerbaikanSertifikat />} />
+          <Route path="sertifikat/perbaikan/:requestId" element={<DetailPerbaikanSertifikat />} />
+          <Route path="sertifikat/:id/perbaikan" element={<FormPerbaikanSertifikat />} />
+          <Route path="sertifikat/:id" element={<DetailSertifikatPeserta />} />
           <Route path="profil" element={<ProfilPeserta />} />
-          <Route path="pratinjau-kondisi" element={<PratinjauKondisi />} />
+          <Route path="pratinjau-kondisi" element={<Navigate to="/peserta/workshop-saya" replace />} />
         </Route>
 
         {/* ── ROLE: SEKRETARIAT REKTOR ── */}

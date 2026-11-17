@@ -1,16 +1,47 @@
 import { useState } from 'react';
-import { Award, Download, Printer } from 'lucide-react';
-import { getWorkshopLocation, participantCertificates, participantWorkshops } from './data';
-import { EmptyState, Modal, Status } from './components';
-import UnandLogo from '../../components/UnandLogo';
+import { Link, useOutletContext } from 'react-router-dom';
+import { Award, Eye, FilePenLine, History, Search, SearchX } from 'lucide-react';
+import { EmptyState, Status } from './components';
+import { correctionStatuses } from './certificateCorrections';
+import { CertificateDownloadButton, CertificateEmpty, CertificateHeading, CertificateNotificationsLink, CorrectionStatus, useCertificateDownload } from './CertificateUi';
 
 export default function SertifikatPeserta() {
-  const [selected, setSelected] = useState(null);
-  return <div className="peserta-stack"><section className="peserta-intro"><h2>Sertifikat Anda</h2><p>Unduh sertifikat dari workshop yang telah selesai.</p></section>
-    {participantCertificates.length ? participantCertificates.map(certificate => {
-      const workshop = participantWorkshops.find(item => item.id === certificate.workshopId);
-      return <article className="peserta-certificate-row" key={certificate.id}><div className="peserta-certificate-icon"><Award size={30} /></div><div><Status>Diterbitkan</Status><h3>{workshop.title}</h3><p>No. {certificate.number} &middot; Terbit {certificate.issued}</p></div><button className="peserta-button" onClick={() => setSelected({ ...certificate, workshop })}><Download size={18} />Unduh PDF</button></article>;
-    }) : <EmptyState icon={Award} title="Belum ada sertifikat tersedia">Sertifikat akan muncul setelah kehadiran Anda divalidasi dan dokumen diterbitkan.</EmptyState>}
-    {selected && <Modal title="Sertifikat Workshop" wide onClose={() => setSelected(null)}><div className="peserta-modal-body"><div className="peserta-certificate-preview"><div className="peserta-certificate-brand"><UnandLogo className="peserta-brandmark" /><strong>UNIVERSITAS ANDALAS</strong></div><span>SERTIFIKAT</span><p>No. {selected.number}</p><p>Diberikan kepada</p><h2>{selected.recipient}</h2><p>Atas partisipasinya sebagai peserta dalam kegiatan</p><h3>{selected.workshop.title}</h3><p>{selected.workshop.date} &middot; {getWorkshopLocation(selected.workshop)}</p><div className="peserta-certificate-issued">Diterbitkan pada {selected.issued}<br />Universitas Andalas</div></div></div><footer><button className="peserta-button peserta-button--secondary" onClick={() => setSelected(null)}>Tutup</button><button className="peserta-button" onClick={() => window.print()}><Printer size={18} />Cetak / Simpan PDF</button></footer></Modal>}
+  const { certificates, corrections } = useOutletContext();
+  const [query, setQuery] = useState('');
+  const [issuer, setIssuer] = useState('');
+  const [status, setStatus] = useState('');
+  const download = useCertificateDownload();
+  const latestRequest = certificateId => corrections.filter(item => item.certificateId === certificateId).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))[0];
+  const filtered = certificates.filter(certificate => {
+    const text = `${certificate.recipient} ${certificate.workshop.title} ${certificate.number} ${certificate.issuer}`.toLocaleLowerCase('id-ID');
+    return text.includes(query.trim().toLocaleLowerCase('id-ID')) && (!issuer || certificate.issuerType === issuer)
+      && (!status || (latestRequest(certificate.id)?.status || 'none') === status);
+  }).sort((a, b) => (b.workshop.isoDate || '').localeCompare(a.workshop.isoDate || ''));
+  if (!certificates.length) return <CertificateEmpty />;
+  return <div className="peserta-stack">
+    <CertificateNotificationsLink />
+    <CertificateHeading title="Sertifikat Anda" description="Lihat, unduh, dan ajukan perbaikan sertifikat dari kegiatan yang telah selesai.">
+      <Link className="peserta-button peserta-button--secondary" to="/peserta/sertifikat/perbaikan"><History size={17} />Riwayat Perbaikan</Link>
+    </CertificateHeading>
+    <section className="peserta-filterbar peserta-certificate-filters" aria-label="Filter sertifikat">
+      <label className="peserta-searchbox"><Search size={18} /><input type="search" aria-label="Cari sertifikat" placeholder="Cari kegiatan, nomor, atau penerbit..." value={query} onChange={event => setQuery(event.target.value)} /></label>
+      <select aria-label="Penerbit sertifikat" value={issuer} onChange={event => setIssuer(event.target.value)}><option value="">Semua penerbit</option><option value="unand">UNAND</option><option value="mitra">Mitra</option></select>
+      <select aria-label="Status perbaikan sertifikat" value={status} onChange={event => setStatus(event.target.value)}><option value="">Semua perbaikan</option><option value="none">Belum ada pengajuan</option>{Object.entries(correctionStatuses).map(([key, config]) => <option value={key} key={key}>{config.label}</option>)}</select>
+    </section>
+    <div className="peserta-section-line"><h2>Daftar sertifikat <span className="peserta-count" aria-live="polite">{filtered.length}</span></h2></div>
+    {download.error && <p className="peserta-inline-error" role="alert">{download.error}</p>}
+    {filtered.length ? filtered.map(certificate => {
+      const request = latestRequest(certificate.id);
+      const active = request && ['menunggu', 'diproses'].includes(request.status);
+      return <article className="peserta-certificate-row" key={certificate.id} aria-label={certificate.workshop.title}>
+        <div className="peserta-certificate-icon"><Award size={30} /></div>
+        <div className="peserta-certificate-details"><div className="peserta-activity-status"><Status>{certificate.revision > 1 ? 'Diperbaiki' : 'Diterbitkan'}</Status>{request && <CorrectionStatus status={request.status} />}</div><h3>{certificate.workshop.title}</h3><p>No. {certificate.number} &middot; Terbit {certificate.issued}</p><p className="peserta-certificate-issuer">Penerbit: {certificate.issuer} &middot; {certificate.kind || 'Workshop'}</p></div>
+        <div className="peserta-certificate-actions">
+          <Link className="peserta-button peserta-button--secondary" to={`/peserta/sertifikat/${certificate.id}`}><Eye size={17} />Lihat Detail</Link>
+          <Link className="peserta-button peserta-button--secondary" to={active ? `/peserta/sertifikat/perbaikan/${request.id}` : `/peserta/sertifikat/${certificate.id}/perbaikan`}><FilePenLine size={17} />{active ? 'Lihat Pengajuan' : 'Ajukan Perbaikan'}</Link>
+          <CertificateDownloadButton certificate={certificate} {...download} />
+        </div>
+      </article>;
+    }) : <EmptyState icon={SearchX} title="Sertifikat tidak ditemukan" action={<button className="peserta-button peserta-button--secondary" onClick={() => { setQuery(''); setIssuer(''); setStatus(''); }}>Reset Filter</button>}>Coba kata kunci, penerbit, atau status perbaikan lain.</EmptyState>}
   </div>;
 }

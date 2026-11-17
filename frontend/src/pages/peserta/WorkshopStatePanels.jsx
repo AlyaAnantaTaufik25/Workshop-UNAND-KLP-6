@@ -35,7 +35,7 @@ const formatTime = value => {
   return Number.isNaN(date.getTime()) ? 'Belum tercatat' : new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' }).format(date) + ' WIB';
 };
 
-export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmit, preview = false }) {
+export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmit }) {
   const [code, setCode] = useState('');
   const [file, setFile] = useState(null);
   const [agreed, setAgreed] = useState(false);
@@ -49,12 +49,11 @@ export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmi
   const ref = node => { mounted.current = Boolean(node); };
   const state = attendanceStates[feedbackState || stateKey];
   const online = workshop.mode === 'online';
-  const canSubmit = state.canSubmit && (preview || workshop.attendanceState === 'open');
+  const canSubmit = state.canSubmit && workshop.attendanceState === 'open';
 
   const checkLocation = () => {
     setError('');
     setLocation(null);
-    if (preview) { setLocation({ latitude: -0.914, longitude: 100.458, accuracy: 15 }); setFeedbackState(null); return; }
     if (!navigator.geolocation) { setFeedbackState('location-denied'); setError('Browser ini tidak mendukung akses lokasi.'); return; }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(position => {

@@ -1,0 +1,135 @@
+.peserta-certificate-heading, .peserta-certificate-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.peserta-certificate-heading > div:first-child, .peserta-certificate-section-heading > div:first-child { min-width: 0; }
+.peserta-certificate-heading h2 { margin: 5px 0 6px; font-size: 20px; }
+.peserta-certificate-heading p, .peserta-certificate-section-heading p { margin-top: 6px; color: var(--peserta-muted); font-size: 13px; line-height: 1.8; }
+.peserta-certificate-section-heading h3 { margin: 7px 0; }
+.peserta-certificate-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
+.peserta-certificate-actions--start { justify-content: flex-start; }
+.peserta-certificate-actions .peserta-button { white-space: nowrap; }
+.peserta-certificate-heading > .peserta-certificate-actions { flex-shrink: 0; }
+.peserta-certificate-notifications-link { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.peserta-certificate-notifications-link a, .peserta-certificate-text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--peserta-green); font-size: 12px; font-weight: 600; }
+.peserta-certificate-text-link { margin-top: 20px; }
+.peserta-certificate-notifications-link a:hover, .peserta-certificate-text-link:hover { text-decoration: underline; }
+.peserta-certificate-banner { padding: 18px; border-radius: 8px; color: #638173; background: var(--peserta-tint); font-size: 12px; line-height: 1.9; }
+.peserta-certificate-panel { min-width: 0; padding: 24px; border: 1px solid var(--peserta-line); border-radius: 9px; background: white; box-shadow: 0 3px 14px #1a362306; }
+.peserta-certificate-panel h3 { font-size: 16px; }
+.peserta-certificate-panel p { overflow-wrap: anywhere; }
+.peserta-certificate-panel > .peserta-status { margin-top: 22px; }
+.peserta-certificate-metadata { margin: 0; }
+.peserta-certificate-metadata > div { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 15px 0; border-bottom: 1px solid var(--peserta-line); font-size: 12px; }
+.peserta-certificate-metadata dt { flex-shrink: 0; color: var(--peserta-muted); }
+.peserta-certificate-metadata dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.peserta-certificate-row { min-width: 0; flex-wrap: wrap; }
+.peserta-certificate-details { flex: 1; min-width: 0; }
+.peserta-certificate-details h3, .peserta-certificate-details p { overflow-wrap: anywhere; }
+.peserta-certificate-details .peserta-certificate-issuer { margin-top: 7px; }
+.peserta-certificate-row > .peserta-certificate-actions { flex-basis: 100%; padding-top: 14px; margin-top: 2px; border-top: 1px solid var(--peserta-line); }
+.peserta-certificate-filters select { flex: 1 1 170px; max-width: 250px; width: auto; min-width: 0; }
+.peserta-document-panel { padding: 0; overflow: hidden; }
+.peserta-document-panel > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--peserta-line); color: var(--peserta-muted); font-size: 11px; }
+.peserta-document-panel > header h3 { color: #263238; }
+.peserta-document-panel > header p { margin-top: 7px; line-height: 1.7; }
+.peserta-document-panel > .peserta-certificate-preview { margin: 26px; }
+.peserta-document-panel > footer { padding: 18px 22px; border-top: 1px solid var(--peserta-line); }
+.peserta-document-panel > .peserta-inline-error { margin: 14px 22px; }
+.peserta-certificate-preview .peserta-certificate-demo { margin-top: 12px; font-size: 9px; }
+.peserta-certificate-preview h3 { max-width: 100%; overflow-wrap: anywhere; }
+.peserta-certificate-warning { padding: 18px; border: 1px solid #efd9a8; border-radius: 8px; color: #805d22; background: #fffaf0; font-size: 12px; line-height: 1.8; }
+.peserta-certificate-warning a { display: inline-block; margin-top: 8px; text-decoration: underline; font-weight: 600; }
+.peserta-certificate-request-summary { margin-top: 18px; padding: 16px; background: #f6f8f7; border-radius: 8px; }
+.peserta-certificate-request-summary p { margin-top: 8px; color: var(--peserta-muted); font-size: 12px; }
+.peserta-certificate-version-list { display: flex; flex-direction: column; margin-top: 14px; }
+.peserta-certificate-version-list > div { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--peserta-line); }
+.peserta-certificate-version-list strong { font-size: 12px; }
+.peserta-certificate-version-list p { margin-top: 5px; color: var(--peserta-muted); font-size: 12px; }
+.peserta-correction-form { display: flex; flex-direction: column; gap: 15px; }
+.peserta-certificate-form-summary { display: flex; gap: 12px; padding-bottom: 20px; margin-bottom: 8px; border-bottom: 1px solid var(--peserta-line); color: var(--peserta-green); }
+.peserta-certificate-form-summary p { margin-top: 6px; font-size: 12px; color: var(--peserta-muted); }
+.peserta-correction-form fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.peserta-correction-form legend, .peserta-correction-label { font-size: 13px; font-weight: 600; }
+.peserta-correction-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0 7px; }
+.peserta-correction-field { padding: 18px; border: 1px solid var(--peserta-line); border-radius: 8px; background: #fafcfb; }
+.peserta-correction-field h3 { margin-bottom: 14px; font-size: 14px; }
+.peserta-correction-field > div { margin-bottom: 16px; }
+.peserta-correction-field > div > span, .peserta-correction-field label { display: block; margin-bottom: 7px; color: var(--peserta-muted); font-size: 12px; }
+.peserta-correction-field p { font-size: 13px; white-space: pre-wrap; }
+.peserta-correction-form input:not([type="checkbox"]), .peserta-correction-form textarea { width: 100%; max-width: 100%; padding: 11px 12px; border: 1px solid #cfdbd3; border-radius: 7px; background: white; color: #263238; font: inherit; font-size: 13px; }
+.peserta-correction-form textarea { min-height: 90px; resize: vertical; }
+.peserta-certificate-help { color: var(--peserta-muted); font-size: 11px; }
+.peserta-correction-form .peserta-certificate-help { margin-top: -8px; }
+.peserta-correction-upload { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 18px; border: 1px dashed #b8cdbf; border-radius: 8px; background: #f8fbf9; color: var(--peserta-green); }
+.peserta-correction-upload > div { flex: 1; min-width: 0; }
+.peserta-correction-upload p { margin-top: 8px; color: var(--peserta-muted); font-size: 11px; }
+.peserta-certificate-table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--peserta-line); border-radius: 9px; background: white; }
+.peserta-certificate-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+.peserta-certificate-table th { padding: 15px 18px; background: #f9fbfa; color: var(--peserta-muted); font-weight: 500; white-space: nowrap; }
+.peserta-certificate-table td { min-width: 110px; padding: 17px 18px; border-top: 1px solid var(--peserta-line); vertical-align: top; overflow-wrap: anywhere; }
+.peserta-certificate-table td:first-child { min-width: 220px; }
+.peserta-certificate-table td > strong, .peserta-certificate-table td > span:not(.peserta-status), .peserta-certificate-table td > small { display: block; }
+.peserta-certificate-table td > span:not(.peserta-status), .peserta-certificate-table td > small { margin-top: 6px; color: var(--peserta-muted); }
+.peserta-certificate-panel > .peserta-certificate-table-wrap { margin-top: 18px; }
+.peserta-certificate-reason { margin-top: 22px; font-size: 13px; }
+.peserta-certificate-reason h4 { font-size: 12px; }
+.peserta-certificate-reason p { margin-top: 8px; color: var(--peserta-muted); line-height: 1.8; white-space: pre-wrap; }
+.peserta-certificate-attachment { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px; margin-top: 18px; background: #f7faf8; border-radius: 8px; font-size: 12px; }
+.peserta-certificate-attachment > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.peserta-certificate-attachment p { margin-top: 5px; color: var(--peserta-muted); font-size: 11px; }
+.peserta-certificate-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.peserta-correction-timeline { display: flex; flex-direction: column; gap: 22px; margin-top: 24px; list-style: none; }
+.peserta-correction-timeline li { position: relative; display: flex; gap: 14px; }
+.peserta-correction-timeline li:not(:last-child)::after { content: ''; position: absolute; top: 27px; bottom: -22px; left: 13px; width: 1px; background: #d1e0d6; }
+.peserta-correction-timeline li > span { display: grid; place-items: center; flex: none; width: 27px; height: 27px; border-radius: 50%; color: var(--peserta-green); background: var(--peserta-tint); }
+.peserta-correction-timeline time { display: block; margin-top: 7px; color: var(--peserta-muted); font-size: 11px; }
+.peserta-correction-timeline p { margin-top: 7px; font-size: 12px; line-height: 1.7; }
+.peserta-certificate-response { margin: 20px 0; padding: 18px; border-radius: 8px; color: #4b6455; background: #f3f7f4; font-size: 13px; line-height: 1.8; }
+.peserta-certificate-response--ditolak { color: #934c3b; background: #fff4ef; }
+.peserta-certificate-response--selesai { color: var(--peserta-green); background: var(--peserta-tint); }
+.peserta-certificate-notification-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.peserta-certificate-tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--peserta-line); border-radius: 8px; background: #eff3f0; }
+.peserta-certificate-tabs button { padding: 9px 13px; border: 0; border-radius: 5px; color: var(--peserta-muted); background: transparent; font-size: 12px; }
+.peserta-certificate-tabs button[aria-pressed="true"] { color: var(--peserta-green); background: white; box-shadow: 0 2px 5px #14532d10; }
+.peserta-certificate-notification { display: flex; align-items: flex-start; gap: 18px; }
+.peserta-certificate-notification > div { flex: 1; min-width: 0; }
+.peserta-certificate-notification h3 { margin-top: 12px; font-size: 15px; }
+.peserta-certificate-notification p { margin-top: 7px; color: var(--peserta-muted); font-size: 12px; line-height: 1.8; }
+.peserta-certificate-notification time { display: block; margin-top: 12px; color: var(--peserta-muted); font-size: 11px; }
+.peserta-certificate-notification.is-unread { border-color: #b7d8c1; background: #fbfefc; }
+.peserta-certificate-notification-icon { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 10px; color: var(--peserta-green); background: var(--peserta-tint); }
+.peserta-certificate-unread-label { color: var(--peserta-accent); font-size: 10px; font-weight: 700; }
+.peserta-notification-popover > a + a { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--peserta-line); }
+@media (max-width: 1000px) {
+  .peserta-certificate-heading, .peserta-certificate-section-heading { flex-wrap: wrap; }
+  .peserta-certificate-detail-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .peserta-certificate-panel { padding: 18px; }
+  .peserta-certificate-heading h2 { font-size: 19px; }
+  .peserta-certificate-heading > .peserta-certificate-actions, .peserta-certificate-actions { width: 100%; justify-content: stretch; }
+  .peserta-certificate-actions .peserta-button { flex: 1; width: auto; white-space: normal; }
+  .peserta-certificate-metadata > div { flex-direction: column; gap: 6px; }
+  .peserta-certificate-metadata dd { text-align: left; }
+  .peserta-certificate-metadata dt { flex-shrink: 1; }
+  .peserta-document-panel { padding: 0; }
+  .peserta-document-panel > .peserta-certificate-preview { margin: 16px; }
+  .peserta-document-panel > header, .peserta-document-panel > footer { padding: 14px 16px; }
+  .peserta-correction-fields { grid-template-columns: minmax(0, 1fr); }
+  .peserta-certificate-filters select { max-width: none; }
+  .peserta-certificate-version-list > div, .peserta-certificate-notification { flex-wrap: wrap; }
+  .peserta-certificate-notification > div { flex-basis: calc(100% - 60px); }
+  .peserta-certificate-notification > .peserta-button { width: 100%; }
+  .peserta-certificate-preview .peserta-certificate-brand { flex-direction: column; }
+  .peserta-correction-form input:not([type="checkbox"]), .peserta-correction-form textarea { font-size: 16px; }
+  .peserta-certificate-table, .peserta-certificate-table tbody, .peserta-certificate-table tr, .peserta-certificate-table td { display: block; width: 100%; }
+  .peserta-certificate-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .peserta-certificate-table tr { padding: 12px 18px; border-bottom: 1px solid var(--peserta-line); }
+  .peserta-certificate-table tr:last-child { border-bottom: 0; }
+  .peserta-certificate-table td, .peserta-certificate-table td:first-child { min-width: 0; padding: 8px 0; border: 0; }
+  .peserta-certificate-table td::before { content: attr(data-label); display: block; margin-bottom: 7px; color: var(--peserta-muted); font-size: 11px; font-weight: 400; }
+}
+@page participant-certificate { size: A4 landscape; margin: 12mm; }
+@media print {
+  .peserta-shell .peserta-certificate-page > .peserta-document-panel { display: block; page: participant-certificate; overflow: visible; border: 0; box-shadow: none; padding: 0; }
+  .peserta-shell .peserta-document-panel > header, .peserta-shell .peserta-document-panel > footer, .peserta-shell .peserta-document-panel > .peserta-inline-error { display: none; }
+  .peserta-shell .peserta-document-panel > .peserta-certificate-preview { margin: 0; }
+}

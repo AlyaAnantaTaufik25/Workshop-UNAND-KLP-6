@@ -1,3 +1,5 @@
+import { certificateRecords, certificateRegistrations, certificateWorkshops } from './certificateExamples.js';
+
 export const initialProfile = {
   nama: 'Nadia Amelia',
   email: 'nadia.amelia@student.unand.ac.id',
@@ -7,7 +9,7 @@ export const initialProfile = {
   prodi: 'Sistem Informasi',
 };
 
-export const participantWorkshops = [
+const catalogWorkshops = [
   {
     id: 'data-science',
     attendanceState: 'open',
@@ -61,6 +63,8 @@ export const participantWorkshops = [
   },
   {
     id: 'kepemimpinan-muda',
+    saved: true,
+    attendanceState: 'open',
     title: 'Kepemimpinan Muda Berdampak',
     mode: 'offline',
     theme: 'Pengembangan Diri',
@@ -85,6 +89,7 @@ export const participantWorkshops = [
   },
   {
     id: 'ai-transformasi-digital',
+    saved: true,
     registrationState: 'not-open',
     opens: '20 Mei 2025',
     title: 'Seminar Nasional AI & Transformasi Digital',
@@ -111,6 +116,7 @@ export const participantWorkshops = [
   },
   {
     id: 'manajemen-proyek',
+    saved: true,
     registrationState: 'closed',
     title: 'Workshop Manajemen Proyek Kolaboratif',
     mode: 'offline',
@@ -136,6 +142,7 @@ export const participantWorkshops = [
   },
   {
     id: 'publikasi-jurnal-scopus',
+    saved: true,
     waitingListEnabled: false,
     title: 'Webinar Publikasi Artikel Ilmiah Bereputasi',
     mode: 'online',
@@ -179,14 +186,91 @@ export const participantWorkshops = [
   },
 ];
 
+// Each saved workshop provides a different registration or attendance flow in Workshop Saya.
+const exampleWorkshops = [
+  {
+    id: 'desain-presentasi-digital', title: 'Desain Presentasi Digital yang Efektif', mode: 'online',
+    description: 'Susun materi presentasi yang jelas dan menarik melalui latihan bersama pemateri secara daring.',
+  },
+  {
+    id: 'analisis-data-online', title: 'Analisis Data dengan Spreadsheet', mode: 'online',
+    description: 'Ikuti praktik pengolahan data dan lampirkan tangkapan layar sesi sebagai bukti kehadiran.',
+  },
+  {
+    id: 'metodologi-penelitian', title: 'Metodologi Penelitian Terapan', mode: 'offline', attendanceState: 'not-open',
+    description: 'Persiapkan rancangan penelitian Anda. Sesi presensi akan dibuka ketika kegiatan dimulai.',
+  },
+  {
+    id: 'keamanan-digital', title: 'Literasi dan Keamanan Digital', mode: 'online',
+    description: 'Pelajari perlindungan data pribadi dan kebiasaan aman saat menggunakan layanan digital.',
+  },
+  {
+    id: 'publikasi-ilmiah', title: 'Klinik Penulisan Publikasi Ilmiah', mode: 'online',
+    description: 'Latihan penulisan dan penyuntingan artikel ilmiah bersama pembimbing.',
+  },
+  {
+    id: 'manajemen-kegiatan', title: 'Manajemen Kegiatan Kampus', mode: 'offline', attendanceState: 'closed',
+    description: 'Pelatihan penyusunan rencana kegiatan dan koordinasi tim penyelenggara.',
+  },
+  {
+    id: 'komunikasi-profesional', title: 'Komunikasi Profesional dan Kolaborasi', mode: 'offline',
+    description: 'Bangun kemampuan komunikasi kerja melalui diskusi dan latihan kelompok.',
+  },
+  {
+    id: 'etika-penelitian', title: 'Etika Penelitian dan Integritas Akademik', mode: 'offline', completed: true,
+    description: 'Pembahasan etika pengumpulan data, kepenulisan, dan tanggung jawab peneliti.',
+  },
+  {
+    id: 'inovasi-kampus', title: 'Pengembangan Inovasi Kampus', mode: 'offline', cancelled: true,
+    description: 'Kegiatan dibatalkan oleh panitia. Pendaftaran dan presensi tidak tersedia.',
+  },
+  {
+    id: 'riset-kolaboratif', title: 'Membangun Riset Kolaboratif', mode: 'online',
+    remaining: 0, waitingListEnabled: true, waitingCount: 3, quota: 'Kuota penuh · Waiting list tersedia',
+    description: 'Temukan peluang kerja sama penelitian lintas bidang. Antrean dibuka ketika kuota utama penuh.',
+  },
+];
+
+export const participantWorkshops = [
+  ...catalogWorkshops,
+  ...certificateWorkshops,
+  ...exampleWorkshops.map(workshop => ({
+    ...catalogWorkshops[workshop.mode === 'online' ? 1 : 0],
+    saved: true,
+    registrationState: 'open',
+    attendanceState: 'open',
+    remaining: 24,
+    capacity: 80,
+    quota: '24 kursi tersisa',
+    waitingListEnabled: false,
+    waitingCount: 0,
+    about: workshop.description,
+    ...workshop,
+  })),
+];
+
+export const exampleRegistrations = [
+  ...certificateRegistrations,
+  { workshopId: 'analisis-data-online', status: 'registered' },
+  { workshopId: 'metodologi-penelitian', status: 'registered' },
+  { workshopId: 'keamanan-digital', status: 'registered', attendance: { status: 'pending', method: 'upload', fileName: 'bukti-keamanan-digital.png', submittedAt: '2025-05-24T09:05:00+07:00' } },
+  { workshopId: 'publikasi-ilmiah', status: 'registered', attendance: { status: 'rejected', method: 'upload', fileName: 'bukti-publikasi.png', submittedAt: '2025-05-24T09:10:00+07:00', reason: 'Nama peserta belum terlihat pada tangkapan layar. Unggah ulang bukti yang menampilkan nama dan sesi kegiatan.' } },
+  { workshopId: 'manajemen-kegiatan', status: 'registered' },
+  { workshopId: 'komunikasi-profesional', status: 'cancelled' },
+  { workshopId: 'etika-penelitian', status: 'completed', attendance: { status: 'absent' } },
+  { workshopId: 'inovasi-kampus', status: 'registered' },
+];
+
 export const initialRegistrations = [
   { workshopId: 'data-science', status: 'registered' },
   { workshopId: 'hilirisasi-riset', status: 'waiting', queue: 4 },
   { workshopId: 'public-speaking', status: 'completed', attendance: { status: 'present', method: 'qr-location', submittedAt: '2025-04-12T09:05:00+07:00' } },
+  ...exampleRegistrations,
 ];
 
 export const participantCertificates = [
-  { id: '042', workshopId: 'public-speaking', number: '042/UN16/WS/IV/2025', issued: '18 April 2025', recipient: 'Nadia Amelia' },
+  { id: '042', workshopId: 'public-speaking', number: '042/UN16/WS/IV/2025', issued: '18 April 2025', recipient: 'Nadia Amelia', issuer: 'UNAND', issuerType: 'unand', kind: 'Workshop', degree: '', additionalInfo: '' },
+  ...certificateRecords,
 ];
 
 export function getWorkshopLocation(workshop, format = 'default') {

@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Award, Bell, CalendarDays, LogOut, Menu, PanelsTopLeft, Search, User, X } from 'lucide-react';
-import { initialProfile, initialRegistrations, initials, participantWorkshops, readParticipantData } from './data';
+import { Award, Bell, CalendarDays, LogOut, Menu, Search, User, X } from 'lucide-react';
+import { exampleRegistrations, initialProfile, initialRegistrations, initials, participantWorkshops, readParticipantData } from './data';
 import UnandLogo from '../../components/UnandLogo';
 import { canSubmitAttendance, createRegistration, getRemainingSeats } from './workshopStates';
+import { getIssuedCertificates } from './certificates';
+import { getCertificateVersions } from './certificateCorrections';
+import useCertificateCorrections from './useCertificateCorrections';
 import './peserta.css';
 import './workshopStates.css';
+import './sertifikat.css';
 
 const navItems = [
   { to: '/peserta/cari-workshop', label: 'Cari Workshop', icon: Search },
   { to: '/peserta/workshop-saya', label: 'Workshop Saya', icon: CalendarDays },
   { to: '/peserta/sertifikat', label: 'Sertifikat', icon: Award },
   { to: '/peserta/profil', label: 'Profil', icon: User },
-  { to: '/peserta/pratinjau-kondisi', label: 'Pratinjau Kondisi', icon: PanelsTopLeft },
 ];
 
 function loadRegistrations() {
@@ -21,9 +24,11 @@ function loadRegistrations() {
     && value.every(item => item && participantWorkshops.some(workshop => workshop.id === item.workshopId)
       && ['registered', 'waiting', 'completed', 'cancelled'].includes(item.status)
       && (!item.attendance || ['pending', 'present', 'rejected', 'absent'].includes(item.attendance.status))));
-  return saved.map(item => {
+  // Add the new example workshops to older demo sessions without replacing saved changes.
+  const entries = saved.length ? [...saved, ...exampleRegistrations.filter(example => !saved.some(item => item.workshopId === example.workshopId))] : saved;
+  return entries.map(item => {
     const original = initialRegistrations.find(entry => entry.workshopId === item.workshopId && entry.status === item.status);
-    return !item.attendance && original?.attendance ? { ...item, attendance: original.attendance } : item;
+    return !item.attendance && !item.registeredAt && original?.attendance ? { ...item, attendance: original.attendance } : item;
   });
 }
 
@@ -41,6 +46,10 @@ export default function LayoutPeserta() {
   const [profile, setProfile] = useState(() => readParticipantData('profile', initialProfile, value => value && Object.keys(initialProfile).every(key => typeof value[key] === 'string') && value.nama.trim()));
   const [registrations, setRegistrations] = useState(loadRegistrations);
   const workshops = participantWorkshops.map(workshop => ({ ...workshop, remaining: getRemainingSeats(workshop, registrations, initialRegistrations) }));
+  const { corrections, submitCorrection, cancelCorrection, markCorrectionRead } = useCertificateCorrections();
+  const certificateOriginals = getIssuedCertificates(workshops, registrations);
+  const certificates = certificateOriginals.map(certificate => getCertificateVersions(certificate, corrections).at(-1));
+  const unreadCorrections = corrections.filter(item => ['selesai', 'ditolak'].includes(item.status) && !item.notificationRead && certificates.some(certificate => certificate.id === item.certificateId)).length;
   const notify = useCallback(text => {
     setMessage(text);
     clearTimeout(timer.current);
@@ -106,7 +115,7 @@ export default function LayoutPeserta() {
     // Frontend prototype: keep evidence metadata locally until the attendance API is available.
     return persist('registrations', registrations.map(item => item.workshopId === workshopId ? { ...item, attendance: { ...evidence, status: 'pending' } } : item), setRegistrations);
   };
-  const pageTitle = location.pathname.includes('/workshop/') ? 'Detail Workshop' : navItems.find(item => location.pathname === item.to)?.label || 'Cari Workshop';
+  const pageTitle = location.pathname.startsWith('/peserta/sertifikat') ? 'Sertifikat' : location.pathname.includes('/workshop/') ? 'Detail Workshop' : navItems.find(item => location.pathname === item.to)?.label || 'Cari Workshop';
 
   return <div className="peserta-shell">
     <a className="peserta-skip" href="#peserta-content">Ke konten utama</a>
@@ -121,13 +130,13 @@ export default function LayoutPeserta() {
       <header className="peserta-topbar">
         <div className="peserta-title-wrap"><button ref={menuButtonRef} className="peserta-menu-button peserta-icon-button" aria-label="Buka navigasi" title="Buka navigasi" aria-expanded={menuOpen} aria-controls="peserta-navigation" onClick={() => setMenuOpen(true)}><Menu size={22} /></button><div><span className="peserta-eyebrow">WORKSHOP UNAND</span><h1>{pageTitle}</h1></div></div>
         <div className="peserta-top-actions">
-          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label="Notifikasi" title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(value => !value); setNotificationsRead(true); }}><Bell size={20} />{!notificationsRead && <i className="peserta-notification-dot" />}</button>
-            {notificationsOpen && <div className="peserta-notification-popover"><h2>Notifikasi</h2><NavLink to="/peserta/sertifikat"><Award size={20} /><div><strong>Sertifikat telah diterbitkan</strong><p>Public Speaking untuk Profesional Muda</p><small>18 April 2025</small></div></NavLink></div>}
+          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label="Notifikasi" title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(value => !value); setNotificationsRead(true); }}><Bell size={20} />{((!notificationsRead && certificates.length > 0) || unreadCorrections > 0) && <i className="peserta-notification-dot" />}</button>
+            {notificationsOpen && <div className="peserta-notification-popover"><h2>Notifikasi</h2>{certificates.length ? <><NavLink to="/peserta/sertifikat/notifikasi"><Bell size={20} /><div><strong>Notifikasi perbaikan ({unreadCorrections})</strong><p>Lihat tanggapan penerbit untuk pengajuan Anda.</p></div></NavLink><NavLink to="/peserta/sertifikat"><Award size={20} /><div><strong>Sertifikat telah diterbitkan</strong><p>{certificates[0].workshop.title}</p><small>{certificates[0].issued}</small></div></NavLink></> : <p>Belum ada notifikasi sertifikat.</p>}</div>}
           </div>
           <NavLink to="/peserta/profil" className="peserta-profile-link" aria-label={`Profil ${profile.nama}`}><span className="peserta-avatar">{initials(profile.nama)}</span><div><strong>{profile.nama}</strong><span>Peserta</span></div></NavLink>
         </div>
       </header>
-      <main id="peserta-content" className="peserta-content"><Outlet context={{ profile, saveProfile, workshops, registrations, register, cancelRegistration, submitAttendance, notify }} /></main>
+      <main id="peserta-content" className="peserta-content"><Outlet context={{ profile, saveProfile, workshops, registrations, certificates, certificateOriginals, corrections, submitCorrection, cancelCorrection, markCorrectionRead, register, cancelRegistration, submitAttendance, notify }} /></main>
     </div>
     {message && <div className="peserta-toast" role="status">{message}<button className="peserta-icon-button" aria-label="Tutup pesan" onClick={() => setMessage('')}><X size={16} /></button></div>}
   </div>;
