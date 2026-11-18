@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -15,9 +15,119 @@ import {
   Building2,
   Users,
   CalendarDays,
+  PenTool,
+  Eraser,
+  Upload,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { mitraTandaTangan, currentMitra } from './data';
 import UnandLogo from '../../components/UnandLogo';
+
+/* ------------------------------------------------------------------ */
+/* Canvas Tanda Tangan — mendukung Pen & Eraser, expose via ref        */
+/* ------------------------------------------------------------------ */
+const SignatureCanvas = forwardRef(({ tool, lineWidth, color }, ref) => {
+  const canvasRef = useRef(null);
+  const isDrawing = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const getPos = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches && e.touches[0]) {
+      return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY,
+      };
+    }
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
+  const start = (e) => {
+    e.preventDefault();
+    isDrawing.current = true;
+    lastPos.current = getPos(e);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing.current) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastPos.current.x, lastPos.current.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : (color || '#000000');
+    ctx.lineWidth = tool === 'eraser' ? (lineWidth || 3) * 6 : (lineWidth || 3);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    lastPos.current = pos;
+  };
+
+  const end = (e) => {
+    if (!isDrawing.current) return;
+    e.preventDefault();
+    isDrawing.current = false;
+  };
+
+  useImperativeHandle(ref, () => ({
+    getDataURL: () => canvasRef.current?.toDataURL('image/png'),
+    clear: () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    isEmpty: () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return true;
+      const ctx = canvas.getContext('2d');
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      return !data.some((v) => v !== 0);
+    },
+  }));
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        width: '100%',
+        height: '220px',
+        border: '1.5px solid #d1d5db',
+        borderRadius: '6px',
+        background: '#ffffff',
+        touchAction: 'none',
+        cursor: tool === 'eraser' ? 'cell' : 'crosshair',
+        display: 'block',
+      }}
+      onMouseDown={start}
+      onMouseMove={draw}
+      onMouseUp={end}
+      onMouseLeave={end}
+      onTouchStart={start}
+      onTouchMove={draw}
+      onTouchEnd={end}
+    />
+  );
+});
 
 const statusConfig = {
   'menunggu-ttd': {
@@ -51,22 +161,27 @@ export default function TandaTanganMitra() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterTanggal, setFilterTanggal] = useState('');
 
-  // Mode View: 'list' atau 'detail'
+  // Mode View: 'list' | 'detail' | 'sign'
   const [viewMode, setViewMode] = useState('list');
   const [selectedId, setSelectedId] = useState(null);
 
-  // Modal State Konfirmasi TTE
-  const [showSignModal, setShowSignModal] = useState(false);
-  const [passphrase, setPassphrase] = useState('123456');
-  const [setujuPernyataan, setSetujuPernyataan] = useState(true);
+  // State untuk halaman tanda tangan
+  const [tool, setTool] = useState('pen');
+  const [lineWidth, setLineWidth] = useState(3);
+  const [color, setColor] = useState('#000000');
+  const [stampImg, setStampImg] = useState(null);
+  const [signPin, setSignPin] = useState('');
+  const [signPinError, setSignPinError] = useState('');
+  const [signPage, setSignPage] = useState(1);
   const [toastMsg, setToastMsg] = useState('');
+  const canvasRef = useRef(null);
 
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const selectedItem = data.find(d => d.id === selectedId) || data[0];
+  const selectedItem = data.find((d) => d.id === selectedId) || data[0];
 
   // Hitungan Statistik — per kegiatan/batch
   const countMenungguTtd      = data.filter(d => d.statusTandaTangan === 'menunggu-ttd').length;
@@ -103,10 +218,21 @@ export default function TandaTanganMitra() {
     setViewMode('detail');
   };
 
-  // Konfirmasi dan Pembubuhan TTE
-  const handleProsesTTE = (e) => {
-    e.preventDefault();
-    if (!setujuPernyataan) return;
+  // Konfirmasi dan Pembubuhan TTE — dipanggil dari view 'sign'
+  const handleProsesTTE = () => {
+    const validPin = localStorage.getItem('mitra_pin') || '123456';
+    if (!signPin || signPin.length !== 6) {
+      setSignPinError('PIN harus 6 digit');
+      return;
+    }
+    if (signPin !== validPin) {
+      setSignPinError('PIN salah. Silakan coba lagi atau reset/ubah PIN di menu Profil.');
+      return;
+    }
+    if (canvasRef.current?.isEmpty()) {
+      setSignPinError('Harap gambar tanda tangan terlebih dahulu');
+      return;
+    }
 
     const waktuSekarang = new Date().toLocaleDateString('id-ID', {
       day: 'numeric',
@@ -116,27 +242,34 @@ export default function TandaTanganMitra() {
       minute: '2-digit',
     }) + ' WIB';
 
-    // Jika kegiatan perlu TTE Rektor → 'menunggu-rektor', jika tidak → 'diterbitkan'
     const newStatus = selectedItem.perluRektor ? 'menunggu-rektor' : 'diterbitkan';
 
-    setData(prev =>
-      prev.map(d =>
+    setData((prev) =>
+      prev.map((d) =>
         d.id === selectedItem.id
           ? {
               ...d,
               statusTandaTangan: newStatus,
               waktuTtdMitra: waktuSekarang,
               penandatanganMitra: currentMitra.nama || 'Ahmad Rizal',
+              signatureImg: canvasRef.current?.getDataURL(),
             }
           : d
       )
     );
 
-    setShowSignModal(false);
+    // reset state sign
+    canvasRef.current?.clear();
+    setSignPin('');
+    setSignPinError('');
+    setStampImg(null);
+    setSignPage(1);
+    setViewMode('detail');
+
     showToast(
       selectedItem.perluRektor
-        ? `TTE Mitra berhasil dibubuhkan. Berkas diteruskan untuk TTE Rektor UNAND.`
-        : `TTE Mitra berhasil dibubuhkan. Sertifikat batch kegiatan telah selesai ditandatangani.`
+        ? 'Tanda tangan berhasil dibubuhkan. Berkas diteruskan untuk TTD Rektor UNAND.'
+        : 'Tanda tangan berhasil dibubuhkan. Sertifikat batch kegiatan telah selesai ditandatangani.'
     );
   };
 
@@ -245,7 +378,7 @@ export default function TandaTanganMitra() {
       <div class="ttd-box">
         <div>Pimpinan ${item.mitra}</div>
         <div class="ttd-qr" style="${isSigned ? 'background: #dcfce7; border-color: #166534;' : 'background: #fff7ed; border-color: #ea580c;'}">
-          ${isSigned ? 'TTE VALID<br/>MITRA' : 'MENUNGGU<br/>TTD MITRA'}
+          ${isSigned ? 'TTD VALID<br/>MITRA' : 'MENUNGGU<br/>TTD MITRA'}
         </div>
         <div class="ttd-name">${currentMitra.nama}</div>
         <div style="color: #64748b; font-size: 11px;">
@@ -296,7 +429,7 @@ export default function TandaTanganMitra() {
               <h2 style={{ margin: 0 }}>Detail Sertifikat</h2>
               <span className={cfg.className}>{cfg.label}</span>
             </div>
-            <p>Tinjau isi dokumen sertifikat kegiatan sebelum membubuhkan tanda tangan elektronik.</p>
+            <p>Tinjau isi dokumen sertifikat kegiatan sebelum membubuhkan tanda tangan.</p>
           </div>
         </div>
 
@@ -344,8 +477,8 @@ export default function TandaTanganMitra() {
                     <div className="cert-ttd-sub" style={{ fontSize: 10 }}>
                       {selectedItem.perluRektor
                         ? selectedItem.statusTandaTangan === 'diterbitkan' || selectedItem.statusTandaTangan === 'selesai'
-                          ? '✓ TTE Rektor Sah'
-                          : 'Menunggu TTE Rektor'
+                          ? '✓ TTD Rektor Sah'
+                          : 'Menunggu TTD Rektor'
                         : 'Tidak Diperlukan'}
                     </div>
                   </div>
@@ -364,12 +497,12 @@ export default function TandaTanganMitra() {
                         color: isSignedMitra ? '#15803d' : '#B45309',
                       }}
                     >
-                      {isSignedMitra ? '✓ TTE MITRA TERVERIFIKASI' : 'AREA TANDA TANGAN MITRA'}
+                      {isSignedMitra ? '✓ TTD MITRA TERVERIFIKASI' : 'AREA TANDA TANGAN MITRA'}
                     </div>
                     <div className="cert-ttd-line" />
                     <div className="cert-ttd-title">{currentMitra.nama}</div>
                     <div className="cert-ttd-sub" style={{ fontSize: 10 }}>
-                      {isSignedMitra ? selectedItem.waktuTtdMitra || 'Tanda Tangan Elektronik Sah' : 'Perwakilan Mitra (Menunggu TTD)'}
+                      {isSignedMitra ? selectedItem.waktuTtdMitra || 'Tanda Tangan Sah' : 'Perwakilan Mitra (Menunggu TTD)'}
                     </div>
                   </div>
                 </div>
@@ -431,23 +564,9 @@ export default function TandaTanganMitra() {
                   <span style={{ color: '#334155' }}>{selectedItem.tanggalPengajuan}</span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid #F1F5F9' }}>
-                  <span style={{ color: '#64748B' }}>TTE Rektor</span>
-                  <span style={{ fontWeight: 600, color: selectedItem.perluRektor ? '#0369A1' : '#15803d' }}>
-                    {selectedItem.perluRektor ? 'Diperlukan' : 'Tidak Perlu'}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 8, borderBottom: '1px solid #F1F5F9' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#64748B' }}>Status</span>
                   <span className={cfg.className}>{cfg.label}</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#64748B' }}>Waktu TTE Mitra</span>
-                  <span style={{ color: isSignedMitra ? '#15803d' : '#B45309', fontWeight: 600, fontSize: 12.5 }}>
-                    {selectedItem.waktuTtdMitra || 'Belum Ditandatangani'}
-                  </span>
                 </div>
               </div>
             </div>
@@ -477,7 +596,14 @@ export default function TandaTanganMitra() {
                   <button
                     type="button"
                     className="mitra-btn"
-                    onClick={() => setShowSignModal(true)}
+                    onClick={() => {
+                      setSignPin('');
+                      setSignPinError('');
+                      setStampImg(null);
+                      setSignPage(1);
+                      setTool('pen');
+                      setViewMode('sign');
+                    }}
                     style={{ width: '100%', justifyContent: 'center' }}
                   >
                     <ShieldCheck size={16} /> Konfirmasi dan Tanda Tangani
@@ -497,7 +623,7 @@ export default function TandaTanganMitra() {
                     }}
                   >
                     <Clock size={18} />
-                    <span>TTE Mitra berhasil dibubuhkan. Menunggu proses tanda tangan dari Rektor UNAND.</span>
+                    <span>Tanda tangan berhasil dibubuhkan. Menunggu proses tanda tangan dari Rektor UNAND.</span>
                   </div>
                 ) : (
                   <div
@@ -522,195 +648,226 @@ export default function TandaTanganMitra() {
           </div>
         </div>
 
-        {/* ── MODAL KONFIRMASI TTE RESMI SISTEM ── */}
-        {showSignModal && (
-          <div
-            className="modal-overlay"
-            onClick={() => setShowSignModal(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(15, 23, 42, 0.55)',
-              backdropFilter: 'blur(3px)',
-              display: 'grid',
-              placeItems: 'center',
-              zIndex: 1050,
-              padding: 16,
-            }}
-          >
-            <div
-              className="modal-box"
-              style={{
-                maxWidth: 480,
-                width: '100%',
-                background: '#FFFFFF',
-                borderRadius: 12,
-                overflow: 'hidden',
-                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)',
-              }}
-              onClick={e => e.stopPropagation()}
-            >
-              <form onSubmit={handleProsesTTE}>
-                {/* Modal Header */}
-                <div
-                  style={{
-                    padding: '20px 24px',
-                    borderBottom: '1px solid #F1F5F9',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        background: '#EBF5EE',
-                        color: '#14532d',
-                        display: 'grid',
-                        placeItems: 'center',
-                      }}
-                    >
-                      <ShieldCheck size={22} />
-                    </div>
-                    <div>
-                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#111827' }}>
-                        Konfirmasi Tanda Tangan Elektronik
-                      </h3>
-                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>
-                        Pemberian tanda tangan digital resmi pada sertifikat
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowSignModal(false)}
-                    style={{ background: 'transparent', border: 'none', color: '#9CA3AF', cursor: 'pointer' }}
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
+      </div>
+    );
+  }
 
-                {/* Modal Body */}
-                <div style={{ padding: '20px 24px' }}>
-                  {/* Info Box Penandatangan */}
-                  <div
-                    style={{
-                      background: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: 8,
-                      padding: '12px 16px',
-                      fontSize: 12.5,
-                      marginBottom: 16,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 6,
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748B' }}>Identitas Penandatangan:</span>
-                      <strong style={{ color: '#0F172A' }}>{currentMitra.nama}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748B' }}>Jabatan & Instansi:</span>
-                      <span style={{ color: '#334155' }}>Pimpinan PT Semen Padang</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748B' }}>Dokumen Sertifikat:</span>
-                      <span style={{ fontFamily: 'monospace', color: '#14532d', fontWeight: 600 }}>
-                        {selectedItem.nomorSK}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748B' }}>Kegiatan:</span>
-                      <strong style={{ color: '#334155', textAlign: 'right', maxWidth: 220 }}>{selectedItem.namaKegiatan}</strong>
-                    </div>
-                  </div>
+  // =========================================================================
+  // TAMPILAN 3: HALAMAN TANDA TANGAN TEMPLATE (canvas + tools + PIN)
+  // =========================================================================
+  if (viewMode === 'sign' && selectedItem) {
+    const isSignedMitra =
+      selectedItem.statusTandaTangan === 'diterbitkan' ||
+      selectedItem.statusTandaTangan === 'sudah-ditandatangani' ||
+      selectedItem.statusTandaTangan === 'menunggu-rektor' ||
+      selectedItem.statusTandaTangan === 'selesai';
 
-                  {/* Input Passphrase TTE */}
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 6 }}>
-                      PIN / Passphrase TTE Resmi
-                    </label>
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type="password"
-                        value={passphrase}
-                        onChange={e => setPassphrase(e.target.value)}
-                        required
-                        className="mitra-profil-input"
-                        placeholder="Masukkan PIN TTE Anda"
-                        style={{ paddingLeft: 36 }}
-                      />
-                      <Lock size={16} color="#9CA3AF" style={{ position: 'absolute', left: 12, top: 15 }} />
-                    </div>
-                    <span style={{ fontSize: 11.5, color: '#6B7280', marginTop: 4, display: 'block' }}>
-                      Sistem mencatat waktu penandatanganan dan kode hash keabsahan elektronik.
-                    </span>
-                  </div>
-
-                  {/* Checkbox Pernyataan Keabsahan */}
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 10,
-                      fontSize: 12.5,
-                      color: '#374151',
-                      lineHeight: 1.5,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={setujuPernyataan}
-                      onChange={e => setSetujuPernyataan(e.target.checked)}
-                      style={{ accentColor: '#14532d', marginTop: 3, width: 16, height: 16 }}
-                    />
-                    <span>
-                      Saya telah memeriksa pratinjau sertifikat ini dan menyetujui pembubuhan tanda tangan elektronik resmi selaku penanggung jawab mitra kegiatan.
-                    </span>
-                  </label>
-                </div>
-
-                {/* Modal Footer */}
-                <div
-                  style={{
-                    padding: '14px 24px',
-                    background: '#F8FAFC',
-                    borderTop: '1px solid #E2E8F0',
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: 10,
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setShowSignModal(false)}
-                    className="mitra-profil-btn-batal"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!setujuPernyataan || !passphrase}
-                    className="mitra-profil-btn-simpan"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      opacity: !setujuPernyataan || !passphrase ? 0.6 : 1,
-                    }}
-                  >
-                    <Check size={16} /> Bubuhkan Tanda Tangan Sekarang
-                  </button>
-                </div>
-              </form>
-            </div>
+    return (
+      <div className="mitra-stack">
+        {/* Toast */}
+        {toastMsg && (
+          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1000, background: '#14532d', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+            <Check size={16} /> {toastMsg}
           </div>
         )}
+
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#111827' }}>Tanda Tangan Template</h2>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6B7280' }}>
+              Tandatangani template sertifikat: <strong>{selectedItem.namaKegiatan}</strong>
+            </p>
+          </div>
+          <span style={{
+            fontSize: 12,
+            fontWeight: 700,
+            padding: '4px 10px',
+            borderRadius: 20,
+            background: isSignedMitra ? '#DCFCE7' : '#FEF3C7',
+            color: isSignedMitra ? '#15803d' : '#B45309',
+          }}>
+            {isSignedMitra ? 'Sudah Ditandatangani' : 'Belum Ditandatangani'}
+          </span>
+        </div>
+
+        {/* Two-column layout */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start', marginTop: 16 }}>
+
+          {/* LEFT: Template Preview + tools */}
+          <div style={{ border: '1px solid #E5E7EB', borderRadius: 10, background: '#fff', overflow: 'hidden' }}>
+            {/* Panel title */}
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid #E5E7EB', fontWeight: 700, fontSize: 14, color: '#111827' }}>
+              Template Preview
+            </div>
+
+            {/* Canvas area */}
+            <div style={{ padding: '24px', background: '#f9fafb' }}>
+              <div style={{ background: '#fff', border: '1px solid #d1d5db', borderRadius: 6, padding: 16, minHeight: 400, position: 'relative' }}>
+                {/* Dummy doc text */}
+                <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.7 }}>
+                  <p><strong>Instruksi Pengerjaan:</strong></p>
+                  <p>A. Ketentuan Umum</p>
+                  <ol>
+                    <li>Sol ini harus diselesaikan secara berkelompok.</li>
+                    <li>Anggota kelompok ditentukan oleh Dosen Pengampu.</li>
+                    <li>Jawaban harus menunjukkan analisis dan argumentasi kelompok.</li>
+                    <li>Setiap kelompok harus menghasilkan output: laporan analisis (pdf) + presentasi (ppt/pdf).</li>
+                  </ol>
+                  <p>B. Panduan Analisis Kasus</p>
+                  <ol>
+                    <li>Mengidentifikasi persoalan etis, termasuk pihak yang berkepentingan.</li>
+                    <li>Menerapkan prinsip etika dan kode etik profesi yang relevan.</li>
+                    <li>Menganalisis alternatif tindakan, manfaat, risiko, dan konsekuensi.</li>
+                  </ol>
+                </div>
+                {/* Canvas overlay */}
+                <div style={{ position: 'absolute', inset: 0 }}>
+                  <SignatureCanvas ref={canvasRef} tool={tool} lineWidth={lineWidth} color={color} />
+                </div>
+                {/* Stamp overlay */}
+                {stampImg && (
+                  <img
+                    src={stampImg}
+                    alt="Stamp"
+                    style={{ position: 'absolute', left: 60, top: 60, width: 80, opacity: 0.85, pointerEvents: 'none' }}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Tools bar */}
+            <div style={{ padding: '10px 16px', borderTop: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', background: '#fff' }}>
+              {/* Pen */}
+              <button type="button" onClick={() => setTool('pen')}
+                style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: tool === 'pen' ? '#111827' : '#fff', color: tool === 'pen' ? '#fff' : '#374151', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, cursor: 'pointer' }}>
+                <PenTool size={14} /> Pen
+              </button>
+              {/* Eraser */}
+              <button type="button" onClick={() => setTool('eraser')}
+                style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: tool === 'eraser' ? '#111827' : '#fff', color: tool === 'eraser' ? '#fff' : '#374151', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, cursor: 'pointer' }}>
+                <Eraser size={14} /> Eraser
+              </button>
+              {/* TTD Tersimpan */}
+              <button type="button" disabled
+                style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#6B7280', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, cursor: 'default' }}>
+                <Check size={14} /> TTD Tersimpan
+              </button>
+              {/* Stempel */}
+              <label style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#374151', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, cursor: 'pointer' }}>
+                <ShieldCheck size={14} /> Stempel
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setStampImg(ev.target.result);
+                  reader.readAsDataURL(file);
+                }} />
+              </label>
+              {/* Upload Gambar */}
+              <label style={{ padding: '5px 10px', borderRadius: 6, border: '1px solid #d1d5db', background: '#fff', color: '#374151', display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, cursor: 'pointer' }}>
+                <Upload size={14} /> Upload Gambar
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => setStampImg(ev.target.result);
+                  reader.readAsDataURL(file);
+                }} />
+              </label>
+              {/* Size slider */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151' }}>
+                Size:
+                <input type="range" min={1} max={10} value={lineWidth} onChange={(e) => setLineWidth(Number(e.target.value))}
+                  style={{ width: 70, accentColor: '#14532d' }} />
+                {lineWidth}
+              </div>
+              {/* Color picker */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151' }}>
+                Color:
+                <input type="color" value={color} onChange={(e) => setColor(e.target.value)}
+                  style={{ width: 32, height: 24, border: 'none', cursor: 'pointer', padding: 0 }} />
+              </div>
+            </div>
+
+            {/* Clear button */}
+            <div style={{ padding: '8px 16px', borderTop: '1px solid #E5E7EB' }}>
+              <button type="button" onClick={() => { canvasRef.current?.clear(); setStampImg(null); }}
+                style={{ color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <X size={14} /> Clear
+              </button>
+            </div>
+
+            {/* PIN & Simpan TTD */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid #E5E7EB', background: '#fff' }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#111827', marginBottom: 6 }}>
+                PIN Digital Signature <span style={{ color: '#dc2626' }}>*</span>
+              </label>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="password"
+                    value={signPin}
+                    maxLength={6}
+                    placeholder="Masukkan 6-digit PIN"
+                    onChange={(e) => setSignPin(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 13, boxSizing: 'border-box' }}
+                  />
+                  {signPinError && <span style={{ fontSize: 12, color: '#dc2626', display: 'block', marginTop: 2 }}>{signPinError}</span>}
+                </div>
+                <button type="button" onClick={handleProsesTTE}
+                  style={{ padding: '8px 16px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+                  <Check size={14} /> Simpan TTD
+                </button>
+              </div>
+            </div>
+
+            {/* Pagination */}
+            <div style={{ padding: '10px 16px', borderTop: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, color: '#374151' }}>
+              <span>Halaman {signPage} dari 3</span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button" onClick={() => setSignPage((p) => Math.max(1, p - 1))} disabled={signPage === 1}
+                  style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: signPage === 1 ? '#f3f4f6' : '#fff', color: signPage === 1 ? '#9CA3AF' : '#374151', cursor: signPage === 1 ? 'default' : 'pointer', fontSize: 13 }}>
+                  Previous
+                </button>
+                <button type="button" onClick={() => setSignPage((p) => Math.min(3, p + 1))} disabled={signPage === 3}
+                  style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #d1d5db', background: signPage === 3 ? '#f3f4f6' : '#fff', color: signPage === 3 ? '#9CA3AF' : '#374151', cursor: signPage === 3 ? 'default' : 'pointer', fontSize: 13 }}>
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT: Template Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Info card */}
+            <div style={{ border: '1px solid #E5E7EB', borderRadius: 10, background: '#fff', padding: '16px' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: '#111827' }}>Template Info</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
+                <div>
+                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Title</span>
+                  <div style={{ fontWeight: 600, color: '#111827', marginTop: 2 }}>{selectedItem.namaKegiatan}</div>
+                </div>
+                <div>
+                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Status</span>
+                  <div style={{ fontWeight: 600, color: isSignedMitra ? '#15803d' : '#B45309', marginTop: 2 }}>
+                    {isSignedMitra ? 'Sudah Ditandatangani' : 'Belum Ditandatangani'}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Description</span>
+                  <div style={{ color: '#374151', marginTop: 2 }}>{selectedItem.nomorSK}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Back button */}
+            <button type="button" onClick={() => setViewMode('detail')}
+              style={{ padding: '8px 16px', border: '1px solid #d1d5db', borderRadius: 6, background: '#fff', color: '#374151', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ArrowLeft size={14} /> Kembali ke Detail
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

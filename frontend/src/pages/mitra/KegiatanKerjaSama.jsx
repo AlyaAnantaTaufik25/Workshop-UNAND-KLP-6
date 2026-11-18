@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, SearchX } from 'lucide-react';
+import { Search, SearchX, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
 import { mitraKegiatan } from './data';
 
 export default function KegiatanKerjaSama() {
@@ -8,6 +8,11 @@ export default function KegiatanKerjaSama() {
   const [search, setSearch]             = useState('');
   const [filterJenis, setFilterJenis]   = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+
+  // Ringkasan Statistik
+  const totalKegiatan    = mitraKegiatan.length;
+  const countBerlangsung = mitraKegiatan.filter(k => k.status === 'berlangsung').length;
+  const countSelesai     = mitraKegiatan.filter(k => k.status === 'selesai').length;
 
   const filtered = mitraKegiatan.filter(k => {
     const q = search.toLowerCase();
@@ -24,10 +29,75 @@ export default function KegiatanKerjaSama() {
 
   return (
     <div className="mitra-stack">
-      {/* ── PAGE TITLE ── */}
-      <div className="mitra-intro">
-        <h2>Kegiatan Kerja Sama</h2>
-        <p>Hanya kegiatan yang ditautkan Humas kepada instansi Anda.</p>
+      {/* ── PAGE TITLE / HEADER ── */}
+      <div className="mitra-list-header">
+        <div className="mitra-intro">
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--mitra-green)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
+            Dashboard Mitra
+          </span>
+          <h2 style={{ margin: '2px 0 4px 0' }}>Kegiatan Kerja Sama</h2>
+          <p>Hanya kegiatan yang ditautkan Humas kepada instansi Anda.</p>
+        </div>
+      </div>
+
+      {/* ── RINGKASAN STATISTIK (CARDS) ── */}
+      <div className="mitra-stats-grid">
+        <div
+          className="mitra-stat-box"
+          onClick={() => setFilterStatus('')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            outline: filterStatus === '' ? '2px solid #14532d' : 'none',
+          }}
+          title="Klik untuk tampilkan semua kegiatan"
+        >
+          <div className="mitra-stat-top">
+            <p className="mitra-stat-title">Total Kegiatan</p>
+            <div className="mitra-stat-icon" style={{ background: '#EBF5EE', color: '#14532d' }}>
+              <CalendarDays size={18} />
+            </div>
+          </div>
+          <p className="mitra-stat-val">{totalKegiatan}</p>
+        </div>
+
+        <div
+          className="mitra-stat-box"
+          onClick={() => setFilterStatus(filterStatus === 'berlangsung' ? '' : 'berlangsung')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            outline: filterStatus === 'berlangsung' ? '2px solid #B45309' : 'none',
+          }}
+          title="Klik untuk filter kegiatan berlangsung"
+        >
+          <div className="mitra-stat-top">
+            <p className="mitra-stat-title">Berlangsung</p>
+            <div className="mitra-stat-icon" style={{ background: '#FEF3C7', color: '#B45309' }}>
+              <Clock size={18} />
+            </div>
+          </div>
+          <p className="mitra-stat-val" style={{ color: '#b45309' }}>{countBerlangsung}</p>
+        </div>
+
+        <div
+          className="mitra-stat-box"
+          onClick={() => setFilterStatus(filterStatus === 'selesai' ? '' : 'selesai')}
+          style={{
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            outline: filterStatus === 'selesai' ? '2px solid #15803d' : 'none',
+          }}
+          title="Klik untuk filter kegiatan selesai"
+        >
+          <div className="mitra-stat-top">
+            <p className="mitra-stat-title">Selesai</p>
+            <div className="mitra-stat-icon" style={{ background: '#DCFCE7', color: '#15803d' }}>
+              <CheckCircle2 size={18} />
+            </div>
+          </div>
+          <p className="mitra-stat-val" style={{ color: '#15803d' }}>{countSelesai}</p>
+        </div>
       </div>
 
       {/* ── FILTER BAR ── */}
