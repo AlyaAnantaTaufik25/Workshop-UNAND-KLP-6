@@ -12,7 +12,7 @@ export default function NotifikasiPerbaikanSertifikat() {
   const notifications = corrections.filter(item => ['selesai', 'ditolak'].includes(item.status) && certificates.some(certificate => certificate.id === item.certificateId)).sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
   const unread = notifications.filter(item => !item.notificationRead).length;
   const filtered = notifications.filter(item => !unreadOnly || !item.notificationRead);
-  const markAll = () => { const result = markCorrectionRead(); setError(result.ok ? '' : result.message); };
+  const markAll = async () => { const result = await markCorrectionRead(); setError(result.ok ? '' : result.message); };
   return <div className="peserta-stack">
     <CertificateHeading title="Notifikasi Perbaikan Sertifikat" description="Tanggapan penerbit dan pemberitahuan dokumen pengganti."><Link className="peserta-button peserta-button--secondary" to="/peserta/sertifikat">Kembali ke Daftar</Link></CertificateHeading>
     <div className="peserta-certificate-notification-toolbar"><div className="peserta-certificate-tabs"><button aria-pressed={!unreadOnly} onClick={() => setUnreadOnly(false)}>Semua ({notifications.length})</button><button aria-pressed={unreadOnly} onClick={() => setUnreadOnly(true)}>Belum dibaca ({unread})</button></div><button className="peserta-button peserta-button--secondary" disabled={!unread} onClick={markAll}><CheckCheck size={17} />Tandai Semua Dibaca</button></div>

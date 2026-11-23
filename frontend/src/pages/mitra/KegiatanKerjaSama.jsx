@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, SearchX, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
-import { mitraKegiatan } from './data';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 export default function KegiatanKerjaSama() {
+  const { mitraKegiatan } = usePortalData();
   const navigate = useNavigate();
   const [search, setSearch]             = useState('');
   const [filterJenis, setFilterJenis]   = useState('');
@@ -24,6 +26,8 @@ export default function KegiatanKerjaSama() {
     const matchStatus = filterStatus ? k.status === filterStatus  : true;
     return matchSearch && matchJenis && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const jenisOptions = [...new Set(mitraKegiatan.map(k => k.jenis))];
 
@@ -157,7 +161,7 @@ export default function KegiatanKerjaSama() {
                 </td>
               </tr>
             ) : (
-              filtered.map(k => (
+              pg_filtered.map(k => (
                 <tr key={k.id}>
                   <td>
                     <span
@@ -179,13 +183,13 @@ export default function KegiatanKerjaSama() {
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>{k.tanggal}</td>
                   <td>{k.penyelenggara}</td>
-                  <td>{k.lokasi}</td>
+                  <td style={{ minWidth: 150 }}>{k.lokasi}</td>
                   <td style={{ textAlign: 'center', fontWeight: k.pendaftar > 0 ? 600 : 400 }}>
                     {k.pendaftar}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     {k.kuota === null ? (
-                      <span style={{ color: '#66736c', fontSize: '12px' }}>Tanpa batas</span>
+                      <span style={{ color: '#66736c', fontSize: '12px', whiteSpace: 'nowrap' }}>Tanpa batas</span>
                     ) : (
                       k.kuota
                     )}
@@ -208,6 +212,7 @@ export default function KegiatanKerjaSama() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

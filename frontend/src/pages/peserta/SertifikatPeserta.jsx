@@ -3,7 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { Award, Eye, FilePenLine, History, Search, SearchX } from 'lucide-react';
 import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
-import { CertificateDownloadButton, CertificateEmpty, CertificateHeading, CertificateNotificationsLink, CorrectionStatus, useCertificateDownload } from './CertificateUi';
+import { CertificateDownloadButton, CertificateEmpty, CertificateHeading, CorrectionStatus, useCertificateDownload } from './CertificateUi';
 
 export default function SertifikatPeserta() {
   const { certificates, corrections } = useOutletContext();
@@ -18,9 +18,7 @@ export default function SertifikatPeserta() {
       && (!status || (latestRequest(certificate.id)?.status || 'none') === status);
   }).sort((a, b) => (b.workshop.isoDate || '').localeCompare(a.workshop.isoDate || ''));
   if (!certificates.length) return <CertificateEmpty />;
-  return <div className="peserta-stack">
-    <CertificateNotificationsLink />
-    <CertificateHeading title="Sertifikat Anda" description="Lihat, unduh, dan ajukan perbaikan sertifikat dari kegiatan yang telah selesai.">
+  return <div className="peserta-stack">    <CertificateHeading title="Sertifikat Anda" description="Lihat, unduh, dan ajukan perbaikan sertifikat dari kegiatan yang telah selesai.">
       <Link className="peserta-button peserta-button--secondary" to="/peserta/sertifikat/perbaikan"><History size={17} />Riwayat Perbaikan</Link>
     </CertificateHeading>
     <section className="peserta-filterbar peserta-certificate-filters" aria-label="Filter sertifikat">

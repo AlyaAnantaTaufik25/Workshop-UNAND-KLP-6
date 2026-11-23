@@ -2,35 +2,21 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Download } from 'lucide-react';
 import './laporan-print.css';
+import useApi from '../../hooks/useApi';
+import { reportsApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination } from '../../components/Pagination';
 
 /* ══════════════════════════════════════════
    DATA
 ══════════════════════════════════════════ */
-const kegiatanList = [
-  { id: 1, kegiatan: 'Workshop Data Science untuk Riset Akademik', jenis: 'Workshop', pelaksanaan: 'Offline', periode: '18 Mei 2026', tanggalISO: '2026-05-18', pendaftar: 108, hadir: 88,  belumAbsen: 20, menungguVerifikasi: 0, ditolak: 0 },
-  { id: 2, kegiatan: 'Strategi Hilirisasi Riset dan Inovasi',       jenis: 'Seminar',  pelaksanaan: 'Offline', periode: '24 Mei 2026', tanggalISO: '2026-05-24', pendaftar: 80,  hadir: 0,   belumAbsen: 2,  menungguVerifikasi: 0, ditolak: 0 },
-  { id: 3, kegiatan: 'Kepemimpinan Muda Berdampak',                 jenis: 'Kuliah Umum', pelaksanaan: 'Offline', periode: '2 Juni 2026',  tanggalISO: '2026-06-02', pendaftar: 62,  hadir: 0,   belumAbsen: 62, menungguVerifikasi: 0, ditolak: 0 },
-  { id: 4, kegiatan: 'Manajemen Proyek Kolaboratif',                jenis: 'Workshop', pelaksanaan: 'Offline', periode: '15 April 2026', tanggalISO: '2026-04-15', pendaftar: 92,  hadir: 84,  belumAbsen: 8,  menungguVerifikasi: 0, ditolak: 0 },
-  { id: 5, kegiatan: 'Inovasi Industri Berkelanjutan',              jenis: 'Seminar',  pelaksanaan: 'Offline', periode: '12 Mei 2026',  tanggalISO: '2026-05-12', pendaftar: 76,  hadir: 1,   belumAbsen: 1,  menungguVerifikasi: 0, ditolak: 0 },
-  { id: 6, kegiatan: 'Seminar Transformasi Digital',                jenis: 'Seminar',  pelaksanaan: 'Online',  periode: '18 Mei 2026 – 20 Mei 2026', tanggalISO: '2026-05-18', pendaftar: 1,   hadir: 0,   belumAbsen: 3,  menungguVerifikasi: 0, ditolak: 0 },
-  { id: 7, kegiatan: 'Seminar Kolaborasi Riset Lintas Disiplin',    jenis: 'Seminar',  pelaksanaan: 'Offline', periode: '18 Mei 2026 – 19 Mei 2026', tanggalISO: '2026-05-18', pendaftar: 1,   hadir: 0,   belumAbsen: 2,  menungguVerifikasi: 0, ditolak: 0 },
-];
-
-const rekapSeminarHarian = [
-  { id: 1, kegiatan: 'Strategi Hilirisasi Riset dan Inovasi',    pelaksanaan: 'Offline', hari: 'Hari 1', tanggal: '24 Mei 2026', tanggalISO: '2026-05-24', absensi: 'Ditutup', sampelPeserta: 2, belumAbsen: 2, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-  { id: 2, kegiatan: 'Inovasi Industri Berkelanjutan',            pelaksanaan: 'Offline', hari: 'Hari 1', tanggal: '12 Mei 2026', tanggalISO: '2026-05-12', absensi: 'Ditutup', sampelPeserta: 2, belumAbsen: 1, menungguVerifikasi: 0, hadir: 1, ditolak: 0 },
-  { id: 3, kegiatan: 'Seminar Transformasi Digital',              pelaksanaan: 'Online',  hari: 'Hari 1', tanggal: '18 Mei 2026', tanggalISO: '2026-05-18', absensi: 'Ditutup', sampelPeserta: 1, belumAbsen: 1, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-  { id: 4, kegiatan: 'Seminar Transformasi Digital',              pelaksanaan: 'Online',  hari: 'Hari 2', tanggal: '19 Mei 2026', tanggalISO: '2026-05-19', absensi: 'Ditutup', sampelPeserta: 1, belumAbsen: 1, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-  { id: 5, kegiatan: 'Seminar Transformasi Digital',              pelaksanaan: 'Online',  hari: 'Hari 3', tanggal: '20 Mei 2026', tanggalISO: '2026-05-20', absensi: 'Ditutup', sampelPeserta: 1, belumAbsen: 1, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-  { id: 6, kegiatan: 'Seminar Kolaborasi Riset Lintas Disiplin',  pelaksanaan: 'Offline', hari: 'Hari 1', tanggal: '18 Mei 2026', tanggalISO: '2026-05-18', absensi: 'Ditutup', sampelPeserta: 1, belumAbsen: 1, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-  { id: 7, kegiatan: 'Seminar Kolaborasi Riset Lintas Disiplin',  pelaksanaan: 'Offline', hari: 'Hari 2', tanggal: '19 Mei 2026', tanggalISO: '2026-05-19', absensi: 'Ditutup', sampelPeserta: 1, belumAbsen: 1, menungguVerifikasi: 0, hadir: 0, ditolak: 0 },
-];
+// Data laporan diambil dari API /reports (lihat komponen Laporan)
 
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
 function getDateRange(fp) {
-  const today = new Date('2026-05-18');
+  const today = new Date();
   const to = today.toISOString().slice(0, 10);
   if (fp === 'hari-ini') return { from: to, to };
   if (fp === '7-hari') {
@@ -219,6 +205,11 @@ export default function Laporan() {
   const [filterJenis,    setFilterJenis]    = useState('');
   const [filterKegiatan, setFilterKegiatan] = useState('');
   const [filterPeriode,  setFilterPeriode]  = useState('');
+  const { data: laporan, loading, error, reload } = useApi(() => reportsApi.workshops(), []);
+  const { data: harian } = useApi(() => reportsApi.daily(), []);
+  const kegiatanList = useMemo(() => laporan || [], [laporan]);
+  // Rekap harian untuk kegiatan berjenis seminar
+  const rekapSeminarHarian = useMemo(() => (harian || []).filter(r => r.jenis === 'Seminar'), [harian]);
 
   const filteredKegiatan = useMemo(() => {
     const range = getDateRange(filterPeriode);
@@ -230,16 +221,23 @@ export default function Laporan() {
       const matchPeriode  = range ? l.tanggalISO >= range.from && l.tanggalISO <= range.to : true;
       return matchSearch && matchJenis && matchKegiatan && matchPeriode;
     });
-  }, [search, filterJenis, filterKegiatan, filterPeriode]);
+  }, [kegiatanList, search, filterJenis, filterKegiatan, filterPeriode]);
+  // Paginasi tabel
+  const { pageItems: pg_filteredKegiatan, pager: pager_filteredKegiatan } = usePagination(filteredKegiatan, 10);
 
   const filteredSeminar = useMemo(() => {
     const range = getDateRange(filterPeriode);
     return rekapSeminarHarian.filter(r =>
       range ? r.tanggalISO >= range.from && r.tanggalISO <= range.to : true
     );
-  }, [filterPeriode]);
+  }, [rekapSeminarHarian, filterPeriode]);
+  // Paginasi tabel
+  const { pageItems: pg_filteredSeminar, pager: pager_filteredSeminar } = usePagination(filteredSeminar, 10);
 
-  const jenisOptions = useMemo(() => Array.from(new Set(kegiatanList.map(l => l.jenis))), []);
+  const jenisOptions = useMemo(() => Array.from(new Set(kegiatanList.map(l => l.jenis))), [kegiatanList]);
+
+  if (loading && !laporan) return <PageLoader />;
+  if (error && !laporan) return <ErrorNotice error={error} onRetry={reload} />;
 
   const totalPendaftar = filteredKegiatan.reduce((s, k) => s + k.pendaftar, 0);
   const totalHadir     = filteredKegiatan.reduce((s, k) => s + k.hadir, 0);
@@ -351,7 +349,7 @@ export default function Laporan() {
             {filteredKegiatan.length === 0 ? (
               <tr><td colSpan={9} style={{ textAlign: 'center', color: '#9ca3af', padding: 24 }}>Tidak ada data kegiatan yang sesuai filter.</td></tr>
             ) : (
-              filteredKegiatan.map(k => (
+              pg_filteredKegiatan.map(k => (
                 <tr key={k.id}>
                   <td>
                     <span className="table-name-bold humas-link" style={{ cursor: 'pointer' }} onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}>
@@ -371,6 +369,7 @@ export default function Laporan() {
             )}
           </tbody>
         </table>
+          {pager_filteredKegiatan}
       </div>
 
       {/* Rekap Seminar Harian */}
@@ -398,7 +397,7 @@ export default function Laporan() {
               {filteredSeminar.length === 0 ? (
                 <tr><td colSpan={10} style={{ textAlign: 'center', color: '#9ca3af', padding: 24 }}>Tidak ada data seminar harian sesuai filter.</td></tr>
               ) : (
-                filteredSeminar.map(r => (
+                pg_filteredSeminar.map(r => (
                   <tr key={r.id}>
                     <td>{r.kegiatan}</td>
                     <td>{r.pelaksanaan}</td>
@@ -415,6 +414,7 @@ export default function Laporan() {
               )}
             </tbody>
           </table>
+          {pager_filteredSeminar}
         </div>
       </div>
 

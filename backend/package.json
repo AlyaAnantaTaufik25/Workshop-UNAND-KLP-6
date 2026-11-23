@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node tests/health.test.js"
+    "test": "node tests/health.test.js",
+    "db:migrate": "node database/migrate.js",
+    "db:seed": "node database/seeders/seed.js",
+    "db:reset": "node database/migrate.js && node database/seeders/seed.js"
   },
   "keywords": [
     "workshop",
@@ -18,9 +21,11 @@
   "author": "Backend Team - SIM Workshop UNAND",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.12.0"
   },
   "devDependencies": {

@@ -7,14 +7,14 @@ export default function ProfilPeserta() {
   const [form, setForm] = useState({ ...profile });
   const [error, setError] = useState('');
   const update = event => setForm(value => ({ ...value, [event.target.name]: event.target.value }));
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
     const next = Object.fromEntries(Object.entries(form).map(([key, value]) => [key, value.trim()]));
     if (!next.nama || !next.email || !next.telepon || (next.jenis === 'Mahasiswa' && (!next.nim || !next.prodi))) {
       setError('Lengkapi semua data peserta sebelum menyimpan.');
       return;
     }
-    if (saveProfile(next)) { setForm(next); setError(''); notify('Perubahan profil berhasil disimpan.'); }
+    if (await saveProfile(next)) { setForm(next); setError(''); notify('Perubahan profil berhasil disimpan.'); }
   };
   return <div className="peserta-stack"><section className="peserta-intro"><h2>Informasi pribadi</h2><p>Pastikan data Anda benar untuk kebutuhan sertifikat.</p></section>
     <form className="peserta-profile-form" onSubmit={handleSubmit}><div className="peserta-profile-heading"><span className="peserta-avatar peserta-avatar--large">{initials(profile.nama)}</span><div><h3>{profile.nama}</h3><p>Peserta {profile.jenis}</p></div></div>

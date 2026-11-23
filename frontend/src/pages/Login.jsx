@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { ROLE_HOME, useAuth } from '../context/AuthContext';
 import UnandLogo from '../components/UnandLogo';
 import './login.css';
 import {
@@ -9,29 +10,45 @@ import {
 const roles = [
   { key: 'peserta',            label: 'Peserta',            icon: User,      path: '/peserta/cari-workshop' },
   { key: 'humas',              label: 'Humas',              icon: Building2, path: '/humas/ringkasan' },
-  { key: 'sekretariat-rektor', label: 'Sekretariat Rektor', icon: FileText,  path: '/sekretariat/kegiatan' },
+  { key: 'sekretariat', label: 'Sekretariat Rektor', icon: FileText,  path: '/sekretariat/kegiatan' },
   { key: 'mitra',              label: 'Mitra',              icon: Users,     path: '/mitra/kegiatan-kerja-sama' },
   { key: 'rektor',             label: 'Rektor',             icon: Landmark,  path: '/rektor/pengajuan' },
 ];
 
-export default function Login() {
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('peserta');
-  const navigate = useNavigate();
+const DEMO_PASSWORD = 'password123';
 
-  const handleLogin = (e) => {
+export default function Login() {
+  const [email, setEmail]       = useState('peserta@unand.ac.id');
+  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [selectedRole, setSelectedRole] = useState('peserta');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const navigate = useNavigate();
+  const { user, login } = useAuth();
+
+  if (user) return <Navigate to={ROLE_HOME[user.role] || '/'} replace />;
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const role = roles.find(r => r.key === selectedRole);
-    if (role) navigate(role.path);
+    if (loading) return;
+    setError('');
+    setLoading(true);
+    try {
+      const me = await login(email.trim(), password);
+      navigate(ROLE_HOME[me.role] || '/', { replace: true });
+    } catch (err) {
+      setError(err.message || 'Gagal masuk. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Akses cepat demo: isi otomatis akun demo sesuai role
   const handleDemoSelect = (roleKey) => {
     setSelectedRole(roleKey);
-  };
-
-  const handleDemoLogin = (path) => {
-    navigate(path);
+    setEmail(`${roleKey}@unand.ac.id`);
+    setPassword(DEMO_PASSWORD);
+    setError('');
   };
 
   return (
@@ -87,8 +104,9 @@ export default function Login() {
                 onChange={e => setPassword(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn-primary">
-              Masuk sebagai {roles.find(r => r.key === selectedRole)?.label ?? 'Peserta'}
+            {error && <p role="alert" style={{ color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 12px', fontSize: 13, margin: '0 0 12px' }}>{error}</p>}
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Memproses…' : `Masuk sebagai ${roles.find(r => r.key === selectedRole)?.label ?? 'Peserta'}`}
             </button>
           </form>
 
@@ -105,7 +123,7 @@ export default function Login() {
           </div>
 
           <p className="login-demo-subtitle">
-            Pilih role untuk melihat tampilan masing-masing portal.
+            Pilih role untuk mengisi akun demo (kata sandi: password123).
           </p>
 
           <div className="demo-grid">
@@ -117,7 +135,7 @@ export default function Login() {
                   type="button"
                   key={role.key}
                   className={`demo-btn${role.key === 'rektor' ? ' demo-btn-full' : ''}${isActive ? ' active' : ''}`}
-                  onClick={() => setSelectedRole(role.key)}
+                  onClick={() => handleDemoSelect(role.key)}
                 >
                   <div className="demo-btn-icon">
                     <Icon size={14} />

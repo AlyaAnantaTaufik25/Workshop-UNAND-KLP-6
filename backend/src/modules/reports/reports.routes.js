@@ -1,8 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const reportsController = require('./reports.controller');
+const c = require('./reports.controller');
+const { authenticate } = require('../../middlewares/auth.middleware');
+const { authorizeRoles } = require('../../middlewares/role.middleware');
+const { asyncHandler } = require('../../utils/http.util');
 
-// Rute dasar placeholder modul reports
-router.get('/', (req, res) => reportsController.index(req, res));
+router.use(authenticate, authorizeRoles('humas', 'rektor', 'sekretariat', 'mitra'));
+
+router.get('/summary', asyncHandler(c.summary));
+router.get('/workshops', asyncHandler(c.workshops));
+router.get('/daily', asyncHandler(c.daily));
+router.get('/workshops/:id/export', asyncHandler(c.exportWorkshop));
 
 module.exports = router;

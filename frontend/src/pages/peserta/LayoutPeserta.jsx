@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Award, Bell, CalendarDays, LogOut, Menu, Search, User, X } from 'lucide-react';
-import { exampleRegistrations, initialProfile, initialRegistrations, initials, participantWorkshops, readParticipantData } from './data';
+import { initials } from './data';
 import UnandLogo from '../../components/UnandLogo';
-import { canSubmitAttendance, createRegistration, getRemainingSeats } from './workshopStates';
-import { getIssuedCertificates } from './certificates';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { useAuth } from '../../context/AuthContext';
+import { attendanceApi, certificatesApi, readFileAsDataUrl, registrationsApi, workshopsApi } from '../../api';
 import { getCertificateVersions } from './certificateCorrections';
-import useCertificateCorrections from './useCertificateCorrections';
 import './peserta.css';
 import './workshopStates.css';
 import './sertifikat.css';
@@ -18,19 +18,8 @@ const navItems = [
   { to: '/peserta/profil', label: 'Profil', icon: User },
 ];
 
-function loadRegistrations() {
-  const saved = readParticipantData('registrations', initialRegistrations, value =>
-    Array.isArray(value) && new Set(value.map(item => item?.workshopId)).size === value.length
-    && value.every(item => item && participantWorkshops.some(workshop => workshop.id === item.workshopId)
-      && ['registered', 'waiting', 'completed', 'cancelled'].includes(item.status)
-      && (!item.attendance || ['pending', 'present', 'rejected', 'absent'].includes(item.attendance.status))));
-  // Add the new example workshops to older demo sessions without replacing saved changes.
-  const entries = saved.length ? [...saved, ...exampleRegistrations.filter(example => !saved.some(item => item.workshopId === example.workshopId))] : saved;
-  return entries.map(item => {
-    const original = initialRegistrations.find(entry => entry.workshopId === item.workshopId && entry.status === item.status);
-    return !item.attendance && !item.registeredAt && original?.attendance ? { ...item, attendance: original.attendance } : item;
-  });
-}
+// Portal peserta memakai slug sebagai id kegiatan (dipakai di URL & pencocokan pendaftaran)
+const toParticipantWorkshop = workshop => ({ ...workshop, id: workshop.slug, dbId: workshop.id });
 
 export default function LayoutPeserta() {
   const location = useLocation();
@@ -43,11 +32,37 @@ export default function LayoutPeserta() {
   const notificationRef = useRef();
   const menuButtonRef = useRef();
   const sidebarRef = useRef();
-  const [profile, setProfile] = useState(() => readParticipantData('profile', initialProfile, value => value && Object.keys(initialProfile).every(key => typeof value[key] === 'string') && value.nama.trim()));
-  const [registrations, setRegistrations] = useState(loadRegistrations);
-  const workshops = participantWorkshops.map(workshop => ({ ...workshop, remaining: getRemainingSeats(workshop, registrations, initialRegistrations) }));
-  const { corrections, submitCorrection, cancelCorrection, markCorrectionRead } = useCertificateCorrections();
-  const certificateOriginals = getIssuedCertificates(workshops, registrations);
+  const { user, logout, updateProfile } = useAuth();
+  const profile = { nama: user?.nama || '', email: user?.email || '', jenis: user?.jenis || 'Umum', telepon: user?.telepon || '', nim: user?.nim || '', prodi: user?.prodi || '' };
+  const [workshops, setWorkshops] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [issued, setIssued] = useState([]);
+  const [corrections, setCorrections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+
+  // Ambil seluruh data peserta dari backend
+  const reload = useCallback(async () => {
+    try {
+      const [ws, regs, certs, corr] = await Promise.all([
+        workshopsApi.list(), registrationsApi.my(), certificatesApi.my(), certificatesApi.corrections(),
+      ]);
+      setWorkshops(ws.map(toParticipantWorkshop));
+      setRegistrations(regs);
+      setIssued(certs);
+      setCorrections(corr);
+      setLoadError(null);
+    } catch (err) {
+      setLoadError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => { reload(); }, [reload]);
+
+  const certificateOriginals = issued
+    .map(certificate => ({ ...certificate, workshop: workshops.find(item => item.id === certificate.workshopId) }))
+    .filter(certificate => certificate.workshop);
   const certificates = certificateOriginals.map(certificate => getCertificateVersions(certificate, corrections).at(-1));
   const unreadCorrections = corrections.filter(item => ['selesai', 'ditolak'].includes(item.status) && !item.notificationRead && certificates.some(certificate => certificate.id === item.certificateId)).length;
   const notify = useCallback(text => {
@@ -84,37 +99,72 @@ export default function LayoutPeserta() {
     return () => { sidebar.removeEventListener('keydown', handleKey); document.body.style.overflow = previousOverflow; menuButtonRef.current?.focus(); };
   }, [menuOpen]);
 
-  const persist = (key, value, setter) => {
+  // ── Aksi peserta (semua tersimpan di database melalui API)
+  const saveProfile = async value => {
     try {
-      localStorage.setItem(`workshop-unand:peserta:${key}`, JSON.stringify(value));
-      setter(value);
+      await updateProfile(value);
       return true;
-    } catch {
-      notify('Data belum tersimpan. Periksa izin penyimpanan browser, lalu coba lagi.');
+    } catch (err) {
+      notify(err.message || 'Profil belum tersimpan.');
       return false;
     }
   };
-  const saveProfile = value => persist('profile', value, setProfile);
-  const register = workshopId => {
-    const workshop = workshops.find(item => item.id === workshopId);
-    if (!workshop) return false;
-    const entry = createRegistration(workshop, registrations.find(item => item.workshopId === workshopId));
-    if (!entry) return false;
-    return persist('registrations', [...registrations.filter(item => item.workshopId !== workshopId), entry], setRegistrations);
+  // Melempar error agar dialog dapat menampilkan pesan dari server
+  const register = async workshopId => {
+    await registrationsApi.register(workshopId);
+    await reload();
+    return true;
   };
-  const cancelRegistration = workshopId => {
-    const workshop = workshops.find(item => item.id === workshopId);
+  const cancelRegistration = async workshopId => {
     const entry = registrations.find(item => item.workshopId === workshopId);
-    if (!workshop || workshop.completed || workshop.cancelled || !['registered', 'waiting'].includes(entry?.status)) return false;
-    return persist('registrations', registrations.map(item => item.workshopId === workshopId ? { ...item, status: 'cancelled', cancelledAt: new Date().toISOString() } : item), setRegistrations);
+    if (!entry) throw new Error('Pendaftaran tidak ditemukan.');
+    await registrationsApi.cancel(entry.registrationId);
+    await reload();
+    return true;
   };
-  const submitAttendance = (workshopId, evidence) => {
-    const workshop = workshops.find(item => item.id === workshopId);
-    const entry = registrations.find(item => item.workshopId === workshopId);
-    if (!workshop || !canSubmitAttendance(workshop, entry)) return false;
-    // Frontend prototype: keep evidence metadata locally until the attendance API is available.
-    return persist('registrations', registrations.map(item => item.workshopId === workshopId ? { ...item, attendance: { ...evidence, status: 'pending' } } : item), setRegistrations);
+  const submitAttendance = async (workshopId, evidence) => {
+    if (evidence.method === 'upload') {
+      const fileData = await readFileAsDataUrl(evidence.file);
+      await attendanceApi.upload({ workshopId, fileName: evidence.fileName, fileData });
+    } else {
+      await attendanceApi.checkIn({ workshopId, code: evidence.code, latitude: evidence.location?.latitude, longitude: evidence.location?.longitude });
+    }
+    await reload();
+    return true;
   };
+  const submitCorrection = async (certificate, payload) => {
+    try {
+      const request = await certificatesApi.createCorrection({
+        certificateId: certificate.id,
+        changes: payload.changes.map(change => ({ field: change.field, newValue: change.newValue })),
+        reason: payload.reason,
+        agreed: payload.agreed,
+        attachment: payload.attachment || null,
+      });
+      await reload();
+      return { ok: true, request };
+    } catch (err) {
+      return { ok: false, message: err.message };
+    }
+  };
+  const cancelCorrection = async id => {
+    try {
+      await certificatesApi.cancelCorrection(id);
+      await reload();
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, message: err.message };
+    }
+  };
+  const markCorrectionRead = useCallback(async id => {
+    try {
+      setCorrections(await certificatesApi.markCorrectionsRead(id));
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, message: err.message };
+    }
+  }, []);
+  const handleLogout = () => { logout(); navigate('/', { replace: true }); };
   const pageTitle = location.pathname.startsWith('/peserta/sertifikat') ? 'Sertifikat' : location.pathname.includes('/workshop/') ? 'Detail Workshop' : navItems.find(item => location.pathname === item.to)?.label || 'Cari Workshop';
 
   return <div className="peserta-shell">
@@ -124,19 +174,19 @@ export default function LayoutPeserta() {
       <div className="peserta-brand"><UnandLogo className="peserta-brandmark" /><div><strong>Workshop UNAND</strong><span>Sistem Informasi Workshop</span></div><button className="peserta-menu-close peserta-icon-button" aria-label="Tutup navigasi" title="Tutup navigasi" onClick={() => setMenuOpen(false)}><X size={20} /></button></div>
       <div className="peserta-role"><span>MASUK SEBAGAI</span><strong>Peserta</strong></div>
       <nav aria-label="Navigasi peserta">{navItems.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} className={({ isActive }) => (isActive || (to.endsWith('cari-workshop') && location.pathname.includes('/workshop/'))) ? 'is-active' : ''}><Icon size={20} /><span>{label}</span></NavLink>)}</nav>
-      <button className="peserta-logout" onClick={() => navigate('/')}><LogOut size={20} /><span>Keluar</span></button>
+      <button className="peserta-logout" onClick={handleLogout}><LogOut size={20} /><span>Keluar</span></button>
     </aside>
     <div className="peserta-main">
       <header className="peserta-topbar">
         <div className="peserta-title-wrap"><button ref={menuButtonRef} className="peserta-menu-button peserta-icon-button" aria-label="Buka navigasi" title="Buka navigasi" aria-expanded={menuOpen} aria-controls="peserta-navigation" onClick={() => setMenuOpen(true)}><Menu size={22} /></button><div><span className="peserta-eyebrow">WORKSHOP UNAND</span><h1>{pageTitle}</h1></div></div>
         <div className="peserta-top-actions">
-          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label="Notifikasi" title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(value => !value); setNotificationsRead(true); }}><Bell size={20} />{((!notificationsRead && certificates.length > 0) || unreadCorrections > 0) && <i className="peserta-notification-dot" />}</button>
+          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label="Notifikasi" title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(value => !value); setNotificationsRead(true); }}><Bell size={20} />{unreadCorrections > 0 ? <span className="peserta-notification-count" aria-label={`${unreadCorrections} notifikasi belum dibaca`}>{unreadCorrections}</span> : (!notificationsRead && certificates.length > 0) && <i className="peserta-notification-dot" />}</button>
             {notificationsOpen && <div className="peserta-notification-popover"><h2>Notifikasi</h2>{certificates.length ? <><NavLink to="/peserta/sertifikat/notifikasi"><Bell size={20} /><div><strong>Notifikasi perbaikan ({unreadCorrections})</strong><p>Lihat tanggapan penerbit untuk pengajuan Anda.</p></div></NavLink><NavLink to="/peserta/sertifikat"><Award size={20} /><div><strong>Sertifikat telah diterbitkan</strong><p>{certificates[0].workshop.title}</p><small>{certificates[0].issued}</small></div></NavLink></> : <p>Belum ada notifikasi sertifikat.</p>}</div>}
           </div>
           <NavLink to="/peserta/profil" className="peserta-profile-link" aria-label={`Profil ${profile.nama}`}><span className="peserta-avatar">{initials(profile.nama)}</span><div><strong>{profile.nama}</strong><span>Peserta</span></div></NavLink>
         </div>
       </header>
-      <main id="peserta-content" className="peserta-content"><Outlet context={{ profile, saveProfile, workshops, registrations, certificates, certificateOriginals, corrections, submitCorrection, cancelCorrection, markCorrectionRead, register, cancelRegistration, submitAttendance, notify }} /></main>
+      <main id="peserta-content" className="peserta-content">{loading ? <PageLoader /> : loadError && !workshops.length ? <ErrorNotice error={loadError} onRetry={() => { setLoading(true); reload(); }} /> : <Outlet context={{ profile, saveProfile, workshops, registrations, certificates, certificateOriginals, corrections, submitCorrection, cancelCorrection, markCorrectionRead, register, cancelRegistration, submitAttendance, notify, reload }} />}</main>
     </div>
     {message && <div className="peserta-toast" role="status">{message}<button className="peserta-icon-button" aria-label="Tutup pesan" onClick={() => setMessage('')}><X size={16} /></button></div>}
   </div>;

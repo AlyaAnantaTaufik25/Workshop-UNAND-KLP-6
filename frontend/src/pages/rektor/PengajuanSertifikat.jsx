@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, AlertTriangle } from 'lucide-react';
-import { sertifikatData, dokumenPengganti } from '../../data/mockData';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 const ttdLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -15,6 +16,7 @@ const ttdClass = {
 };
 
 export default function PengajuanSertifikat() {
+  const { sertifikatData, dokumenPengganti } = usePortalData();
   const navigate = useNavigate();
   const [search, setSearch]                 = useState('');
   const [filterJenis, setFilterJenis]       = useState('');
@@ -27,6 +29,8 @@ export default function PengajuanSertifikat() {
     const matchStatus = filterStatus ? s.statusTandaTangan === filterStatus : true;
     return matchSearch && matchJenis && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filteredSert, pager: pager_filteredSert } = usePagination(filteredSert, 10);
 
   return (
     <div>
@@ -119,7 +123,7 @@ export default function PengajuanSertifikat() {
                 </td>
               </tr>
             )}
-            {filteredSert.map(s => (
+            {pg_filteredSert.map(s => (
               <tr key={s.id}>
                 <td><span className="table-name-bold">{s.namaKegiatan}</span></td>
                 <td>{s.jenis}</td>
@@ -150,6 +154,7 @@ export default function PengajuanSertifikat() {
             ))}
           </tbody>
         </table>
+          {pager_filteredSert}
       </div>
     </div>
   );

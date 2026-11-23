@@ -1,14 +1,8 @@
 import { useState } from 'react';
 import { Search, SearchX } from 'lucide-react';
-import { mitraPeserta } from './data';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
-const kegiatanOptions = [
-  'Workshop Data Science untuk Riset Akademik',
-  'Manajemen Proyek Kolaboratif',
-  'Inovasi Industri Berkelanjutan',
-  'Seminar Transformasi Digital',
-  'Seminar Kolaborasi Riset Lintas Disiplin',
-];
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
 
@@ -18,6 +12,8 @@ function StatusHadirBadge({ status }) {
 }
 
 export default function PesertaMitra() {
+  const { mitraPeserta } = usePortalData();
+  const kegiatanOptions = [...new Set(mitraPeserta.map(p => p.kegiatan))];
   const [search, setSearch]                 = useState('');
   const [filterJenis, setFilterJenis]       = useState('');
   const [filterKegiatan, setFilterKegiatan] = useState('');
@@ -31,6 +27,8 @@ export default function PesertaMitra() {
     const matchStatus   = filterStatus ? p.statusHadir === filterStatus : true;
     return matchSearch && matchJenis && matchKegiatan && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   return (
     <div className="mitra-stack">
@@ -93,7 +91,7 @@ export default function PesertaMitra() {
                 </td>
               </tr>
             ) : (
-              filtered.map(p => (
+              pg_filtered.map(p => (
                 <tr key={p.id}>
                   <td><span className="mitra-activity-title">{p.nama}</span></td>
                   <td>
@@ -111,6 +109,7 @@ export default function PesertaMitra() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

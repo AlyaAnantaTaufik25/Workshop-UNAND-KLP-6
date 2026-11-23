@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { User, Lock, KeyRound, Check, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { currentRektor } from './data';
+import { usePortalData } from '../../context/PortalData';
+import { useAuth } from '../../context/AuthContext';
+import { authApi } from '../../api';
 
 function initials(name) {
   if (!name) return 'AR';
@@ -8,6 +10,8 @@ function initials(name) {
 }
 
 export default function ProfilRektor() {
+  const { currentRektor } = usePortalData();
+  const { updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('profil'); // 'profil' | 'pin'
 
   // Form Profil
@@ -16,9 +20,6 @@ export default function ProfilRektor() {
   const [error, setError] = useState('');
 
   // State PIN Digital Signature
-  const [currentStoredPin, setCurrentStoredPin] = useState(() => {
-    return localStorage.getItem('rektor_pin') || '123456';
-  });
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -32,13 +33,19 @@ export default function ProfilRektor() {
     setForm(val => ({ ...val, [event.target.name]: event.target.value }));
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
     const next = Object.fromEntries(
       Object.entries(form).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
     );
     if (!next.nama || !next.email || !next.telepon) {
       setError('Lengkapi semua data profil sebelum menyimpan.');
+      return;
+    }
+    try {
+      await updateProfile({ nama: next.nama, email: next.email, telepon: next.telepon, nip: next.nip, unitKerja: next.unitKerja, jabatan: next.jabatan });
+    } catch (err) {
+      setError(err.message);
       return;
     }
     setError('');
@@ -48,15 +55,10 @@ export default function ProfilRektor() {
   };
 
   // Handler Ubah PIN
-  const handleUbahPin = (e) => {
+  const handleUbahPin = async (e) => {
     e.preventDefault();
     setPinError('');
     setPinSuccessMsg('');
-
-    if (oldPin !== currentStoredPin) {
-      setPinError('PIN lama tidak sesuai. Silakan periksa kembali atau gunakan tombol reset.');
-      return;
-    }
 
     if (!/^\d{6}$/.test(newPin)) {
       setPinError('PIN baru harus terdiri dari tepat 6 digit angka.');
@@ -68,8 +70,13 @@ export default function ProfilRektor() {
       return;
     }
 
-    localStorage.setItem('rektor_pin', newPin);
-    setCurrentStoredPin(newPin);
+    // PIN diverifikasi & disimpan (ter-hash) di server
+    try {
+      await authApi.changePin(oldPin, newPin);
+    } catch (err) {
+      setPinError(err.message);
+      return;
+    }
     setOldPin('');
     setNewPin('');
     setConfirmPin('');
@@ -80,8 +87,7 @@ export default function ProfilRektor() {
   // Handler Lupa / Reset PIN
   const handleResetDefaultPin = () => {
     if (window.confirm('Apakah Anda yakin ingin mereset PIN tanda tangan Rektor ke PIN awal (123456)?')) {
-      localStorage.setItem('rektor_pin', '123456');
-      setCurrentStoredPin('123456');
+      authApi.resetPin().catch(err => setPinError(err.message));
       setOldPin('');
       setNewPin('');
       setConfirmPin('');

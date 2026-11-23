@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Check, PenTool, FileText, CheckCircle2 } from 'lucide-react';
-import { sertifikatData } from '../../data/mockData';
-import { currentRektor } from './data';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
+import { usePortalData } from '../../context/PortalData';
 
 export default function DetailRiwayatRektor() {
+  const { sertifikatData, currentRektor } = usePortalData();
   const { id }   = useParams();
   const navigate = useNavigate();
 

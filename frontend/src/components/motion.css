@@ -1,0 +1,229 @@
+/* ============================================================
+   MOTION — animasi halus di seluruh portal
+   Durasi & kurva dipusatkan di variabel agar mudah disesuaikan.
+   Otomatis nonaktif untuk pengguna "prefers-reduced-motion".
+   ============================================================ */
+:root {
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-slow: 360ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ── Keyframes ── */
+@keyframes motion-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes motion-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes motion-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes motion-drop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes motion-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── 1. Transisi masuk halaman (setiap pindah menu) ── */
+.content-container > *,
+.mitra-content > *,
+.peserta-content > * {
+  animation: motion-fade-up var(--motion-slow) var(--ease-out) both;
+}
+
+/* Kartu & baris muncul berurutan (stagger ringan) */
+.ringkasan-stats-row > *,
+.humas-stats-grid > *,
+.mitra-stats-grid > *,
+.laporan-summary-row > *,
+.rekap-cards-grid > *,
+.kelola-absensi-stats-grid > *,
+.peserta-stat-grid > * {
+  animation: motion-fade-up var(--motion-slow) var(--ease-out) both;
+}
+.ringkasan-stats-row > :nth-child(2), .humas-stats-grid > :nth-child(2), .mitra-stats-grid > :nth-child(2),
+.laporan-summary-row > :nth-child(2), .rekap-cards-grid > :nth-child(2), .kelola-absensi-stats-grid > :nth-child(2),
+.peserta-stat-grid > :nth-child(2) { animation-delay: 50ms; }
+.ringkasan-stats-row > :nth-child(3), .humas-stats-grid > :nth-child(3), .mitra-stats-grid > :nth-child(3),
+.laporan-summary-row > :nth-child(3), .rekap-cards-grid > :nth-child(3), .kelola-absensi-stats-grid > :nth-child(3),
+.peserta-stat-grid > :nth-child(3) { animation-delay: 100ms; }
+.ringkasan-stats-row > :nth-child(4), .humas-stats-grid > :nth-child(4), .mitra-stats-grid > :nth-child(4),
+.laporan-summary-row > :nth-child(4), .rekap-cards-grid > :nth-child(4), .kelola-absensi-stats-grid > :nth-child(4),
+.peserta-stat-grid > :nth-child(4) { animation-delay: 150ms; }
+
+/* Baris tabel memudar masuk (juga saat ganti halaman paginasi / filter) */
+.role-humas tbody tr,
+.role-sekretariat tbody tr,
+.role-rektor tbody tr,
+.mitra-shell tbody tr,
+.peserta-shell tbody tr {
+  animation: motion-fade var(--motion-base) var(--ease-out) both;
+}
+
+/* Isi tab berganti dengan lembut */
+[class*="tab-content"],
+.kelola-absensi-container,
+.rekap-kehadiran-container,
+.humas-detail-body {
+  animation: motion-fade-up var(--motion-base) var(--ease-out) both;
+}
+
+/* ── 2. Modal & overlay ── */
+.modal-overlay,
+.peserta-modal-backdrop,
+.peserta-overlay,
+.ui-nav-overlay {
+  animation: motion-fade var(--motion-base) var(--ease-out) both;
+}
+.modal-box,
+.confirm-modal,
+.peserta-modal {
+  animation: motion-pop var(--motion-slow) var(--ease-out) both;
+}
+
+/* ── 3. Popover notifikasi & dropdown ── */
+.layout-notif-dropdown,
+.header-notif-popover,
+.mitra-notification-popover,
+.peserta-notification-popover {
+  transform-origin: top right;
+  animation: motion-drop var(--motion-base) var(--ease-out) both;
+}
+
+/* ── 4. Toast ── */
+.peserta-toast,
+[role="status"][style*="position: fixed"] {
+  animation: motion-slide-up var(--motion-slow) var(--ease-out) both;
+}
+
+/* ── 5. Interaksi tombol & tautan ── */
+button,
+a,
+.btn-primary,
+[class*="-btn"],
+[class*="button"] {
+  transition-property: background-color, border-color, color, box-shadow, transform, opacity;
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-out);
+}
+button:not(:disabled):active,
+.btn-primary:not(:disabled):active,
+.ui-icon-action:not(:disabled):active,
+.ui-pager-btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+/* Tombol aksi utama sedikit terangkat saat disorot */
+.btn-primary:not(:disabled):hover,
+.humas-tambah-btn:hover,
+.modal-btn-publish:not(:disabled):hover,
+.peserta-button:not(:disabled):not(.peserta-button--secondary):hover {
+  box-shadow: 0 6px 16px -6px rgba(20, 83, 45, 0.45);
+  transform: translateY(-1px);
+}
+.ui-icon-action:not(:disabled):hover { transform: translateY(-1px); }
+
+/* ── 6. Kartu: angkat halus saat disorot ── */
+.ringkasan-stat-card,
+.humas-stat-card,
+.kelola-absensi-stat-card,
+.rekap-stat-card,
+.laporan-summary-card,
+.mitra-card,
+.peserta-card,
+.peserta-workshop-card,
+.ringkasan-terdekat-item {
+  transition: transform var(--motion-base) var(--ease-out),
+              box-shadow var(--motion-base) var(--ease-out),
+              border-color var(--motion-base) var(--ease-out),
+              background-color var(--motion-base) var(--ease-out);
+}
+.ringkasan-stat-card:hover,
+.humas-stat-card:hover,
+.rekap-stat-card:hover,
+.laporan-summary-card:hover,
+.mitra-card:hover,
+.peserta-card:hover,
+.peserta-workshop-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -14px rgba(15, 42, 24, 0.28);
+}
+/* Gambar kartu workshop sedikit membesar */
+.peserta-workshop-card img {
+  transition: transform var(--motion-slow) var(--ease-out);
+}
+.peserta-workshop-card:hover img { transform: scale(1.04); }
+
+/* ── 7. Baris tabel & navigasi ── */
+.role-humas tbody tr td,
+.role-sekretariat tbody tr td,
+.role-rektor tbody tr td,
+.mitra-shell tbody tr td {
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+.sidebar nav a,
+.mitra-sidebar nav a,
+.peserta-sidebar nav a,
+.sidebar-group-btn,
+.sidebar-sub-link {
+  transition: background-color var(--motion-base) var(--ease-out),
+              color var(--motion-base) var(--ease-out),
+              padding-left var(--motion-base) var(--ease-out);
+}
+.sidebar nav a:not(.is-active):hover,
+.mitra-sidebar nav a:not(.active):not(.is-active):hover,
+.peserta-sidebar nav a:not(.is-active):hover {
+  padding-left: 16px;
+}
+.sidebar-sub-menu {
+  animation: motion-drop var(--motion-base) var(--ease-out) both;
+}
+
+/* Garis bawah tab aktif bergeser halus */
+[class*="tab-btn"],
+.peserta-certificate-tabs button {
+  transition: color var(--motion-base) var(--ease-out),
+              border-color var(--motion-base) var(--ease-out),
+              background-color var(--motion-base) var(--ease-out);
+}
+
+/* ── 8. Input: fokus lembut ── */
+input,
+select,
+textarea {
+  transition: border-color var(--motion-fast) var(--ease-out),
+              box-shadow var(--motion-base) var(--ease-out),
+              background-color var(--motion-fast) var(--ease-out);
+}
+
+/* Badge notifikasi berdenyut sekali saat muncul */
+.layout-notif-badge,
+.peserta-notification-count,
+.peserta-notification-dot,
+.mitra-notification-dot,
+.top-header-notif-dot {
+  animation: motion-pop var(--motion-slow) var(--ease-out) both;
+}
+
+/* ── Aksesibilitas: hormati pengaturan kurangi gerakan ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html { scroll-behavior: smooth; }

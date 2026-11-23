@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Search, Check, Eye, Palette } from 'lucide-react';
-import { humasTemplates } from '../data/mockData';
+import useApi from '../hooks/useApi';
+import { certificatesApi } from '../api';
 import CertificateTemplateRenderer from './CertificateTemplateRenderer';
 
 export default function TemplateHumasModal({
@@ -10,6 +11,9 @@ export default function TemplateHumasModal({
   onSelectTemplate,
   activityName = 'Workshop Data Science untuk Riset Akademik',
 }) {
+  // Pustaka desain template bawaan dari database
+  const { data: libraryData } = useApi(() => certificatesApi.templates({ library: 1 }), []);
+  const humasTemplates = libraryData || [];
   const [search, setSearch] = useState('');
   const [filterKategori, setFilterKategori] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState(null);

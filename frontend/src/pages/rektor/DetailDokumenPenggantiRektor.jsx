@@ -10,19 +10,20 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from 'lucide-react';
-import { dokumenPengganti } from '../../data/mockData';
-import { currentRektor } from './data';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
 import SignatureCanvas from '../../components/SignatureCanvas';
+import { usePortalData } from '../../context/PortalData';
+import { certificatesApi } from '../../api';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
 
 export default function DetailDokumenPenggantiRektor() {
+  const { dokumenPengganti, currentRektor, reload } = usePortalData();
   const { id }   = useParams();
   const navigate = useNavigate();
-  const [reSigned, setReSigned]       = useState(false);
+  const [reSigned, setReSigned]       = useState(() => dokumenPengganti.find(d => String(d.id) === id)?.status === 'selesai');
   const [reSignedImg, setReSignedImg] = useState(null);
   const [activeView, setActiveView]   = useState('baru');
 
@@ -41,20 +42,22 @@ export default function DetailDokumenPenggantiRektor() {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const handleProsesTTEUlang = () => {
-    const validPin = localStorage.getItem('rektor_pin') || '123456';
+  const handleProsesTTEUlang = async () => {
     if (!signPin || signPin.length !== 6) {
       setSignPinError('PIN harus 6 digit angka');
-      return;
-    }
-    if (signPin !== validPin) {
-      setSignPinError('PIN salah. Silakan coba lagi atau ubah PIN di menu Profil.');
       return;
     }
     if (canvasRef.current?.isEmpty()) {
       setSignPinError('Harap gambar tanda tangan terlebih dahulu pada canvas');
       return;
     }
+    try {
+      await certificatesApi.signReplacement(dp.id, signPin);
+    } catch (err) {
+      setSignPinError(err.message);
+      return;
+    }
+    reload();
 
     const dataUrl = canvasRef.current?.getDataURL();
     setReSignedImg(dataUrl);

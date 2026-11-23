@@ -88,7 +88,7 @@ export default function WorkshopSaya() {
     {registrationWorkshop && <WorkshopRegistrationDialog key={`${registrationWorkshop.id}-${registrationAction.action}`} workshop={registrationWorkshop} registration={registrations.find(item => item.workshopId === registrationWorkshop.id)} action={registrationAction.action} onClose={() => setRegistrationAction(null)} />}
     {selected && <Modal title={selectedRegistration?.status === 'waiting' ? 'Status Antrean Workshop' : 'Presensi Workshop'} wide onClose={() => setAttendanceId(null)}><div className="peserta-modal-body"><h3>{selected.title}</h3><p>{selected.time} &middot; {getWorkshopLocation(selected)}</p>{selectedRegistration?.status === 'waiting' && <div className="peserta-queue"><span>Nomor antrean Anda</span><strong>{String(selectedRegistration.queue).padStart(2, '0')}</strong><small>Kursi diberikan sesuai urutan antrean.</small></div>}<AttendancePanel key={selected.id} workshop={selected} state={getAttendanceState(selected, selectedRegistration)} attendance={selectedRegistration?.attendance} onSubmit={async evidence => {
       const success = await submitAttendance(selected.id, evidence);
-      if (success) notify('Presensi disimpan di browser. Status menunggu verifikasi panitia.');
+      if (success) notify(evidence.method === 'upload' ? 'Bukti presensi terkirim. Status menunggu verifikasi panitia.' : 'Presensi berhasil. Kehadiran Anda tervalidasi.');
       return success;
     }} /></div><footer><button className="peserta-button peserta-button--secondary" onClick={() => setAttendanceId(null)}>Tutup</button></footer></Modal>}
   </div>;

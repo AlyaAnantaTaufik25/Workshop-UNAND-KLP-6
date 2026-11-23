@@ -11,9 +11,12 @@ import {
   LogOut,
   Bell,
 } from 'lucide-react';
-import { currentMitra } from './data';
 import UnandLogo from '../../components/UnandLogo';
 import './mitra.css';
+import { usePortalData } from '../../context/PortalData';
+import { useAuth } from '../../context/AuthContext';
+import useNotifications from '../../hooks/useNotifications';
+import { useMobileNav } from '../../components/MobileNav';
 
 const navItems = [
   { to: '/mitra/kegiatan-kerja-sama',  label: 'Kegiatan Kerja Sama',  icon: Briefcase },
@@ -37,6 +40,11 @@ const pageTitles = {
 };
 
 export default function LayoutMitra() {
+  // Navigasi sidebar untuk layar kecil
+  const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
+  const { currentMitra } = usePortalData();
+  const { logout } = useAuth();
+  const { items: notifications, unread, markRead } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -71,7 +79,8 @@ export default function LayoutMitra() {
     'Kegiatan Kerja Sama';
 
   return (
-    <div className="mitra-shell">
+    <div className={`mitra-shell${navClass}`}>
+      {navOverlay}
       {/* ── SIDEBAR ── */}
       <aside className="mitra-sidebar">
         {/* Brand */}
@@ -109,7 +118,7 @@ export default function LayoutMitra() {
         </nav>
 
         {/* Logout */}
-        <button className="mitra-logout" onClick={() => navigate('/')}>
+        <button className="mitra-logout" onClick={() => { logout(); navigate('/', { replace: true }); }}>
           <LogOut size={18} />
           <span>Keluar</span>
         </button>
@@ -120,6 +129,7 @@ export default function LayoutMitra() {
         {/* Topbar */}
         <header className="mitra-topbar">
           <div className="mitra-title-wrap">
+            {navToggle}
             <div>
               <span className="mitra-eyebrow">WORKSHOP UNAND</span>
               <h1>{pageTitle}</h1>
@@ -140,40 +150,28 @@ export default function LayoutMitra() {
                 }}
               >
                 <Bell size={20} />
-                {!notifRead && <i className="mitra-notification-dot" />}
+                {unread > 0 && <i className="mitra-notification-dot" />}
               </button>
 
               {notifOpen && (
                 <div className="mitra-notification-popover">
                   <h2>Notifikasi</h2>
-                  <NavLink
-                    to="/mitra/perbaikan-sertifikat"
-                    className="mitra-notif-item"
-                    onClick={() => setNotifOpen(false)}
-                  >
-                    <div className="mitra-notif-icon">
-                      <Award size={18} />
-                    </div>
-                    <div>
-                      <strong>Permohonan Perbaikan Sertifikat</strong>
-                      <p>Rafi Pratama mengajukan perbaikan nama pada sertifikat Workshop Data Science.</p>
-                      <small>20 Mei 2026 · Baru</small>
-                    </div>
-                  </NavLink>
-                  <NavLink
-                    to="/mitra/tanda-tangan"
-                    className="mitra-notif-item"
-                    onClick={() => setNotifOpen(false)}
-                  >
-                    <div className="mitra-notif-icon" style={{ background: '#edf5fa', color: '#236483' }}>
-                      <Pencil size={18} />
-                    </div>
-                    <div>
-                      <strong>Menunggu Tanda Tangan Elektronik</strong>
-                      <p>Sertifikat Workshop Data Science menunggu TTE Pimpinan PT Semen Padang.</p>
-                      <small>18 Mei 2026</small>
-                    </div>
-                  </NavLink>
+                  {notifications.length === 0 && <p style={{ padding: '8px 4px', fontSize: 13, color: '#6b7280' }}>Belum ada notifikasi.</p>}
+                  {notifications.map(n => (
+                    <NavLink
+                      key={n.id}
+                      to={n.link || '#'}
+                      className="mitra-notif-item"
+                      onClick={() => { setNotifOpen(false); if (n.belumDibaca) markRead(n.id); }}
+                    >
+                      <div className="mitra-notif-icon"><Award size={18} /></div>
+                      <div>
+                        <strong>{n.judul}</strong>
+                        <p>{n.deskripsi}</p>
+                        <small>{n.waktu}</small>
+                      </div>
+                    </NavLink>
+                  ))}
                 </div>
               )}
             </div>

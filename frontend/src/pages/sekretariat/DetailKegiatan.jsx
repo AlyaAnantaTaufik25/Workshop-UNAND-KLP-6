@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Upload, Check, CheckCircle } from 'lucide-react';
-import { sertifikatData, humasTemplates } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
 import CertificateTemplateRenderer from '../../components/CertificateTemplateRenderer';
+import { usePortalData } from '../../context/PortalData';
 
 /* ─── Status maps ─────────────────────────────────────── */
 const sertStatusClass = {
@@ -32,6 +32,7 @@ function getSteps(status) {
 
 /* ─── Main Component ──────────────────────────────────── */
 export default function DetailKegiatan() {
+  const { sertifikatData, humasTemplates } = usePortalData();
   const { id } = useParams();
   const navigate = useNavigate();
   const [toastMessage, setToastMessage] = useState('');

@@ -15,6 +15,7 @@ const partnersRoutes = require('../modules/partners/partners.routes');
 const locationsRoutes = require('../modules/locations/locations.routes');
 const certificatesRoutes = require('../modules/certificates/certificates.routes');
 const reportsRoutes = require('../modules/reports/reports.routes');
+const notificationsRoutes = require('../modules/notifications/notifications.routes');
 
 /**
  * @route   GET /api/v1/health
@@ -64,6 +65,7 @@ router.use('/partners', partnersRoutes);
 router.use('/locations', locationsRoutes);
 router.use('/certificates', certificatesRoutes);
 router.use('/reports', reportsRoutes);
+router.use('/notifications', notificationsRoutes);
 
 module.exports = router;
 

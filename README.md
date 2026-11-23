@@ -111,11 +111,13 @@ workshop-unand/
    ```
 
 4. **Setup Database MySQL Lokal:**
-   - Jalankan MySQL (misalnya nyalakan service MySQL di kontrol panel XAMPP).
-   - Buat database baru bernama `sim_workshop_unand` melalui phpMyAdmin atau MySQL CLI:
-     ```sql
-     CREATE DATABASE sim_workshop_unand CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   - Jalankan MySQL (misalnya nyalakan service MySQL di kontrol panel XAMPP / Laragon).
+   - Buat database, tabel, dan data awal sekaligus (database dibuat otomatis bila belum ada):
+     ```bash
+     npm run db:reset     # = db:migrate + db:seed (menghapus & mengisi ulang semua data)
      ```
+   - Akun demo hasil seed (kata sandi semua `password123`, PIN TTE Rektor/Mitra `123456`):
+     `peserta@unand.ac.id`, `humas@unand.ac.id`, `sekretariat@unand.ac.id`, `mitra@unand.ac.id`, `rektor@unand.ac.id`
    - Pastikan konfigurasi di `backend/.env` telah sesuai:
      ```env
      DB_HOST=127.0.0.1

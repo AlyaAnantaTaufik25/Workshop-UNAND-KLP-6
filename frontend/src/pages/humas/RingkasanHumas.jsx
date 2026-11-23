@@ -4,8 +4,12 @@ import {
   Briefcase, Users, Check, Plus, Eye, Pencil,
   Trash2, X, CalendarDays
 } from 'lucide-react';
-import { humasKegiatan } from './data';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
+import { IconAction } from '../../components/Pagination';
+import useKegiatan from './useKegiatan';
+import useApi from '../../hooks/useApi';
+import { reportsApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 
 // ─── helpers ────────────────────────────────────────────
 const statusConfig = {
@@ -13,113 +17,46 @@ const statusConfig = {
   publik:      { label: 'Publik',      className: 'humas-badge humas-badge-publik'      },
   selesai:     { label: 'Selesai',     className: 'humas-badge humas-badge-selesai'     },
   draft:       { label: 'Draft',       className: 'humas-badge humas-badge-draft'       },
+  dibatalkan:  { label: 'Dibatalkan',  className: 'humas-badge humas-badge-selesai'     },
 };
-
-// Notifikasi mock data
-const notifikasiData = [
-  {
-    id: 1,
-    judul: 'Pengajuan Perbaikan Sertifikat Baru',
-    deskripsi: 'Nadia Amelia · Workshop Penulisan Artikel Ilmiah',
-    waktu: '17 Mei 2026, 10:15 · belum dibaca',
-    belumDibaca: true,
-    link: '/humas/perbaikan-sertifikat',
-  },
-];
-
-// ─── Notifikasi Modal ────────────────────────────────────
-function NotifikasiModal({ onClose, onNavigate }) {
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" style={{ maxWidth: 480, marginTop: 80 }} onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <p className="modal-header-crumb">WORKSHOP UNAND</p>
-            <h2 className="modal-header-title">Notifikasi Perbaikan Sertifikat</h2>
-          </div>
-          <button className="modal-close-btn" onClick={onClose}><X size={16} /></button>
-        </div>
-
-        <div className="modal-body" style={{ gap: 12 }}>
-          {notifikasiData.map(n => (
-            <div key={n.id} className="notif-item">
-              <div className="notif-item-icon">
-                <Bell size={16} />
-              </div>
-              <div className="notif-item-content">
-                <p className="notif-item-title">{n.judul}</p>
-                <p className="notif-item-desc">{n.deskripsi}</p>
-                <p className="notif-item-time">{n.waktu}</p>
-                <button
-                  className="notif-item-link"
-                  onClick={() => { onClose(); onNavigate(n.link); }}
-                >
-                  Lihat Detail
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Main Component ──────────────────────────────────────
 export default function RingkasanHumas() {
   const navigate = useNavigate();
-  const [kegiatan, setKegiatan]     = useState(humasKegiatan);
+  const { kegiatan, loading, error, reload, save, remove } = useKegiatan();
+  const { data: summary } = useApi(() => reportsApi.summary(), [kegiatan.length]);
   const [showTambah, setShowTambah] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [actionError, setActionError] = useState('');
 
-  // Tambah / Edit kegiatan
-  const handleSaveKegiatan = (payload) => {
-    if (payload.id) {
-      setKegiatan(prev => prev.map(k =>
-        k.id === payload.id
-          ? {
-              ...k,
-              nama: payload.judul || k.nama,
-              jenis: payload.jenis,
-              tanggal: payload.tanggal || k.tanggal,
-              penyelenggara: payload.penyelenggara,
-              status: payload.status,
-            }
-          : k
-      ));
-    } else {
-      setKegiatan(prev => [{
-        id: Date.now(),
-        nama: payload.judul || 'Kegiatan Baru',
-        jenis: payload.jenis,
-        tanggal: payload.tanggal || '-',
-        penyelenggara: payload.penyelenggara,
-        lokasi: `${payload.gedung} - ${payload.ruangan}`,
-        pendaftar: 0,
-        kuota: payload.kuotaJenis === 'Terbatas' ? Number(payload.kuota) : null,
-        status: payload.status,
-      }, ...prev]);
-    }
-  };
+  // Tambah / Edit kegiatan (disimpan ke database)
+  const handleSaveKegiatan = (payload) => save(payload);
 
-  // Stats computed
-  const totalPendaftar = kegiatan.reduce((s, k) => s + (k.pendaftar || 0), 0);
-  const totalKegiatan  = kegiatan.length;
-  const pesertaHadir   = 173; // sesuai dengan data sampel desain
+  // Statistik
+  const totalPendaftar = summary?.totalPendaftar ?? kegiatan.reduce((s, k) => s + (k.pendaftar || 0), 0);
+  const totalKegiatan  = summary?.totalKegiatan ?? kegiatan.length;
+  const pesertaHadir   = summary?.pesertaHadir ?? kegiatan.reduce((s, k) => s + (k.hadir || 0), 0);
 
-  // Kegiatan terdekat (3 pertama yg belum selesai)
-  const kegiatanTerdekat = kegiatan.filter(k => k.status !== 'selesai').slice(0, 3);
-  const kegiatanTerbaru  = kegiatan;
+  // Kegiatan terdekat: publik/berlangsung, urut tanggal terdekat
+  const kegiatanTerdekat = kegiatan
+    .filter(k => ['publik', 'berlangsung'].includes(k.status))
+    .sort((x, y) => x.tanggalMulai.localeCompare(y.tanggalMulai))
+    .slice(0, 3);
+  const kegiatanTerbaru  = kegiatan.slice(0, 5);
 
   const getDayLabel = (tanggal) => {
     const parts = tanggal?.split(' ');
-    return parts?.[0] || '18';
+    return parts?.[0] || '-';
   };
+
+  if (loading && !kegiatan.length) return <PageLoader />;
 
   return (
     <>
       <div className="humas-ringkasan-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
 
         {/* Page Heading area */}
         <div className="ringkasan-header-area">
@@ -224,63 +161,54 @@ export default function RingkasanHumas() {
 
         {/* ── Kegiatan Terbaru ── */}
         <div className="ringkasan-card-container" style={{ marginTop: 24 }}>
-          <h3 className="ringkasan-card-title">Kegiatan terbaru</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <h3 className="ringkasan-card-title" style={{ margin: 0 }}>Kegiatan terbaru</h3>
+            <button className="ringkasan-lihat-btn" onClick={() => navigate('/humas/kelola-kegiatan')}>Lihat semua</button>
+          </div>
           <div className="table-container" style={{ margin: 0, boxShadow: 'none' }}>
             <table className="data-table">
               <thead>
-                <tr>
-                  <th>Nama Kegiatan</th>
-                  <th>Jenis</th>
-                  <th>Tanggal</th>
-                  <th>Penyelenggara</th>
-                  <th>Pendaftar</th>
-                  <th>Status</th>
-                  <th>Tindakan</th>
-                </tr>
-              </thead>
+              <tr>
+                <th>Kegiatan</th>
+                <th>Tanggal</th>
+                <th>Penyelenggara</th>
+                <th style={{ textAlign: 'center' }}>Pendaftar / Kuota</th>
+                <th>Status</th>
+                <th>Tindakan</th>
+              </tr>
+            </thead>
               <tbody>
                 {kegiatanTerbaru.map(k => {
                   const cfg = statusConfig[k.status] ?? statusConfig.draft;
                   return (
                     <tr key={k.id}>
-                      <td>
-                        <span
-                          className="table-name-bold humas-link"
-                          style={{ cursor: 'pointer', fontWeight: 600 }}
-                          onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
-                        >
-                          {k.nama}
-                        </span>
-                      </td>
-                      <td>{k.jenis}</td>
-                      <td style={{ whiteSpace: 'nowrap' }}>{k.tanggal}</td>
-                      <td>{k.penyelenggara}</td>
-                      <td style={{ textAlign: 'center' }}>{k.pendaftar}</td>
-                      <td><span className={cfg.className}>● {cfg.label}</span></td>
-                      <td>
-                        <div className="humas-tindakan-group">
-                          <button
-                            className="btn-table-action"
-                            onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
-                          >
-                            <Eye size={13} /> Detail
-                          </button>
-                          <button
-                            className="btn-table-action"
-                            onClick={() => { setEditTarget(k); setShowTambah(true); }}
-                          >
-                            <Pencil size={13} /> Edit
-                          </button>
-                          <button
-                            className="btn-table-action"
-                            style={{ color: '#dc2626' }}
-                            onClick={() => setDeleteTarget(k.id)}
-                          >
-                            <Trash2 size={13} /> Hapus
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <td className="ui-cell-name">
+                      <span
+                        className="table-name-bold humas-link"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}
+                      >
+                        {k.nama}
+                      </span>
+                      <div className="ui-cell-muted" style={{ marginTop: 3 }}>
+                        {k.jenis} · {k.jenisPelaksanaan} · {k.lokasi}
+                      </div>
+                    </td>
+                    <td className="ui-nowrap">{k.tanggal}</td>
+                    <td className="ui-cell-muted" style={{ minWidth: 140 }}>{k.penyelenggara}</td>
+                    <td className="ui-nowrap" style={{ textAlign: 'center' }}>
+                      <strong style={{ color: k.pendaftar > 0 ? 'var(--green-700)' : 'inherit' }}>{k.pendaftar}</strong>
+                      <span className="ui-cell-muted"> / {k.kuota ?? '∞'}</span>
+                    </td>
+                    <td className="ui-nowrap"><span className={cfg.className}>● {cfg.label}</span></td>
+                    <td>
+                      <div className="ui-row-actions">
+                        <IconAction icon={Eye} label="Lihat detail" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)} />
+                        <IconAction icon={Pencil} label="Edit kegiatan" onClick={() => { setEditTarget(k); setShowTambah(true); }} />
+                        <IconAction icon={Trash2} label="Hapus kegiatan" tone="danger" onClick={() => setDeleteTarget(k.id)} />
+                      </div>
+                    </td>
+                  </tr>
                   );
                 })}
               </tbody>
@@ -320,8 +248,9 @@ export default function RingkasanHumas() {
               <button
                 className="modal-btn"
                 style={{ background: '#dc2626', color: 'white', border: 'none' }}
-                onClick={() => {
-                  setKegiatan(prev => prev.filter(k => k.id !== deleteTarget));
+                onClick={async () => {
+                  try { await remove(deleteTarget); setActionError(''); }
+                  catch (err) { setActionError(err.message); }
                   setDeleteTarget(null);
                 }}
               >

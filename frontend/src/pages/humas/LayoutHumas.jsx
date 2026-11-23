@@ -4,21 +4,12 @@ import {
   Home, Briefcase, Handshake, MapPin,
   Users, FileText, BarChart3, User, LogOut, ChevronDown, ChevronRight, Bell, X
 } from 'lucide-react';
-import { currentHumas } from './data';
+import { useAuth, useCurrentUser } from '../../context/AuthContext';
+import useNotifications from '../../hooks/useNotifications';
 import UnandLogo from '../../components/UnandLogo';
 import './humas.css';
+import { useMobileNav } from '../../components/MobileNav';
 
-// Notifikasi mock data (shared across layout)
-export const notifikasiData = [
-  {
-    id: 1,
-    judul: 'Pengajuan Perbaikan Sertifikat Baru',
-    deskripsi: 'Nadia Amelia · Workshop Penulisan Artikel Ilmiah',
-    waktu: '17 Mei 2026, 10:15 · belum dibaca',
-    belumDibaca: true,
-    link: '/humas/kelola-sertifikat/perbaikan',
-  },
-];
 
 const navItems = [
   { to: '/humas/ringkasan',         label: 'Dashboard',               icon: Home },
@@ -51,6 +42,8 @@ const pageTitles = {
 };
 
 export default function LayoutHumas() {
+  // Navigasi sidebar untuk layar kecil
+  const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
   const navigate = useNavigate();
   const location = useLocation();
   const [sertifikatOpen, setSertifikatOpen] = useState(
@@ -59,6 +52,9 @@ export default function LayoutHumas() {
   );
   const [showNotif, setShowNotif] = useState(false);
   const notifRef = useRef(null);
+  const currentHumas = useCurrentUser();
+  const { logout } = useAuth();
+  const { items: notifikasiData, unread: unreadCount, markRead } = useNotifications();
 
   // Tutup dropdown saat klik luar
   useEffect(() => {
@@ -76,10 +72,10 @@ export default function LayoutHumas() {
     Object.entries(pageTitles).find(([k]) => location.pathname.startsWith(k))?.[1] ??
     'Dashboard';
 
-  const unreadCount = notifikasiData.filter(n => n.belumDibaca).length;
 
   return (
-    <div className="app-layout role-humas">
+    <div className={`app-layout role-humas${navClass}`}>
+      {navOverlay}
 
       {/* ── SIDEBAR ── */}
       <aside className="sidebar" aria-label="Navigasi Humas">
@@ -149,7 +145,7 @@ export default function LayoutHumas() {
         {/* Logout */}
         <button
           className="sidebar-logout"
-          onClick={() => navigate('/')}
+          onClick={() => { logout(); navigate('/', { replace: true }); }}
         >
           <LogOut size={20} />
           <span>Keluar</span>
@@ -162,6 +158,7 @@ export default function LayoutHumas() {
         {/* Top Header */}
         <header className="top-header">
           <div className="top-header-left">
+            {navToggle}
             <span className="top-header-crumb">WORKSHOP UNAND</span>
             <h1 className="top-header-title">{pageTitle}</h1>
           </div>
@@ -187,6 +184,7 @@ export default function LayoutHumas() {
                     <button className="modal-close-btn" onClick={() => setShowNotif(false)}><X size={15} /></button>
                   </div>
                   <div className="layout-notif-dropdown-body">
+                    {notifikasiData.length === 0 && <p className="notif-item-desc" style={{ padding: 16 }}>Belum ada notifikasi.</p>}
                     {notifikasiData.map(n => (
                       <div key={n.id} className="notif-item">
                         <div className="notif-item-icon"><Bell size={15} /></div>
@@ -196,7 +194,7 @@ export default function LayoutHumas() {
                           <p className="notif-item-time">{n.waktu}</p>
                           <button
                             className="notif-item-link"
-                            onClick={() => { setShowNotif(false); navigate(n.link); }}
+                            onClick={() => { setShowNotif(false); markRead(n.id); if (n.link) navigate(n.link); }}
                           >
                             Lihat Detail
                           </button>

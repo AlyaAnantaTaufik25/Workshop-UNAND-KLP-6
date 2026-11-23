@@ -89,11 +89,12 @@ export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmi
     setSubmitting(true);
     setError('');
     try {
-      const saved = await onSubmit({ method: online ? 'upload' : 'qr-location', ...(online ? { fileName: file.name } : { code: code.trim(), location }), submittedAt: new Date().toISOString() });
+      const saved = await onSubmit({ method: online ? 'upload' : 'qr-location', ...(online ? { fileName: file.name, file } : { code: code.trim(), location }), submittedAt: new Date().toISOString() });
       if (!saved && mounted.current) { setFeedbackState('error'); setError('Presensi belum tersimpan. Silakan coba kembali.'); }
       if (saved && mounted.current) setFeedbackState(null);
-    } catch {
-      if (mounted.current) { setFeedbackState('error'); setError('Terjadi kesalahan saat menyimpan presensi.'); }
+    } catch (failure) {
+      // Server mengirim kode state presensi (mis. outside-radius, invalid-code) bila ditolak
+      if (mounted.current) { setFeedbackState(failure?.state && attendanceStates[failure.state] ? failure.state : 'error'); setError(failure?.message || 'Terjadi kesalahan saat menyimpan presensi.'); }
     } finally {
       if (mounted.current) setSubmitting(false);
     }

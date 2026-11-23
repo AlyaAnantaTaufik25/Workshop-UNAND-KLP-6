@@ -2,17 +2,16 @@ const rolesRepository = require('./roles.repository');
 
 /**
  * Business Logic Layer untuk modul roles
- * Fitur: Manajemen Role dan Hak Akses
  */
 class RolesService {
-  /**
-   * Konstruktor service
-   */
   constructor() {
     this.repository = rolesRepository;
   }
 
-  // TODO: Tambahkan implementasi aturan bisnis sistem di sini
+  async list() {
+    const rows = await this.repository.findAll();
+    return rows.map((r) => ({ id: r.id, code: r.code, nama: r.name, deskripsi: r.description, jumlahPengguna: Number(r.jumlah_pengguna) }));
+  }
 }
 
 module.exports = new RolesService();

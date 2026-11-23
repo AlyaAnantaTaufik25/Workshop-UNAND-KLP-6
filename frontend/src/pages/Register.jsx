@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UnandLogo from '../components/UnandLogo';
+import { useAuth } from '../context/AuthContext';
 import './login.css';
 import './register.css';
 
 export default function Register() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const { register } = useAuth();
 
-  const handleRegister = event => {
+  const handleRegister = async event => {
     event.preventDefault();
     const form = event.currentTarget;
     const values = new FormData(form);
@@ -33,21 +36,15 @@ export default function Register() {
       return;
     }
 
+    setSaving(true);
     try {
-      // Demo only: reuse the participant profile without storing credentials.
-      localStorage.setItem('workshop-unand:peserta:profile', JSON.stringify({
-        nama,
-        email,
-        telepon,
-        jenis: 'Umum',
-        nim: '',
-        prodi: '',
-      }));
-    } catch {
-      setError('Profil demo belum tersimpan. Izinkan penyimpanan browser, lalu coba lagi.');
-      return;
+      await register({ nama, email, telepon, password: values.get('password'), jenis: 'Umum' });
+      navigate('/peserta/cari-workshop', { replace: true });
+    } catch (err) {
+      setError(err.message || 'Registrasi gagal. Silakan coba lagi.');
+    } finally {
+      setSaving(false);
     }
-    navigate('/peserta/cari-workshop', { replace: true });
   };
 
   return (
@@ -134,7 +131,7 @@ export default function Register() {
               />
             </div>
             {error && <p id="register-error" className="register-error" role="alert">{error}</p>}
-            <button type="submit" className="btn-primary">Daftar Akun Demo</button>
+            <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Mendaftarkan…' : 'Daftar Akun'}</button>
           </form>
 
           <p className="login-register-link">

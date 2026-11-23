@@ -1,0 +1,335 @@
+/* ============================================================
+   UI POLISH — komponen bersama & perapihan tabel lintas portal
+   ============================================================ */
+
+/* ── Paginasi ── */
+.ui-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-top: 1px solid #edf2ef;
+  background: #ffffff;
+  font-size: 12.5px;
+  color: #66736c;
+}
+.ui-pager-buttons { display: flex; align-items: center; gap: 4px; }
+.ui-pager-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfe6e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #263238;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ui-pager-btn:hover:not(:disabled) { background: #edf7ef; border-color: #228b45; }
+.ui-pager-btn.is-active { background: #14532d; border-color: #14532d; color: #ffffff; }
+.ui-pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ui-pager-gap { padding: 0 4px; color: #9aa5a0; }
+
+/* ── Tombol aksi ikon (kolom Tindakan) ── */
+.ui-row-actions { display: inline-flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.ui-icon-action {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #14532d;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.ui-icon-action:hover:not(:disabled) { background: #edf7ef; border-color: #228b45; }
+.ui-icon-action:disabled { opacity: 0.4; cursor: not-allowed; }
+.ui-icon-action--danger { color: #dc2626; }
+.ui-icon-action--danger:hover:not(:disabled) { background: #fef2f2; border-color: #f87171; color: #b91c1c; }
+.ui-icon-action--warning { color: #b45309; }
+.ui-icon-action--warning:hover:not(:disabled) { background: #fffbeb; border-color: #f59e0b; }
+
+/* ── Toolbar pencarian di atas tabel ── */
+.ui-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.ui-table-search {
+  position: relative;
+  flex: 1 1 260px;
+  max-width: 360px;
+}
+.ui-table-search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #9aa5a0; }
+.ui-table-search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 34px;
+  border: 1px solid #dfe6e1;
+  border-radius: 9px;
+  font-size: 13px;
+  background: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+.ui-table-search input:focus { border-color: #228b45; box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.12); }
+
+/* ── Perapihan tabel lintas portal ── */
+.role-humas table td,
+.role-sekretariat table td,
+.role-rektor table td,
+.mitra-shell table td {
+  vertical-align: middle;
+}
+/* Sel teks pendek tidak dipecah per kata */
+.ui-nowrap { white-space: nowrap; }
+.ui-cell-name { min-width: 200px; max-width: 320px; line-height: 1.4; }
+.ui-cell-muted { color: #66736c; font-size: 12.5px; line-height: 1.4; }
+
+/* Kelompok tombol aksi lama di portal humas: sebaris, tidak bertumpuk */
+.role-humas .humas-tindakan-group {
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+/* Tabel lebar dapat digulir horizontal pada layar kecil */
+.role-humas .table-container,
+.role-sekretariat .table-container,
+.role-rektor .table-container {
+  overflow-x: auto;
+}
+
+/* Kolom aksi (terakhir) tidak dipecah ke beberapa baris */
+.role-humas table td:last-child,
+.role-sekretariat table td:last-child,
+.role-rektor table td:last-child,
+.mitra-shell table td:last-child {
+  white-space: nowrap;
+}
+
+/* Header boleh terlipat agar tidak memakan lebar kolom isi */
+.role-humas table th,
+.role-sekretariat table th,
+.role-rektor table th,
+.mitra-shell table th {
+  white-space: normal;
+  line-height: 1.35;
+  vertical-align: bottom;
+}
+
+/* Sel teks tidak menyempit sampai pecah per kata ("PT / Semen / Padang") */
+.role-humas table td,
+.role-sekretariat table td,
+.role-rektor table td,
+.mitra-shell table td {
+  min-width: 72px;
+}
+
+/* Kolom nama (judul kegiatan / nama peserta) diberi ruang cukup */
+.role-humas table td:has(> .table-name-bold, > span > .table-name-bold, > .humas-link),
+.role-sekretariat table td:has(> .table-name-bold, > .table-link-bold, > strong),
+.role-rektor table td:has(> .table-name-bold, > strong),
+.mitra-shell table td:has(> .mitra-activity-title, > strong) {
+  min-width: 190px;
+  line-height: 1.4;
+}
+
+/* Tabel portal mitra juga dapat digulir horizontal */
+.mitra-shell table { min-width: 100%; }
+.mitra-shell .mitra-table-card,
+.mitra-shell [class*="table-wrap"] {
+  overflow-x: auto;
+}
+.role-humas table [class*="badge"],
+.role-sekretariat table [class*="badge"],
+.role-rektor table [class*="badge"],
+.mitra-shell table [class*="badge"] {
+  white-space: nowrap;
+}
+/* Badge netral untuk status yang belum ada */
+.badge.badge-gray {
+  background: #f1f5f3;
+  color: #66736c;
+}
+
+/* ============================================================
+   RESPONSIF — portal humas, sekretariat, rektor, mitra (≤ 900px)
+   ============================================================ */
+.ui-nav-toggle { display: none; }
+.ui-nav-overlay { display: none; }
+
+@media (max-width: 900px) {
+  .ui-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    border: 1px solid #dfe6e1;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #14532d;
+    cursor: pointer;
+  }
+  .ui-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    border: 0;
+    background: rgba(21, 38, 28, 0.35);
+  }
+
+  /* Sidebar menjadi panel geser */
+  .app-layout .sidebar,
+  .mitra-shell .mitra-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 10px 0 30px rgba(15, 42, 24, 0.12);
+    z-index: 100;
+  }
+  .app-layout.nav-open .sidebar,
+  .mitra-shell.nav-open .mitra-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Konten memakai lebar penuh */
+  .app-layout .main-content,
+  .role-humas .main-content,
+  .role-sekretariat .main-content,
+  .role-rektor .main-content,
+  .mitra-shell .mitra-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  /* Header ringkas */
+  .app-layout .top-header,
+  .mitra-shell .mitra-topbar {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    gap: 8px;
+  }
+  .app-layout .top-header-left,
+  .mitra-shell .mitra-title-wrap {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .app-layout .user-info,
+  .app-layout .user-chevron,
+  .mitra-shell .mitra-profile-text {
+    display: none;
+  }
+  .app-layout .content-container,
+  .mitra-shell .mitra-content {
+    padding: 16px !important;
+  }
+
+  /* Judul halaman & tombol aksi utama bertumpuk rapi */
+  .humas-list-header,
+  .ringkasan-header-area {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+  .filter-bar .search-wrap { flex: 1 1 100% !important; }
+  .filter-bar select { flex: 1 1 140px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-layout .sidebar,
+  .mitra-shell .mitra-sidebar { transition: none; }
+}
+
+@media (max-width: 900px) {
+  /* Tombol menu sejajar dengan judul halaman */
+  .app-layout .top-header-left {
+    display: grid !important;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    align-items: center;
+  }
+  .app-layout .top-header-left .ui-nav-toggle { grid-row: span 2; margin-right: 0; }
+
+  /* Kartu statistik menyesuaikan lebar layar */
+  .ringkasan-stats-row,
+  .humas-stats-grid,
+  .mitra-stats-grid,
+  .laporan-summary-row,
+  .rekap-cards-grid,
+  .kelola-absensi-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* Cegah halaman melebar melebihi layar */
+  .app-layout .main-content,
+  .mitra-shell .mitra-main { overflow-x: hidden; }
+  .app-layout .table-container,
+  .mitra-shell .mitra-table-card { max-width: 100%; overflow-x: auto; }
+}
+
+/* ============================================================
+   TIPOGRAFI — Plus Jakarta Sans di seluruh portal
+   ============================================================ */
+body {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01" on;
+}
+/* Kontrol form ikut memakai font halaman (bawaan browser tidak mewarisi) */
+button, input, select, textarea {
+  font-family: inherit;
+}
+/* Angka statistik & tabel sejajar rapi */
+table td, .ringkasan-stat-value, [class*="stat-num"], [class*="stat-value"] {
+  font-variant-numeric: tabular-nums;
+}
+/* Judul sedikit lebih rapat agar terlihat tegas */
+h1, h2, h3, .humas-section-title, .ringkasan-title, .humas-detail-title {
+  letter-spacing: -0.015em;
+}
+
+/* Jumlah notifikasi belum dibaca pada lonceng peserta */
+.peserta-notification-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #ffffff;
+}

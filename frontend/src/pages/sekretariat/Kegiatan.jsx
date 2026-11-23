@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { workshops } from '../../data/mockData';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -16,6 +17,7 @@ const statusClass = {
 };
 
 export default function Kegiatan() {
+  const { workshops } = usePortalData();
   const navigate = useNavigate();
   const [search,     setSearch]     = useState('');
   const [filterJenis, setFilterJenis] = useState('');
@@ -30,6 +32,8 @@ export default function Kegiatan() {
     const matchStatus = filterStatus ? w.statusSertifikat === filterStatus : true;
     return matchSearch && matchJenis && matchMode && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   return (
     <div>
@@ -106,7 +110,7 @@ export default function Kegiatan() {
                 </td>
               </tr>
             )}
-            {filtered.map(w => (
+            {pg_filtered.map(w => (
               <tr key={w.id}>
                 <td>
                   <span className="table-name-bold">{w.nama}</span>
@@ -122,13 +126,13 @@ export default function Kegiatan() {
                 <td style={{ whiteSpace: 'nowrap' }}>{w.tanggal}</td>
                 <td>{w.penyelenggara}</td>
                 <td>
-                  <span className="table-link">{w.lokasi}</span>
+                  <span className="table-link" style={{ display: 'inline-block', minWidth: 150 }}>{w.lokasi}</span>
                 </td>
                 <td style={{ textAlign: 'center' }}>{w.pendaftar}</td>
                 <td style={{ textAlign: 'center' }}>{w.hadir}</td>
                 <td>
-                  <span className={statusClass[w.statusSertifikat]}>
-                    {statusLabel[w.statusSertifikat]}
+                  <span className={statusClass[w.statusSertifikat] || 'badge badge-gray'}>
+                    {statusLabel[w.statusSertifikat] || 'Belum diajukan'}
                   </span>
                 </td>
                 <td>
@@ -143,6 +147,7 @@ export default function Kegiatan() {
             ))}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

@@ -1,24 +1,9 @@
 import { useState } from 'react';
 import { Search, Bell, Eye } from 'lucide-react';
-
-const initialData = [
-  {
-    id: 1,
-    namaPeserta: 'Nadia Amelia',
-    namaKegiatan: 'Workshop Penulisan Artikel Ilmiah UNAND',
-    kegiatanSingkat: 'Workshop Penulisan Artikel Ilmiah',
-    nomorSertifikat: 'UNAND/SERT/1004/2026',
-    jenisPerbaikan: 'Nama Peserta',
-    tanggalPengajuan: '17 Mei 2026, 10:15',
-    status: 'diproses',
-    catatan: 'Nama pada sertifikat tertulis Nadia Amelia, seharusnya Nadia Amelia Putri.',
-    detail: {
-      jenisKegiatan: 'Workshop',
-      tanggalKegiatan: '15/4/2026',
-      penerbit: 'UNAND',
-    },
-  },
-];
+import useApi from '../../hooks/useApi';
+import { certificatesApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination } from '../../components/Pagination';
 
 const statusConfig = {
   menunggu: { label: 'Menunggu Pemeriksaan', className: 'humas-badge humas-badge-draft' },
@@ -28,20 +13,18 @@ const statusConfig = {
 };
 
 export default function PerbaikanSertifikat() {
-  const [data, setData] = useState(initialData);
+  const { data: apiData, loading, error, reload } = useApi(() => certificatesApi.corrections(), [], []);
+  const data = apiData || [];
+  const [actionError, setActionError] = useState('');
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
   // Mode: 'list' | 'detail' | 'koreksi'
   const [mode, setMode] = useState('list');
-  const [selectedItem, setSelectedItem] = useState(initialData[0]);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // State untuk form koreksi
-  const [koreksiForm, setKoreksiForm] = useState({
-    namaPeserta: 'Nadia Amelia',
-    informasiKegiatan: 'Workshop Penulisan Artikel Ilmiah',
-    informasiLainnya: '',
-  });
+  const [koreksiForm, setKoreksiForm] = useState({ namaPeserta: '', informasiKegiatan: '', informasiLainnya: '' });
 
   const filtered = data.filter(d => {
     const q = search.toLowerCase();
@@ -52,52 +35,54 @@ export default function PerbaikanSertifikat() {
     const matchStatus = filterStatus ? d.status === filterStatus : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const handleOpenDetail = item => {
     setSelectedItem(item);
     setMode('detail');
   };
 
+  // Nilai awal koreksi = usulan perbaikan dari peserta
+  const usulan = (item, field, fallback) => item?.changes?.find(c => c.field === field)?.newValue ?? fallback;
   const handleOpenKoreksi = () => {
     setKoreksiForm({
-      namaPeserta: selectedItem.namaPeserta,
-      informasiKegiatan: selectedItem.kegiatanSingkat || selectedItem.namaKegiatan,
-      informasiLainnya: '',
+      namaPeserta: usulan(selectedItem, 'recipient', selectedItem.namaPeserta),
+      informasiKegiatan: usulan(selectedItem, 'activity', selectedItem.namaKegiatan),
+      informasiLainnya: usulan(selectedItem, 'other', ''),
     });
     setMode('koreksi');
   };
 
-  const handleSimpanKoreksi = () => {
-    setData(prev =>
-      prev.map(item => {
-        if (item.id === selectedItem.id) {
-          return {
-            ...item,
-            namaPeserta: koreksiForm.namaPeserta,
-            kegiatanSingkat: koreksiForm.informasiKegiatan,
-            status: 'selesai',
-          };
-        }
-        return item;
-      })
-    );
-    setSelectedItem(prev => ({
-      ...prev,
-      namaPeserta: koreksiForm.namaPeserta,
-      kegiatanSingkat: koreksiForm.informasiKegiatan,
-      status: 'selesai',
-    }));
-    setMode('detail');
+  const process = async (action, extra = {}) => {
+    try {
+      const updated = await certificatesApi.processCorrection(selectedItem.dbId, { action, ...extra });
+      setActionError('');
+      setSelectedItem(updated);
+      await reload();
+      return true;
+    } catch (err) {
+      setActionError(err.message);
+      return false;
+    }
   };
 
-  const handleTolak = () => {
-    setData(prev =>
-      prev.map(item =>
-        item.id === selectedItem.id ? { ...item, status: 'ditolak' } : item
-      )
-    );
-    setSelectedItem(prev => ({ ...prev, status: 'ditolak' }));
-    setMode('list');
+  // Menyetujui perbaikan -> dokumen pengganti diterbitkan (dan diteruskan ke Rektor untuk TTE ulang)
+  const handleSimpanKoreksi = async () => {
+    const ok = await process('selesai', {
+      changes: [
+        { field: 'recipient', newValue: koreksiForm.namaPeserta },
+        { field: 'activity', newValue: koreksiForm.informasiKegiatan },
+        { field: 'other', newValue: koreksiForm.informasiLainnya },
+      ],
+    });
+    if (ok) setMode('detail');
+  };
+
+  const handleTolak = async () => {
+    const note = window.prompt('Alasan penolakan perbaikan:');
+    if (!note || !note.trim()) return;
+    if (await process('tolak', { note: note.trim() })) setMode('list');
   };
 
   // Komponen Kanvas Sertifikat
@@ -252,6 +237,9 @@ export default function PerbaikanSertifikat() {
 
   return (
     <div className="humas-list-page">
+      <ErrorNotice error={error} onRetry={reload} />
+      {actionError && <ErrorNotice error={{ message: actionError }} />}
+      {loading && !data.length && <PageLoader />}
       {/* ────────────────────────────────────────────────────────── */}
       {/* 1. LIST VIEW                                               */}
       {/* ────────────────────────────────────────────────────────── */}
@@ -326,7 +314,7 @@ export default function PerbaikanSertifikat() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map(d => {
+                  pg_filtered.map(d => {
                     const cfg = statusConfig[d.status] ?? statusConfig.diproses;
                     return (
                       <tr key={d.id}>
@@ -361,6 +349,7 @@ export default function PerbaikanSertifikat() {
                 )}
               </tbody>
             </table>
+          {pager_filtered}
           </div>
         </>
       )}
@@ -561,8 +550,8 @@ export default function PerbaikanSertifikat() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+          {/* Action Buttons (hanya untuk pengajuan yang masih aktif) */}
+          {['menunggu', 'diproses'].includes(selectedItem.status) && <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
             <button
               type="button"
               style={{
@@ -595,7 +584,7 @@ export default function PerbaikanSertifikat() {
             >
               Tolak Pengajuan
             </button>
-          </div>
+          </div>}
         </>
       )}
 

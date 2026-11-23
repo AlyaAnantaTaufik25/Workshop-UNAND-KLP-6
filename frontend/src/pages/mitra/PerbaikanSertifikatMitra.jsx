@@ -15,8 +15,11 @@ import {
   FileCheck2,
   SearchX,
 } from 'lucide-react';
-import { mitraPerbaikan } from './data';
 import UnandLogo from '../../components/UnandLogo';
+import { usePortalData } from '../../context/PortalData';
+import { useEffect as useSyncEffect } from 'react';
+import { certificatesApi } from '../../api';
+import { usePagination } from '../../components/Pagination';
 
 const statusConfig = {
   menunggu: {
@@ -46,7 +49,9 @@ const statusConfig = {
 };
 
 export default function PerbaikanSertifikatMitra() {
+  const { mitraPerbaikan, reload } = usePortalData();
   const [data, setData] = useState(mitraPerbaikan);
+  useSyncEffect(() => { setData(mitraPerbaikan); }, [mitraPerbaikan]);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
@@ -89,6 +94,8 @@ export default function PerbaikanSertifikatMitra() {
     const matchStatus = filterStatus ? d.status === filterStatus : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   // Handler Masuk ke Tampilan 2 (Detail)
   const handleBukaDetail = (item) => {
@@ -108,8 +115,21 @@ export default function PerbaikanSertifikatMitra() {
   };
 
   // Handler Simpan Hasil Koreksi Form
-  const handleSimpanKoreksi = (e) => {
+  const handleSimpanKoreksi = async (e) => {
     e.preventDefault();
+    // Menyetujui perbaikan -> dokumen pengganti terbit (diteruskan ke Rektor bila perlu TTE ulang)
+    try {
+      if (selectedItem.status === 'menunggu') await certificatesApi.processCorrection(selectedItem.id, { action: 'proses' });
+      await certificatesApi.processCorrection(selectedItem.id, {
+        action: 'selesai',
+        note: formKeterangan,
+        changes: [{ field: 'recipient', newValue: formNama }, { field: 'degree', newValue: formNama.split(',').slice(1).join(',').trim() }],
+      });
+    } catch (err) {
+      showToast(err.message);
+      return;
+    }
+    reload();
     setData(prev =>
       prev.map(d =>
         d.id === selectedItem.id
@@ -129,9 +149,16 @@ export default function PerbaikanSertifikatMitra() {
   };
 
   // Handler Konfirmasi Tolak Pengajuan
-  const handleConfirmTolak = (e) => {
+  const handleConfirmTolak = async (e) => {
     e.preventDefault();
     if (!alasanTolak.trim()) return;
+    try {
+      await certificatesApi.processCorrection(selectedItem.id, { action: 'tolak', note: alasanTolak.trim() });
+    } catch (err) {
+      showToast(err.message);
+      return;
+    }
+    reload();
 
     setData(prev =>
       prev.map(d =>
@@ -954,7 +981,7 @@ export default function PerbaikanSertifikatMitra() {
                 </td>
               </tr>
             ) : (
-              filtered.map((item, idx) => {
+              pg_filtered.map((item, idx) => {
                 const cfg = statusConfig[item.status] ?? statusConfig.menunggu;
                 return (
                   <tr key={item.id}>
@@ -1028,6 +1055,7 @@ export default function PerbaikanSertifikatMitra() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

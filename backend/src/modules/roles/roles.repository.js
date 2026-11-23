@@ -2,17 +2,18 @@ const { pool } = require('../../config/database');
 
 /**
  * Data Access Layer untuk modul roles
- * Fitur: Manajemen Role dan Hak Akses
  */
 class RolesRepository {
-  /**
-   * Konstruktor repository
-   */
   constructor() {
     this.db = pool;
   }
 
-  // TODO: Tambahkan query database terisolasi di sini
+  async findAll() {
+    const [rows] = await this.db.query(
+      `SELECT r.*, (SELECT COUNT(*) FROM users u WHERE u.role_id = r.id) AS jumlah_pengguna FROM roles r ORDER BY r.id`
+    );
+    return rows;
+  }
 }
 
 module.exports = new RolesRepository();

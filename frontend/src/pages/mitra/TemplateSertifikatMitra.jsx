@@ -16,16 +16,12 @@ import {
   Building2,
   HelpCircle,
 } from 'lucide-react';
-import { mitraTemplates } from './data';
 import UnandLogo from '../../components/UnandLogo';
+import { usePortalData } from '../../context/PortalData';
+import { useEffect as useSyncEffect } from 'react';
+import { certificatesApi, readFileAsDataUrl } from '../../api';
+import { usePagination } from '../../components/Pagination';
 
-const kegiatanOptions = [
-  'Workshop Data Science untuk Riset Akademik',
-  'Manajemen Proyek Kolaboratif',
-  'Inovasi Industri Berkelanjutan',
-  'Seminar Transformasi Digital',
-  'Seminar Kolaborasi Riset Lintas Disiplin',
-];
 
 const statusConfig = {
   'dapat-dipakai': { label: 'Dapat dipakai', className: 'mitra-badge-status mitra-badge-status--berlangsung' },
@@ -36,8 +32,11 @@ const statusConfig = {
 const defaultForm = { id: null, nama: '', kegiatanTerkait: '', berkas: null, berkasNama: '' };
 
 export default function TemplateSertifikatMitra() {
+  const { mitraTemplates, mitraKegiatan, reload } = usePortalData();
   const [templates, setTemplates]       = useState(mitraTemplates);
+  useSyncEffect(() => { setTemplates(mitraTemplates); }, [mitraTemplates]);
   const [search, setSearch]             = useState('');
+  const kegiatanOptions = mitraKegiatan.map(k => k.nama);
   const [filterStatus, setFilterStatus] = useState('');
 
   // View mode: 'list' atau 'form' (halaman form baru)
@@ -63,6 +62,8 @@ export default function TemplateSertifikatMitra() {
     const matchStatus = filterStatus ? t.status === filterStatus : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const handleBukaTambah = () => {
     setForm(defaultForm);
@@ -90,9 +91,22 @@ export default function TemplateSertifikatMitra() {
     }
   };
 
-  const handleSimpanForm = (e) => {
+  const handleSimpanForm = async (e) => {
     e.preventDefault();
     if (!form.nama.trim()) return;
+    try {
+      const body = {
+        nama: form.nama,
+        kegiatanTerkait: form.kegiatanTerkait,
+        ...(form.berkas ? { berkas: await readFileAsDataUrl(form.berkas), berkasNama: form.berkasNama } : {}),
+      };
+      if (isEdit && form.id) await certificatesApi.updateTemplate(form.id, body);
+      else await certificatesApi.createTemplate(body);
+    } catch (err) {
+      showToast(err.message);
+      return;
+    }
+    reload();
 
     if (isEdit && form.id) {
       setTemplates(prev =>
@@ -121,8 +135,16 @@ export default function TemplateSertifikatMitra() {
     setForm(defaultForm);
   };
 
-  const handleConfirmHapus = () => {
+  const handleConfirmHapus = async () => {
     if (deleteTarget) {
+      try {
+        await certificatesApi.deleteTemplate(deleteTarget.id);
+      } catch (err) {
+        showToast(err.message);
+        setDeleteTarget(null);
+        return;
+      }
+      reload();
       setTemplates(prev => prev.filter(t => t.id !== deleteTarget.id));
       showToast(`Template "${deleteTarget.nama}" berhasil dihapus.`);
       setDeleteTarget(null);
@@ -369,7 +391,7 @@ export default function TemplateSertifikatMitra() {
                 </td>
               </tr>
             ) : (
-              filtered.map(t => {
+              pg_filtered.map(t => {
                 const cfg = statusConfig[t.status] ?? statusConfig['dapat-dipakai'];
                 return (
                   <tr key={t.id}>
@@ -430,6 +452,7 @@ export default function TemplateSertifikatMitra() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
 
       {/* ── MODAL KONFIRMASI HAPUS FORMAL & ELEGAN ── */}

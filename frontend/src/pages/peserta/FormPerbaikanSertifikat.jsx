@@ -3,7 +3,7 @@ import { Link, useNavigate, useOutletContext, useParams, useSearchParams } from 
 import { Check, FilePenLine, LoaderCircle, Upload } from 'lucide-react';
 import { Modal } from './components';
 import { certificateValues, correctionFields, validateAttachment, validateCorrection } from './certificateCorrections';
-import { CertificateHeading, CertificateNotFound, CertificateNotificationsLink } from './CertificateUi';
+import { CertificateHeading, CertificateNotFound } from './CertificateUi';
 
 function readAttachment(file) {
   if (!file) return Promise.resolve(null);
@@ -48,17 +48,15 @@ export default function FormPerbaikanSertifikat() {
     busyRef.current = true; setBusy(true); setError('');
     try {
       const attachment = await readAttachment(file);
-      const result = submitCorrection(certificate, { ...payload, attachment });
+      const result = await submitCorrection(certificate, { ...payload, attachment });
       if (!result.ok) { setError(result.message); return; }
       notify('Pengajuan perbaikan tersimpan. Status menunggu pemeriksaan penerbit.');
       navigate(`/peserta/sertifikat/perbaikan/${result.request.id}`, { replace: true });
     } catch (failure) { setError(failure.message || 'Pengajuan belum tersimpan. Silakan coba lagi.'); }
     finally { busyRef.current = false; setBusy(false); }
   };
-  return <div className="peserta-stack">
-    <CertificateNotificationsLink />
-    <CertificateHeading title="Ajukan Perbaikan Sertifikat" description="Sampaikan bagian yang salah dan usulan data yang benar kepada penerbit."><Link className="peserta-button peserta-button--secondary" to={`/peserta/sertifikat/${id}`}>Kembali ke Detail</Link></CertificateHeading>
-    <div className="peserta-certificate-banner">Mode demo: pengajuan dan lampiran tersimpan di browser, belum dikirim ke penerbit. Data pada sertifikat tetap berlaku sampai penerbit menerbitkan perbaikan.</div>
+  return <div className="peserta-stack">    <CertificateHeading title="Ajukan Perbaikan Sertifikat" description="Sampaikan bagian yang salah dan usulan data yang benar kepada penerbit."><Link className="peserta-button peserta-button--secondary" to={`/peserta/sertifikat/${id}`}>Kembali ke Detail</Link></CertificateHeading>
+    <div className="peserta-certificate-banner">Pengajuan dikirim ke penerbit sertifikat. Data pada sertifikat tetap berlaku sampai penerbit menerbitkan perbaikan.</div>
     <form className="peserta-certificate-panel peserta-correction-form" onSubmit={review}>
       <div className="peserta-certificate-form-summary"><FilePenLine size={22} /><div><h3>{certificate.workshop.title}</h3><p>{certificate.number}</p><p>Penerbit tujuan: <strong>{certificate.issuer}</strong></p></div></div>
       <fieldset><legend>Bagian yang perlu diperbaiki <span aria-hidden="true">*</span></legend><div className="peserta-correction-fields">{Object.entries(correctionFields).map(([field, config]) => <label className="peserta-checkbox" key={field}><input type="checkbox" checked={selected.includes(field)} onChange={() => toggle(field)} /><span>{config.label}</span></label>)}</div></fieldset>

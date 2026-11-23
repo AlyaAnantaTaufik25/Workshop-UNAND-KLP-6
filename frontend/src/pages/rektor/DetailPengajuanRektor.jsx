@@ -15,11 +15,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { sertifikatData } from '../../data/mockData';
-import { currentRektor } from './data';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
 import SignatureCanvas from '../../components/SignatureCanvas';
+import { usePortalData } from '../../context/PortalData';
+import { certificatesApi } from '../../api';
 
 const statusClass = {
   'menunggu-rektor': 'badge badge-orange',
@@ -33,6 +33,7 @@ const statusLabel = {
 };
 
 export default function DetailPengajuanRektor() {
+  const { sertifikatData, currentRektor, reload } = usePortalData();
   const { id }   = useParams();
   const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ export default function DetailPengajuanRektor() {
   const [signed, setSigned] = useState(sert?.statusTandaTangan === 'diterbitkan');
   const [signatureImg, setSignatureImg] = useState(null);
   const [waktuTtdRektor, setWaktuTtdRektor] = useState(
-    sert?.statusTandaTangan === 'diterbitkan' ? '18 Mei 2026, 14.30 WIB' : null
+    sert?.waktuTtdRektor || null
   );
 
   // State untuk penandatanganan (Canvas, Tools, PIN)
@@ -107,20 +108,23 @@ export default function DetailPengajuanRektor() {
   ];
 
   // Simpan / Proses Tanda Tangan Elektronik
-  const handleProsesTTE = () => {
-    const validPin = localStorage.getItem('rektor_pin') || '123456';
+  const handleProsesTTE = async () => {
     if (!signPin || signPin.length !== 6) {
       setSignPinError('PIN harus 6 digit angka');
-      return;
-    }
-    if (signPin !== validPin) {
-      setSignPinError('PIN salah. Silakan coba lagi atau ubah PIN di menu Profil.');
       return;
     }
     if (canvasRef.current?.isEmpty()) {
       setSignPinError('Harap gambar tanda tangan terlebih dahulu pada canvas');
       return;
     }
+    // PIN diverifikasi server; sertifikat peserta terbit otomatis setelah TTE terakhir
+    try {
+      await certificatesApi.sign(sert.id, signPin, canvasRef.current?.getDataURL());
+    } catch (err) {
+      setSignPinError(err.message);
+      return;
+    }
+    reload();
 
     const waktuSekarang =
       new Date().toLocaleDateString('id-ID', {

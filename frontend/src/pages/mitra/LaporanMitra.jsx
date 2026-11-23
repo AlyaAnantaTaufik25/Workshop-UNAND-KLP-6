@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 import {
   Search,
   FileSpreadsheet,
@@ -9,11 +11,11 @@ import {
   UserCheck,
   UserX,
 } from 'lucide-react';
-import { mitraKegiatan } from './data';
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
 
 export default function LaporanMitra() {
+  const { mitraKegiatan } = usePortalData();
   const [search, setSearch] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
   const [filterKegiatan, setFilterKegiatan] = useState('');
@@ -28,6 +30,8 @@ export default function LaporanMitra() {
     const matchTanggal = filterTanggal ? (k.isoTanggal === filterTanggal || k.tanggal.includes(filterTanggal)) : true;
     return matchSearch && matchJenis && matchKegiatan && matchTanggal;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const totalPendaftar = filtered.reduce((s, k) => s + (k.pendaftar || 0), 0);
   const totalHadir = filtered.reduce((s, k) => s + (k.hadir || 0), 0);
@@ -559,7 +563,7 @@ export default function LaporanMitra() {
                 </td>
               </tr>
             ) : (
-              filtered.map(k => (
+              pg_filtered.map(k => (
                 <tr key={k.id}>
                   {/* 1. Kegiatan */}
                   <td>
@@ -607,6 +611,7 @@ export default function LaporanMitra() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

@@ -1,27 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, Plus, X, Eye, Pencil, Trash2, MapPin, Navigation, Compass } from 'lucide-react';
-
-const initialGedung = [
-  {
-    id: 1,
-    gedung: 'Convention Hall',
-    ruangan: 'Ruang Utama',
-    lokasi: 'Kampus Limau Manis, Padang',
-    lat: '-0.9142',
-    lng: '100.4580',
-    radius: 150,
-  },
-  {
-    id: 2,
-    gedung: 'Gedung Rektorat',
-    ruangan: 'Ruang Sidang Lantai 4',
-    lokasi: 'Kampus Limau Manis, Padang',
-    lat: '-0.9147',
-    lng: '100.4592',
-    radius: 100,
-  },
-];
+import useCrud from '../../hooks/useCrud';
+import { locationsApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination, IconAction } from '../../components/Pagination';
 
 const defaultForm = {
   gedung: '',
@@ -34,7 +17,8 @@ const defaultForm = {
 
 export default function KelolaGedung() {
   const navigate = useNavigate();
-  const [gedung, setGedung] = useState(initialGedung);
+  const { items, loading, error, reload, actionError, create, update, remove } = useCrud(locationsApi);
+  const gedung = items;
   const [search, setSearch] = useState('');
 
   // Modals state
@@ -53,20 +37,16 @@ export default function KelolaGedung() {
       g.ruangan.toLowerCase().includes(search.toLowerCase()) ||
       g.lokasi.toLowerCase().includes(search.toLowerCase())
   );
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   // ── Handlers Tambah ──
-  const handleSimpanTambah = () => {
+  const handleSimpanTambah = async () => {
     if (!tambahForm.gedung || !tambahForm.ruangan) return;
-    setGedung(prev => [
-      ...prev,
-      {
-        ...tambahForm,
-        id: Date.now(),
-        radius: Number(tambahForm.radius) || 100,
-      },
-    ]);
-    setTambahForm(defaultForm);
-    setShowTambah(false);
+    if (await create({ ...tambahForm, radius: Number(tambahForm.radius) || 100 })) {
+      setTambahForm(defaultForm);
+      setShowTambah(false);
+    }
   };
 
   // ── Handlers Edit ──
@@ -83,30 +63,22 @@ export default function KelolaGedung() {
     });
   };
 
-  const handleSimpanEdit = () => {
+  const handleSimpanEdit = async () => {
     if (!editForm.gedung || !editForm.ruangan) return;
-    setGedung(prev =>
-      prev.map(g =>
-        g.id === editData.id
-          ? {
-              ...g,
-              ...editForm,
-              radius: Number(editForm.radius) || g.radius,
-            }
-          : g
-      )
-    );
-    setEditData(null);
+    if (await update(editData.id, { ...editForm, radius: Number(editForm.radius) || editData.radius })) setEditData(null);
   };
 
   // ── Handlers Hapus ──
-  const handleHapus = id => {
-    setGedung(prev => prev.filter(g => g.id !== id));
+  const handleHapus = async id => {
+    if (window.confirm('Hapus gedung/ruangan ini?')) await remove(id);
   };
 
   return (
     <>
       <div className="humas-list-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
+        {loading && !items.length && <PageLoader />}
         {/* Top Header Row */}
         <div
           style={{
@@ -187,7 +159,7 @@ export default function KelolaGedung() {
                   </td>
                 </tr>
               ) : (
-                filtered.map(g => (
+                pg_filtered.map(g => (
                   <tr key={g.id}>
                     <td>{g.gedung}</td>
                     <td>{g.ruangan}</td>
@@ -196,28 +168,10 @@ export default function KelolaGedung() {
                     <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{g.lng}</td>
                     <td style={{ textAlign: 'center' }}>{g.radius}</td>
                     <td>
-                      <div className="humas-tindakan-group">
-                        <button
-                          type="button"
-                          className="humas-tindakan-btn humas-tindakan-view"
-                          onClick={() => setDetailData(g)}
-                        >
-                          <Eye size={12} /> Detail
-                        </button>
-                        <button
-                          type="button"
-                          className="humas-tindakan-btn humas-tindakan-edit"
-                          onClick={() => handleOpenEdit(g)}
-                        >
-                          <Pencil size={12} /> Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="humas-tindakan-btn humas-tindakan-delete"
-                          onClick={() => handleHapus(g.id)}
-                        >
-                          <Trash2 size={12} /> Hapus
-                        </button>
+                      <div className="ui-row-actions">
+                        <IconAction icon={Eye} label="Lihat detail" onClick={() => setDetailData(g)} />
+                        <IconAction icon={Pencil} label="Edit" onClick={() => handleOpenEdit(g)} />
+                        <IconAction icon={Trash2} label="Hapus" tone="danger" onClick={() => handleHapus(g.id)} />
                       </div>
                     </td>
                   </tr>
@@ -225,6 +179,7 @@ export default function KelolaGedung() {
               )}
             </tbody>
           </table>
+          {pager_filtered}
         </div>
       </div>
 

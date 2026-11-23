@@ -1,58 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
-import { humasKegiatan } from './data';
-
-const initialMitra = [
-  {
-    id: 1,
-    nama: 'PT Semen Padang',
-    jenis: 'Eksternal',
-    penanggungJawab: 'Ahmad Rizal',
-    email: 'mitra@semenpadang.co.id',
-    kontak: '0751 815250',
-    kegiatanTerkait: [
-      'Workshop Data Science untuk Riset Akademik',
-      'Manajemen Proyek Kolaboratif',
-      'Inovasi Industri Berkelanjutan',
-      'Seminar Transformasi Digital',
-      'Seminar Kolaborasi Riset Lintas Disiplin'
-    ],
-  },
-  {
-    id: 2,
-    nama: 'Bank Nagari',
-    jenis: 'Eksternal',
-    penanggungJawab: 'Dewi Anggraini',
-    email: 'kc.ekonomi@banknagari.co.id',
-    kontak: '0751 31377',
-    kegiatanTerkait: ['Strategi Hilirisasi Riset dan Inovasi'],
-  },
-  {
-    id: 3,
-    nama: 'Fakultas Ekonomi dan Bisnis UNAND',
-    jenis: 'Internal',
-    penanggungJawab: 'Sari Dewi',
-    email: 'feb@unand.ac.id',
-    kontak: '0751 71000',
-    kegiatanTerkait: ['Kepemimpinan Muda Berdampak'],
-  },
-  {
-    id: 4,
-    nama: 'Fakultas Teknologi Informasi UNAND',
-    jenis: 'Internal',
-    penanggungJawab: 'Rahmat Hidayat',
-    email: 'fti@unand.ac.id',
-    kontak: '0751 77889',
-    kegiatanTerkait: ['Seminar Kolaborasi Riset Lintas Disiplin'],
-  },
-];
+import useCrud from '../../hooks/useCrud';
+import { partnersApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination, IconAction } from '../../components/Pagination';
 
 const defaultForm = { nama: '', jenis: 'Eksternal', penanggungJawab: '', email: '', kontak: '' };
 
 export default function KelolaMitra() {
   const navigate = useNavigate();
-  const [mitra, setMitra]           = useState(initialMitra);
+  const { items, loading, error, reload, actionError, create, update, remove } = useCrud(partnersApi);
+  const mitra = items;
   const [search, setSearch]         = useState('');
   const [showModal, setShowModal]   = useState(false);
   const [detailMitra, setDetailMitra] = useState(null);
@@ -65,6 +24,8 @@ export default function KelolaMitra() {
     m.nama.toLowerCase().includes(search.toLowerCase()) ||
     m.penanggungJawab.toLowerCase().includes(search.toLowerCase())
   );
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const handleBukaTambah = () => {
     setForm(defaultForm);
@@ -82,29 +43,32 @@ export default function KelolaMitra() {
     });
   };
 
-  const handleSimpanTambah = () => {
+  const handleSimpanTambah = async () => {
     if (!form.nama || !form.jenis) return;
-    setMitra(prev => [...prev, { ...form, id: Date.now(), kegiatanTerkait: [] }]);
-    setForm(defaultForm);
-    setShowModal(false);
-  };
-
-  const handleSimpanEdit = () => {
-    if (!editMitra) return;
-    setMitra(prev => prev.map(m => m.id === editMitra.id ? { ...m, ...form } : m));
-    setEditMitra(null);
-    setForm(defaultForm);
-  };
-
-  const handleHapus = (id) => {
-    if (window.confirm('Yakin ingin menghapus mitra ini?')) {
-      setMitra(prev => prev.filter(m => m.id !== id));
+    if (await create(form)) {
+      setForm(defaultForm);
+      setShowModal(false);
     }
+  };
+
+  const handleSimpanEdit = async () => {
+    if (!editMitra) return;
+    if (await update(editMitra.id, form)) {
+      setEditMitra(null);
+      setForm(defaultForm);
+    }
+  };
+
+  const handleHapus = async (id) => {
+    if (window.confirm('Yakin ingin menghapus mitra ini?')) await remove(id);
   };
 
   return (
     <>
       <div className="humas-list-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
+        {loading && !items.length && <PageLoader />}
 
         {/* Header + actions */}
         <div className="humas-list-header">
@@ -156,7 +120,7 @@ export default function KelolaMitra() {
                   </td>
                 </tr>
               )}
-              {filtered.map(m => (
+              {pg_filtered.map(m => (
                 <tr key={m.id}>
                   <td>
                     <span
@@ -173,14 +137,15 @@ export default function KelolaMitra() {
                   <td style={{ whiteSpace: 'nowrap' }}>{m.kontak}</td>
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {m.kegiatanTerkait.map((kg, i) => {
-                        const target = humasKegiatan.find(k => k.nama === kg);
-                        return target ? (
+                      {m.kegiatanTerkait.length === 0 && <span className="ui-cell-muted">Belum ada</span>}
+                      {m.kegiatanTerkait.length > 2 && <span className="ui-cell-muted">{m.kegiatanTerkait.length} kegiatan, terbaru:</span>}
+                      {m.kegiatanTerkait.slice(0, 2).map((kg, i) => {
+                        return kg ? (
                           <button
                             key={i}
                             className="humas-link"
                             style={{ fontSize: '12.5px', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
-                            onClick={() => navigate(`/humas/kelola-kegiatan/${target.id}`)}
+                            onClick={() => navigate(`/humas/kelola-kegiatan?q=${encodeURIComponent(kg)}`)}
                           >
                             {kg}
                           </button>
@@ -191,31 +156,17 @@ export default function KelolaMitra() {
                     </div>
                   </td>
                   <td>
-                    <div className="humas-tindakan-group">
-                      <button
-                        className="humas-tindakan-btn humas-tindakan-view"
-                        onClick={() => setDetailMitra(m)}
-                      >
-                        <Eye size={12} /> Detail
-                      </button>
-                      <button
-                        className="humas-tindakan-btn humas-tindakan-edit"
-                        onClick={() => handleBukaEdit(m)}
-                      >
-                        <Pencil size={12} /> Edit
-                      </button>
-                      <button
-                        className="humas-tindakan-btn humas-tindakan-delete"
-                        onClick={() => handleHapus(m.id)}
-                      >
-                        <Trash2 size={12} /> Hapus
-                      </button>
+                    <div className="ui-row-actions">
+                      <IconAction icon={Eye} label="Lihat detail" onClick={() => setDetailMitra(m)} />
+                      <IconAction icon={Pencil} label="Edit" onClick={() => handleBukaEdit(m)} />
+                      <IconAction icon={Trash2} label="Hapus" tone="danger" onClick={() => handleHapus(m.id)} />
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {pager_filtered}
         </div>
       </div>
 

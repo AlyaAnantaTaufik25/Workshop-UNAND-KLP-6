@@ -1,19 +1,16 @@
 import { useState } from 'react';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
-
-const initialPengguna = [
-  { id: 1, nama: 'Nadia Amelia',          email: 'peserta@unand.ac.id',     role: 'Peserta',             status: 'Aktif' },
-  { id: 2, nama: 'Nadia Amelia',          email: 'humas@unand.ac.id',       role: 'Humas',               status: 'Aktif' },
-  { id: 3, nama: 'Rini Marlina',          email: 'sekretariat@unand.ac.id', role: 'Sekretariat Rektor',  status: 'Aktif' },
-  { id: 4, nama: 'Ahmad Rizal',           email: 'mitra@unand.ac.id',       role: 'Mitra',               status: 'Aktif' },
-  { id: 5, nama: 'Prof. Andani Eka Putra',email: 'rektor@unand.ac.id',      role: 'Rektor',              status: 'Aktif' },
-];
+import { Search, Bell, Plus, Eye, Pencil, Trash2, X, UserX, UserCheck } from 'lucide-react';
+import useCrud from '../../hooks/useCrud';
+import { usersApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination, IconAction } from '../../components/Pagination';
 
 const roleOptions = ['Peserta', 'Humas', 'Sekretariat Rektor', 'Mitra', 'Rektor'];
 const defaultForm = { nama: '', email: '', role: 'Peserta', status: 'Aktif' };
 
 export default function KelolaPengguna() {
-  const [pengguna, setPengguna]         = useState(initialPengguna);
+  const { items, loading, error, reload, actionError, create, update, run } = useCrud(usersApi);
+  const pengguna = items;
   const [search, setSearch]             = useState('');
   const [filterRole, setFilterRole]     = useState('');
   const [showModal, setShowModal]       = useState(false);
@@ -29,6 +26,8 @@ export default function KelolaPengguna() {
     const matchRole   = filterRole ? p.role === filterRole : true;
     return matchSearch && matchRole;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const handleBukaTambah = () => {
     setForm(defaultForm);
@@ -45,29 +44,34 @@ export default function KelolaPengguna() {
     });
   };
 
-  const handleSimpanTambah = () => {
+  // Akun baru memakai kata sandi awal "password123"
+  const handleSimpanTambah = async () => {
     if (!form.nama || !form.email || !form.role || !form.status) return;
-    setPengguna(prev => [...prev, { ...form, id: Date.now() }]);
-    setForm(defaultForm);
-    setShowModal(false);
+    if (await create(form)) {
+      setForm(defaultForm);
+      setShowModal(false);
+    }
   };
 
-  const handleSimpanEdit = () => {
+  const handleSimpanEdit = async () => {
     if (!editPengguna) return;
-    setPengguna(prev => prev.map(p => p.id === editPengguna.id ? { ...p, ...form } : p));
-    setEditPengguna(null);
-    setForm(defaultForm);
+    if (await update(editPengguna.id, form)) {
+      setEditPengguna(null);
+      setForm(defaultForm);
+    }
   };
 
-  const handleToggleStatus = (id) => {
-    setPengguna(prev => prev.map(p =>
-      p.id === id ? { ...p, status: p.status === 'Aktif' ? 'Nonaktif' : 'Aktif' } : p
-    ));
+  const handleToggleStatus = async (id) => {
+    const p = pengguna.find(item => item.id === id);
+    if (p) await run(() => usersApi.setStatus(id, p.status === 'Aktif' ? 'Nonaktif' : 'Aktif'));
   };
 
   return (
     <>
       <div className="humas-list-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
+        {loading && !items.length && <PageLoader />}
 
         {/* Header + actions */}
         <div className="humas-list-header">
@@ -121,7 +125,7 @@ export default function KelolaPengguna() {
                   </td>
                 </tr>
               )}
-              {filtered.map(p => (
+              {pg_filtered.map(p => (
                 <tr key={p.id}>
                   <td>
                     <span
@@ -143,34 +147,17 @@ export default function KelolaPengguna() {
                     </span>
                   </td>
                   <td>
-                    <div className="humas-tindakan-group">
-                      <button
-                        type="button"
-                        className="humas-tindakan-btn humas-tindakan-view"
-                        onClick={() => setDetailPengguna(p)}
-                      >
-                        <Eye size={12} /> Detail
-                      </button>
-                      <button
-                        type="button"
-                        className="humas-tindakan-btn humas-tindakan-edit"
-                        onClick={() => handleBukaEdit(p)}
-                      >
-                        <Pencil size={12} /> Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="humas-tindakan-btn humas-tindakan-delete"
-                        onClick={() => handleToggleStatus(p.id)}
-                      >
-                        <Trash2 size={12} /> {p.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan'}
-                      </button>
+                    <div className="ui-row-actions">
+                      <IconAction icon={Eye} label="Lihat detail" onClick={() => setDetailPengguna(p)} />
+                      <IconAction icon={Pencil} label="Edit" onClick={() => handleBukaEdit(p)} />
+                      <IconAction icon={p.status === 'Aktif' ? UserX : UserCheck} label={p.status === 'Aktif' ? 'Nonaktifkan akun' : 'Aktifkan akun'} tone={p.status === 'Aktif' ? 'danger' : 'default'} onClick={() => handleToggleStatus(p.id)} />
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {pager_filtered}
         </div>
       </div>
 

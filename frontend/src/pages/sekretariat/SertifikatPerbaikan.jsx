@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { dokumenPengganti } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
 
 export default function SertifikatPerbaikan() {
+  const { dokumenPengganti } = usePortalData();
   const navigate = useNavigate();
   const [dpSearch, setDpSearch] = useState('');
   const [dpStatus, setDpStatus] = useState('');
@@ -19,6 +21,8 @@ export default function SertifikatPerbaikan() {
     const matchStatus = dpStatus ? d.status === dpStatus : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filteredDp, pager: pager_filteredDp } = usePagination(filteredDp, 10);
 
   return (
     <div>
@@ -77,7 +81,7 @@ export default function SertifikatPerbaikan() {
                     </td>
                   </tr>
                 )}
-                {filteredDp.map(d => (
+                {pg_filteredDp.map(d => (
                   <tr key={d.id}>
                     <td><span className="table-name-bold">{d.namaPeserta}</span></td>
                     <td>
@@ -110,6 +114,7 @@ export default function SertifikatPerbaikan() {
                 ))}
               </tbody>
             </table>
+          {pager_filteredDp}
           </div>
         </div>
       </div>

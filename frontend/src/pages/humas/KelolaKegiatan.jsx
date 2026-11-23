@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X, Check } from 'lucide-react';
-import { humasKegiatan } from './data';
+import { Search, Bell, Plus, Eye, Pencil, Trash2, X, Check, ClipboardCheck, EyeOff } from 'lucide-react';
+import { usePagination, IconAction } from '../../components/Pagination';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
+import useKegiatan from './useKegiatan';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 
 const statusConfig = {
   berlangsung: { label: 'Berlangsung', className: 'humas-badge humas-badge-berlangsung' },
   publik:      { label: 'Publik',      className: 'humas-badge humas-badge-publik'      },
   selesai:     { label: 'Selesai',     className: 'humas-badge humas-badge-selesai'     },
   draft:       { label: 'Draft',       className: 'humas-badge humas-badge-draft'       },
+  dibatalkan:  { label: 'Dibatalkan',  className: 'humas-badge humas-badge-selesai'     },
 };
 
 export default function KelolaKegiatan() {
@@ -16,7 +19,8 @@ export default function KelolaKegiatan() {
   const [searchParams] = useSearchParams();
   const initialMitra = searchParams.get('mitra') || searchParams.get('q') || '';
 
-  const [kegiatan, setKegiatan]         = useState(humasKegiatan);
+  const { kegiatan, loading, error, reload, save, remove, setStatus } = useKegiatan();
+  const [actionError, setActionError]   = useState('');
   const [search, setSearch]             = useState(initialMitra);
   const [filterJenis, setFilterJenis]   = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -37,42 +41,31 @@ export default function KelolaKegiatan() {
     return matchSearch && matchJenis && matchStatus;
   });
 
-  const handleSave = (payload) => {
-    if (payload.id) {
-      setKegiatan(prev => prev.map(k =>
-        k.id === payload.id
-          ? { ...k, nama: payload.judul || k.nama, jenis: payload.jenis, penyelenggara: payload.penyelenggara, status: payload.status }
-          : k
-      ));
-    } else {
-      setKegiatan(prev => [{
-        id: Date.now(),
-        nama: payload.judul || 'Kegiatan Baru',
-        jenis: payload.jenis,
-        tanggal: payload.tanggal || '-',
-        penyelenggara: payload.penyelenggara,
-        lokasi: payload.lokasi || (payload.gedung ? `${payload.gedung} · ${payload.ruangan || 'Ruang Utama'}` : 'Online'),
-        pendaftar: 0,
-        kuota: payload.kuotaJenis === 'Terbatas' ? Number(payload.kuota) : null,
-        status: payload.status,
-      }, ...prev]);
-    }
-  };
+  // Simpan ke database; error ditampilkan di dalam modal
+  const handleSave = (payload) => save(payload);
 
-  const handleJadikanDraft = (id) => {
-    setKegiatan(prev => prev.map(k => k.id === id ? { ...k, status: 'draft' } : k));
+  const handleJadikanDraft = async (id) => {
+    try { await setStatus(id, 'draft'); setActionError(''); }
+    catch (err) { setActionError(err.message); }
     setDraftTarget(null);
   };
 
-  const handleHapus = (id) => {
-    setKegiatan(prev => prev.filter(k => k.id !== id));
+  const handleHapus = async (id) => {
+    if (!window.confirm('Hapus kegiatan ini beserta seluruh data pendaftarannya?')) return;
+    try { await remove(id); setActionError(''); }
+    catch (err) { setActionError(err.message); }
   };
+
+  const { pageItems, pager } = usePagination(filtered, 10);
 
   const jenisOptions = [...new Set(kegiatan.map(k => k.jenis))];
 
   return (
     <>
       <div className="humas-list-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
+        {loading && !kegiatan.length && <PageLoader />}
 
         {/* Page heading + actions */}
         <div className="humas-list-header">
@@ -118,13 +111,10 @@ export default function KelolaKegiatan() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Nama Kegiatan</th>
-                <th>Jenis</th>
+                <th>Kegiatan</th>
                 <th>Tanggal</th>
-                <th>Penyelenggara / Mitra</th>
-                <th>Lokasi</th>
-                <th>Pendaftar</th>
-                <th>Kuota</th>
+                <th>Penyelenggara</th>
+                <th style={{ textAlign: 'center' }}>Pendaftar / Kuota</th>
                 <th>Status</th>
                 <th>Tindakan</th>
               </tr>
@@ -132,16 +122,16 @@ export default function KelolaKegiatan() {
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
+                  <td colSpan={6} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
                     Tidak ada kegiatan ditemukan.
                   </td>
                 </tr>
               )}
-              {filtered.map(k => {
+              {pageItems.map(k => {
                 const cfg = statusConfig[k.status] ?? statusConfig.draft;
                 return (
                   <tr key={k.id}>
-                    <td>
+                    <td className="ui-cell-name">
                       <span
                         className="table-name-bold humas-link"
                         style={{ cursor: 'pointer' }}
@@ -149,52 +139,24 @@ export default function KelolaKegiatan() {
                       >
                         {k.nama}
                       </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        <span>{k.jenis}</span>
-                        <span className="humas-pelaksanaan-badge" style={{ fontSize: '10.5px', padding: '1px 6px' }}>
-                          ● {k.jenisPelaksanaan || (k.lokasi?.toLowerCase().includes('online') ? 'Online' : 'Offline')}
-                        </span>
+                      <div className="ui-cell-muted" style={{ marginTop: 3 }}>
+                        {k.jenis} · {k.jenisPelaksanaan} · {k.lokasi}
                       </div>
                     </td>
-                    <td style={{ whiteSpace: 'nowrap' }}>{k.tanggal}</td>
-                    <td>{k.penyelenggara}</td>
-                    <td>{k.lokasi}</td>
-                    <td style={{ textAlign: 'center', color: k.pendaftar > 0 ? 'var(--green-700)' : 'inherit', fontWeight: k.pendaftar > 0 ? 600 : 400 }}>
-                      {k.pendaftar}
+                    <td className="ui-nowrap">{k.tanggal}</td>
+                    <td className="ui-cell-muted" style={{ minWidth: 140 }}>{k.penyelenggara}</td>
+                    <td className="ui-nowrap" style={{ textAlign: 'center' }}>
+                      <strong style={{ color: k.pendaftar > 0 ? 'var(--green-700)' : 'inherit' }}>{k.pendaftar}</strong>
+                      <span className="ui-cell-muted"> / {k.kuota ?? '∞'}</span>
                     </td>
-                    <td style={{ textAlign: 'center' }}>
-                      {k.kuota === null
-                        ? <span style={{ color: 'var(--gray-400)', fontSize: '12px' }}>Tanpa batas</span>
-                        : k.kuota}
-                    </td>
+                    <td className="ui-nowrap"><span className={cfg.className}>● {cfg.label}</span></td>
                     <td>
-                      <span className={cfg.className}>● {cfg.label}</span>
-                    </td>
-                    <td>
-                      <div className="humas-tindakan-group">
-                        <button className="humas-tindakan-btn humas-tindakan-view" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)}>
-                          <Eye size={12} /> Detail
-                        </button>
-                        <button className="humas-tindakan-btn humas-tindakan-edit" onClick={() => { setEditTarget(k); setShowTambah(true); }}>
-                          <Pencil size={12} /> Edit
-                        </button>
-                        {k.jenis === 'Seminar' && (
-                          <button
-                            className="humas-tindakan-btn humas-tindakan-view"
-                            style={{ color: '#15803d', fontWeight: 600 }}
-                            onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}?tab=presensi`)}
-                          >
-                            <Check size={12} /> Kelola Absensi Seminar
-                          </button>
-                        )}
-                        <button className="humas-tindakan-btn humas-tindakan-delete" onClick={() => handleHapus(k.id)}>
-                          <Trash2 size={12} /> Hapus
-                        </button>
-                        <button className="humas-tindakan-btn humas-tindakan-draft" onClick={() => setDraftTarget(k.id)}>
-                          Jadikan Draft
-                        </button>
+                      <div className="ui-row-actions">
+                        <IconAction icon={Eye} label="Lihat detail" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)} />
+                        <IconAction icon={Pencil} label="Edit kegiatan" onClick={() => { setEditTarget(k); setShowTambah(true); }} />
+                        <IconAction icon={ClipboardCheck} label="Kelola absensi" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}?tab=presensi`)} />
+                        {k.status !== 'draft' && <IconAction icon={EyeOff} label="Jadikan draft" tone="warning" onClick={() => setDraftTarget(k.id)} />}
+                        <IconAction icon={Trash2} label="Hapus kegiatan" tone="danger" onClick={() => handleHapus(k.id)} />
                       </div>
                     </td>
                   </tr>
@@ -202,6 +164,7 @@ export default function KelolaKegiatan() {
               })}
             </tbody>
           </table>
+          {pager}
         </div>
       </div>
 

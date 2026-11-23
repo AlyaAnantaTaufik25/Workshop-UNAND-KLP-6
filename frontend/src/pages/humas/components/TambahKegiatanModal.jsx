@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { X, Calendar, Clock } from 'lucide-react';
+import useApi from '../../../hooks/useApi';
+import { locationsApi, partnersApi, readFileAsDataUrl } from '../../../api';
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum', 'Pelatihan', 'Konferensi'];
 const jenisPelaksanaanOptions = ['Offline', 'Online'];
-const mitraOptions = ['PT Semen Padang', 'Bank Nagari', 'Fakultas Ekonomi dan Bisnis UNAND', 'Fakultas Teknologi Informasi UNAND', 'UNAND', 'Lainnya'];
-const gedungOptions = ['Convention Hall', 'Gedung Rektorat', 'Gedung Fakultas', 'Aula Utama'];
-const ruanganMap = {
+// Opsi cadangan bila data mitra/gedung dari server belum termuat
+const fallbackMitraOptions = ['PT Semen Padang', 'Bank Nagari', 'Fakultas Ekonomi dan Bisnis UNAND', 'Fakultas Teknologi Informasi UNAND', 'UNAND', 'Lainnya'];
+const fallbackRuanganMap = {
   'Convention Hall':   ['Ruang Utama', 'Ruang A', 'Ruang B', 'Ruang C'],
   'Gedung Rektorat':   ['Ruang Sidang Lantai 4', 'Ruang Sidang Lantai 3', 'Aula Rektorat'],
   'Gedung Fakultas':   ['Aula Fakultas', 'Ruang Seminar', 'Ruang Kelas Besar'],
@@ -63,6 +65,17 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
 
   const [form, setForm] = useState(initialForm);
   const [posterName, setPosterName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Opsi penyelenggara & gedung/ruangan dari database
+  const { data: partners } = useApi(() => partnersApi.list(), []);
+  const { data: locations } = useApi(() => locationsApi.list(), []);
+  const mitraOptions = partners?.length ? ['UNAND', ...partners.map(p => p.nama)] : fallbackMitraOptions;
+  const ruanganMap = locations?.length
+    ? locations.reduce((map, l) => ({ ...map, [l.gedung]: [...(map[l.gedung] || []), l.ruangan] }), {})
+    : fallbackRuanganMap;
+  const gedungOptions = Object.keys(ruanganMap);
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
@@ -91,20 +104,37 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
 
   const durasiHari = hitungDurasiHari();
 
-  const handleSubmit = (status) => {
+  const handleSubmit = async (status) => {
+    if (saving) return;
+    if (!form.judul.trim()) { setError('Judul kegiatan wajib diisi.'); return; }
+    if (!form.tanggalMulai) { setError('Tanggal mulai wajib diisi.'); return; }
+    if (form.jenisPelaksanaan !== 'Online' && !form.gedung) { setError('Pilih gedung dan ruangan untuk kegiatan offline.'); return; }
     const tanggalDisplay = form.tanggalMulai && form.tanggalSelesai
       ? (form.tanggalMulai === form.tanggalSelesai ? form.tanggalMulai : `${form.tanggalMulai} – ${form.tanggalSelesai}`)
       : (form.tanggalMulai || '-');
 
-    const payload = {
-      ...form,
-      tanggal: tanggalDisplay,
-      lokasi: form.gedung ? `${form.gedung} · ${form.ruangan || 'Ruang Utama'}` : 'Online',
-      status,
-      id: editData?.id,
-    };
-    onSave?.(payload);
-    onClose();
+    // Mengedit kegiatan yang sedang berjalan/selesai tidak menurunkan statusnya ke 'publik'
+    const keepStatus = editData && status === 'publik' && ['berlangsung', 'selesai'].includes(editData.status);
+    setSaving(true);
+    setError('');
+    try {
+      const poster = form.poster instanceof File ? await readFileAsDataUrl(form.poster) : undefined;
+      const payload = {
+        ...form,
+        tanggal: tanggalDisplay,
+        lokasi: form.gedung ? `${form.gedung} · ${form.ruangan || 'Ruang Utama'}` : 'Online',
+        status: keepStatus ? editData.status : status,
+        id: editData?.id,
+      };
+      if (poster === undefined) delete payload.poster;
+      else payload.poster = poster;
+      await onSave?.(payload);
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Kegiatan belum tersimpan.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -405,15 +435,16 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
         </div>
 
         {/* ── Footer Buttons ── */}
+        {error && <p role="alert" style={{ margin: '0 24px 12px', padding: '8px 12px', borderRadius: 8, background: '#fef2f2', color: '#b91c1c', fontSize: 13 }}>{error}</p>}
         <div className="modal-footer">
-          <button className="modal-btn modal-btn-batal" onClick={onClose}>
+          <button className="modal-btn modal-btn-batal" onClick={onClose} disabled={saving}>
             Batal
           </button>
-          <button className="modal-btn modal-btn-draft" onClick={() => handleSubmit('draft')}>
-            Simpan Draft
+          <button className="modal-btn modal-btn-draft" onClick={() => handleSubmit('draft')} disabled={saving}>
+            {saving ? 'Menyimpan…' : 'Simpan Draft'}
           </button>
-          <button className="modal-btn modal-btn-publish" onClick={() => handleSubmit('publik')}>
-            Publikasikan
+          <button className="modal-btn modal-btn-publish" onClick={() => handleSubmit('publik')} disabled={saving}>
+            {saving ? 'Menyimpan…' : editData ? 'Simpan Perubahan' : 'Publikasikan'}
           </button>
         </div>
 

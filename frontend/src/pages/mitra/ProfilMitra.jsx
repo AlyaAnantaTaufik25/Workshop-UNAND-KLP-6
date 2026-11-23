@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { User, Check, Lock, KeyRound, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { currentMitra } from './data';
 import './mitra.css';
+import { usePortalData } from '../../context/PortalData';
+import { authApi } from '../../api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ProfilMitra() {
+  const { currentMitra } = usePortalData();
   const [activeTab, setActiveTab] = useState('profil'); // 'profil' | 'pin'
 
   // State Profil
@@ -17,12 +20,11 @@ export default function ProfilMitra() {
   };
 
   const [form, setForm] = useState(initialData);
+  const { updateProfile } = useAuth();
+  const [profileError, setProfileError] = useState('');
   const [saved, setSaved] = useState(false);
 
   // State PIN Tanda Tangan
-  const [currentStoredPin, setCurrentStoredPin] = useState(() => {
-    return localStorage.getItem('mitra_pin') || '123456';
-  });
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
@@ -42,22 +44,25 @@ export default function ProfilMitra() {
     setSaved(false);
   };
 
-  const handleSimpan = (e) => {
+  const handleSimpan = async (e) => {
     e.preventDefault();
+    try {
+      await updateProfile({ nama: form.nama, email: form.email, telepon: form.telepon, jabatan: form.jabatan, bidangUsaha: form.bidangUsaha, alamat: form.alamat });
+      setProfileError('');
+    } catch (err) {
+      setProfileError(err.message);
+      alert(err.message);
+      return;
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 4000);
   };
 
   // Handler Ubah PIN
-  const handleUbahPin = (e) => {
+  const handleUbahPin = async (e) => {
     e.preventDefault();
     setPinError('');
     setPinSuccessMsg('');
-
-    if (oldPin !== currentStoredPin) {
-      setPinError('PIN lama tidak sesuai. Silakan periksa kembali atau gunakan tombol reset.');
-      return;
-    }
 
     if (!/^\d{6}$/.test(newPin)) {
       setPinError('PIN baru harus terdiri dari tepat 6 digit angka.');
@@ -69,9 +74,13 @@ export default function ProfilMitra() {
       return;
     }
 
-    // Simpan ke localStorage & state
-    localStorage.setItem('mitra_pin', newPin);
-    setCurrentStoredPin(newPin);
+    // PIN diverifikasi & disimpan (ter-hash) di server
+    try {
+      await authApi.changePin(oldPin, newPin);
+    } catch (err) {
+      setPinError(err.message);
+      return;
+    }
     setOldPin('');
     setNewPin('');
     setConfirmPin('');
@@ -82,8 +91,7 @@ export default function ProfilMitra() {
   // Handler Lupa / Reset PIN
   const handleResetDefaultPin = () => {
     if (window.confirm('Apakah Anda yakin ingin mereset PIN tanda tangan ke PIN awal (123456)?')) {
-      localStorage.setItem('mitra_pin', '123456');
-      setCurrentStoredPin('123456');
+      authApi.resetPin().catch(err => setPinError(err.message));
       setOldPin('');
       setNewPin('');
       setConfirmPin('');

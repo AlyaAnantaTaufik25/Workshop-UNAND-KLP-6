@@ -3,9 +3,12 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   FileText, Clock, User, LogOut, Bell, Award
 } from 'lucide-react';
-import { currentRektor } from './data';
 import UnandLogo from '../../components/UnandLogo';
 import './rektor.css';
+import { usePortalData } from '../../context/PortalData';
+import { useAuth } from '../../context/AuthContext';
+import useNotifications from '../../hooks/useNotifications';
+import { useMobileNav } from '../../components/MobileNav';
 
 const navItems = [
   { to: '/rektor/pengajuan', label: 'Pengajuan Sertifikat', icon: FileText },
@@ -21,6 +24,11 @@ const pageTitles = {
 };
 
 export default function LayoutRektor() {
+  // Navigasi sidebar untuk layar kecil
+  const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
+  const { currentRektor } = usePortalData();
+  const { logout } = useAuth();
+  const { items: notifications, unread, markRead } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -59,7 +67,8 @@ export default function LayoutRektor() {
     : (pageTitles[location.pathname] ?? 'Portal Rektor');
 
   return (
-    <div className="app-layout role-rektor">
+    <div className={`app-layout role-rektor${navClass}`}>
+      {navOverlay}
       {/* ── SIDEBAR REKTOR (Selaras dengan Peserta) ── */}
       <aside className="sidebar" aria-label="Navigasi Rektor">
         {/* Brand */}
@@ -102,7 +111,7 @@ export default function LayoutRektor() {
         {/* Logout */}
         <button
           className="sidebar-logout"
-          onClick={() => navigate('/')}
+          onClick={() => { logout(); navigate('/', { replace: true }); }}
         >
           <LogOut size={20} />
           <span>Keluar</span>
@@ -115,6 +124,7 @@ export default function LayoutRektor() {
         {/* Top Header (Selaras dengan Peserta) */}
         <header className="top-header">
           <div className="top-header-left">
+            {navToggle}
             <span className="top-header-crumb">WORKSHOP UNAND</span>
             <h1 className="top-header-title">{pageTitle}</h1>
           </div>
@@ -132,24 +142,28 @@ export default function LayoutRektor() {
                 }}
               >
                 <Bell size={20} />
-                {!notifRead && <i className="top-header-notif-dot" />}
+                {unread > 0 && <i className="top-header-notif-dot" />}
               </button>
 
               {notifOpen && (
                 <div className="header-notif-popover">
                   <h2>Notifikasi</h2>
-                  <NavLink
-                    to="/rektor/sertifikat-perbaikan"
-                    className="header-notif-item"
-                    onClick={() => setNotifOpen(false)}
-                  >
-                    <Award size={18} />
-                    <div>
-                      <strong>Menunggu TTE Sertifikat Perbaikan</strong>
-                      <p>Sertifikat perbaikan Nadia Amelia menunggu persetujuan Anda.</p>
-                      <small>17 Mei 2026 · Baru</small>
-                    </div>
-                  </NavLink>
+                  {notifications.length === 0 && <p style={{ padding: '8px 4px', fontSize: 13, color: '#6b7280' }}>Belum ada notifikasi.</p>}
+                  {notifications.map(n => (
+                    <NavLink
+                      key={n.id}
+                      to={n.link || '#'}
+                      className="header-notif-item"
+                      onClick={() => { setNotifOpen(false); if (n.belumDibaca) markRead(n.id); }}
+                    >
+                      <Award size={18} />
+                      <div>
+                        <strong>{n.judul}</strong>
+                        <p>{n.deskripsi}</p>
+                        <small>{n.waktu}</small>
+                      </div>
+                    </NavLink>
+                  ))}
                 </div>
               )}
             </div>

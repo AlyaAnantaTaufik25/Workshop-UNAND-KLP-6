@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Clock, Briefcase, Users, Check, Download } from 'lucide-react';
-import { workshops } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
 import { downloadPresensiCSV, downloadPesertaCSV } from './utils/exportHelper';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -17,6 +18,14 @@ const statusClass = {
 };
 
 const tabs = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
+
+const LABEL_HADIR = { 'hadir-valid': 'Hadir', 'menunggu-verifikasi': 'Menunggu verifikasi', ditolak: 'Ditolak', 'tidak-hadir': 'Tidak hadir', 'belum-hadir': 'Belum hadir' };
+function usePesertaKegiatan(w) {
+  const { presensiData } = usePortalData();
+  return presensiData
+    .filter(p => p.kegiatanId === w.id)
+    .map(p => ({ id: p.id, nama: p.namaPeserta, jenis: p.jenis, kegiatan: w.nama, statusPendaftaran: 'Terdaftar', waktu: p.waktuPresensi, status: LABEL_HADIR[p.statusKehadiran] || 'Belum hadir', statusKehadiran: LABEL_HADIR[p.statusKehadiran] || 'Belum hadir' }));
+}
 
 // ── Tab: Informasi ───────────────────────────────────────────
 function TabInformasi({ w }) {
@@ -101,32 +110,8 @@ function TabInformasi({ w }) {
 
 // ── Tab: Peserta ─────────────────────────────────────────────
 function TabPeserta({ w }) {
-  const pesertaList = [
-    {
-      id: 1,
-      nama: 'Nadia Amelia',
-      jenis: 'Mahasiswa',
-      kegiatan: w.nama,
-      statusPendaftaran: 'Terdaftar',
-      statusKehadiran: 'Belum hadir',
-    },
-    {
-      id: 2,
-      nama: 'Rafi Pratama',
-      jenis: 'Umum',
-      kegiatan: w.nama,
-      statusPendaftaran: 'Terdaftar',
-      statusKehadiran: 'Hadir',
-    },
-    {
-      id: 3,
-      nama: 'Siti Rahmah',
-      jenis: 'Mahasiswa',
-      kegiatan: w.nama,
-      statusPendaftaran: 'Terdaftar',
-      statusKehadiran: 'Belum hadir',
-    },
-  ];
+  const pesertaList = usePesertaKegiatan(w);
+  const { pageItems: pesertaPage, pager: pesertaPager } = usePagination(pesertaList, 15);
 
   return (
     <div>
@@ -156,7 +141,7 @@ function TabPeserta({ w }) {
             </tr>
           </thead>
           <tbody>
-            {pesertaList.map(p => (
+            {pesertaPage.map(p => (
               <tr key={p.id}>
                 <td><span className="table-name-bold">{p.nama}</span></td>
                 <td>{p.jenis}</td>
@@ -175,6 +160,7 @@ function TabPeserta({ w }) {
             ))}
           </tbody>
         </table>
+            {pesertaPager}
       </div>
     </div>
   );
@@ -182,26 +168,8 @@ function TabPeserta({ w }) {
 
 // ── Tab: Presensi ────────────────────────────────────────────
 function TabPresensi({ w }) {
-  const presensiSample = [
-    {
-      id: 1,
-      nama: 'Nadia Amelia',
-      waktu: null,
-      status: 'Belum hadir',
-    },
-    {
-      id: 2,
-      nama: 'Rafi Pratama',
-      waktu: '18 Mei 2026 - 08.47 WIB',
-      status: 'Hadir',
-    },
-    {
-      id: 3,
-      nama: 'Siti Rahmah',
-      waktu: null,
-      status: 'Belum hadir',
-    },
-  ];
+  const presensiSample = usePesertaKegiatan(w);
+  const { pageItems: presensiPage, pager: presensiPager } = usePagination(presensiSample, 15);
 
   return (
     <div>
@@ -229,7 +197,7 @@ function TabPresensi({ w }) {
             </tr>
           </thead>
           <tbody>
-            {presensiSample.map(p => (
+            {presensiPage.map(p => (
               <tr key={p.id}>
                 <td><span className="table-name-bold">{p.nama}</span></td>
                 <td style={{ color: p.waktu ? 'var(--gray-700)' : 'var(--gray-400)' }}>
@@ -244,6 +212,7 @@ function TabPresensi({ w }) {
             ))}
           </tbody>
         </table>
+            {presensiPager}
       </div>
     </div>
   );
@@ -251,6 +220,7 @@ function TabPresensi({ w }) {
 
 // ── Tab: Rekap ───────────────────────────────────────────────
 function TabRekap({ w }) {
+  const rekapPeserta = usePesertaKegiatan(w);
   const cards = [
     {
       label: 'Total kegiatan',
@@ -260,13 +230,13 @@ function TabRekap({ w }) {
     },
     {
       label: 'Total pendaftar',
-      value: String(w.pendaftar || 108),
+      value: String(w.pendaftar ?? 0),
       sub: '',
       icon: Users,
     },
     {
       label: 'Peserta hadir',
-      value: String(w.hadir || 88),
+      value: String(w.hadir ?? 0),
       sub: '',
       icon: Check,
     },
@@ -276,11 +246,7 @@ function TabRekap({ w }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
         <button
-          onClick={() => downloadPresensiCSV(w.nama, [
-            { nama: 'Nadia Amelia', status: 'Belum hadir' },
-            { nama: 'Rafi Pratama', waktu: '18 Mei 2026 - 08.47 WIB', status: 'Hadir' },
-            { nama: 'Siti Rahmah', status: 'Belum hadir' },
-          ])}
+          onClick={() => downloadPresensiCSV(w.nama, rekapPeserta)}
           className="btn-primary"
           style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '13px' }}
         >
@@ -311,6 +277,7 @@ function TabRekap({ w }) {
 
 // ── Main Component ───────────────────────────────────────────
 export default function DetailKegiatanKegiatan() {
+  const { workshops } = usePortalData();
   const { id }      = useParams();
   const navigate    = useNavigate();
   const [activeTab, setActiveTab] = useState('Informasi');

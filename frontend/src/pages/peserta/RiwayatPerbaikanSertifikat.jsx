@@ -3,7 +3,7 @@ import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { History, Search } from 'lucide-react';
 import { EmptyState } from './components';
 import { correctionStatuses, formatCorrectionTime } from './certificateCorrections';
-import { CertificateHeading, CertificateNotificationsLink, CorrectionStatus } from './CertificateUi';
+import { CertificateHeading, CorrectionStatus } from './CertificateUi';
 
 export default function RiwayatPerbaikanSertifikat() {
   const { certificates, corrections } = useOutletContext();
@@ -17,9 +17,7 @@ export default function RiwayatPerbaikanSertifikat() {
     return (!selectedCertificate || item.certificateId === selectedCertificate) && (!status || item.status === status)
       && `${item.id} ${certificate.workshop.title} ${certificate.issuer} ${certificate.number}`.toLocaleLowerCase('id-ID').includes(query.trim().toLocaleLowerCase('id-ID'));
   }).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
-  return <div className="peserta-stack">
-    <CertificateNotificationsLink />
-    <CertificateHeading title="Riwayat Perbaikan Sertifikat" description="Pantau pengajuan, tanggapan penerbit, dan dokumen pengganti."><Link className="peserta-button peserta-button--secondary" to="/peserta/sertifikat">Kembali ke Daftar</Link></CertificateHeading>
+  return <div className="peserta-stack">    <CertificateHeading title="Riwayat Perbaikan Sertifikat" description="Pantau pengajuan, tanggapan penerbit, dan dokumen pengganti."><Link className="peserta-button peserta-button--secondary" to="/peserta/sertifikat">Kembali ke Daftar</Link></CertificateHeading>
     <div className="peserta-stat-grid">{['menunggu', 'diproses', 'selesai', 'ditolak'].map(key => <button className={`peserta-stat peserta-stat--${correctionStatuses[key].tone}${status === key ? ' is-selected' : ''}`} key={key} onClick={() => setStatus(status === key ? '' : key)} aria-pressed={status === key}><span>{correctionStatuses[key].label}</span><strong>{owned.filter(item => item.status === key).length}</strong></button>)}</div>
     <section className="peserta-filterbar peserta-certificate-filters" aria-label="Filter riwayat perbaikan"><label className="peserta-searchbox"><Search size={18} /><input type="search" aria-label="Cari pengajuan perbaikan" placeholder="Cari pengajuan atau kegiatan..." value={query} onChange={event => setQuery(event.target.value)} /></label><select aria-label="Filter sertifikat pengajuan" value={selectedCertificate} onChange={event => setParams(event.target.value ? { sertifikat: event.target.value } : {})}><option value="">Semua sertifikat</option>{certificates.map(certificate => <option value={certificate.id} key={certificate.id}>{certificate.workshop.title}</option>)}</select><select aria-label="Filter status pengajuan" value={status} onChange={event => setStatus(event.target.value)}><option value="">Semua status</option>{Object.entries(correctionStatuses).map(([key, config]) => <option value={key} key={key}>{config.label}</option>)}</select></section>
     {filtered.length ? <div className="peserta-certificate-table-wrap"><table className="peserta-certificate-table"><caption className="peserta-sr-only">Daftar pengajuan perbaikan sertifikat</caption><thead><tr><th>Kegiatan / Nomor pengajuan</th><th>Penerbit</th><th>Tanggal pengajuan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>{filtered.map(item => {

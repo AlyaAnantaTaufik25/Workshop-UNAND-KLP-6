@@ -24,8 +24,8 @@ export default function WorkshopRegistrationDialog({ workshop, registration, act
       notify(cancelling ? 'Pendaftaran dibatalkan. Kursi atau antrean Anda telah dilepas.' : waiting ? 'Berhasil bergabung ke waiting list. Pantau antrean di Workshop Saya.' : 'Pendaftaran berhasil. Kursi Anda telah dikonfirmasi.');
       onClose();
       onSuccess?.();
-    } catch {
-      setError('Perubahan belum tersimpan. Silakan coba kembali.');
+    } catch (failure) {
+      setError(failure?.message || 'Perubahan belum tersimpan. Silakan coba kembali.');
     } finally {
       setSaving(false);
     }

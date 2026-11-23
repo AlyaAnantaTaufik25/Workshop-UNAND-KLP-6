@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check, PenTool, Eraser, Stamp, Upload, X, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { usePortalData } from '../../context/PortalData';
+import { certificatesApi } from '../../api';
 
 /**
  * Canvas component that supports pen and eraser tools.
@@ -99,12 +101,14 @@ const SignatureCanvas = forwardRef(({ tool }, ref) => {
 export default function DetailTandaTanganMitra() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { mitraTandaTangan, reload } = usePortalData();
+  const pengajuan = mitraTandaTangan.find(item => String(item.id) === id);
 
   // ------ Dummy data (replace with real API if needed) ------
   const template = {
-    title: 'TEST DELLA',
-    status: 'Belum Ditandatangani',
-    description: '12345',
+    title: pengajuan?.namaKegiatan || 'Pengajuan tidak ditemukan',
+    status: pengajuan?.statusTandaTangan === 'menunggu-ttd' ? 'Belum Ditandatangani' : 'Sudah Ditandatangani',
+    description: pengajuan ? `${pengajuan.jumlahSertifikat} sertifikat · No. SK ${pengajuan.nomorSK}` : '-',
     instructions: [
       'Langsung gambar tanda tangan di PDF',
       'Gunakan tools di bawah untuk menggambar',
@@ -143,14 +147,13 @@ export default function DetailTandaTanganMitra() {
     setSaved(false);
   };
 
-  const handleSave = () => {
-    const validPin = localStorage.getItem('mitra_pin') || '123456';
+  const handleSave = async () => {
     if (!pin || pin.length !== 6) {
       setPinError('PIN 6 digit wajib diisi');
       return;
     }
-    if (pin !== validPin) {
-      setPinError('PIN salah. Silakan periksa kembali atau ubah/reset di menu Profil.');
+    if (!pengajuan) {
+      setPinError('Pengajuan tidak ditemukan');
       return;
     }
     const dataUrl = canvasRef.current?.getDataURL();
@@ -158,8 +161,13 @@ export default function DetailTandaTanganMitra() {
       setPinError('Gambar tanda tangan terlebih dahulu');
       return;
     }
-    // Simulasi penyimpanan – di aplikasi nyata kirim ke server
-    console.log('Saved signature', { dataUrl, stampImg, stampPos, stampScale, pin });
+    try {
+      await certificatesApi.sign(pengajuan.id, pin, dataUrl);
+    } catch (err) {
+      setPinError(err.message);
+      return;
+    }
+    reload();
     setSaved(true);
     setPinError('');
   };

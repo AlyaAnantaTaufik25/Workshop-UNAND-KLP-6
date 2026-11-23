@@ -1,25 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
-
-const initialTemplates = [
-  {
-    id: 1,
-    nama: 'Template UNAND — Data Science',
-    kegiatanTerkait: 'Workshop Data Science untuk Riset Akademik',
-    penerbit: 'UNAND',
-    status: 'dapat-dipakai',
-    berkasNama: 'Template UNAND — Data Science.pdf',
-  },
-];
-
-const kegiatanOptions = [
-  'Workshop Data Science untuk Riset Akademik',
-  'Strategi Hilirisasi Riset dan Inovasi',
-  'Kepemimpinan Muda Berdampak',
-  'Manajemen Proyek Kolaboratif',
-  'Inovasi Industri Berkelanjutan',
-];
+import useApi from '../../hooks/useApi';
+import { certificatesApi, readFileAsDataUrl, workshopsApi } from '../../api';
+import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { usePagination, IconAction } from '../../components/Pagination';
 
 const defaultForm = {
   nama: '',
@@ -37,7 +22,19 @@ const statusConfig = {
 
 export default function TemplateSertifikat() {
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState(initialTemplates);
+  // Template milik UNAND (bukan desain bawaan pustaka)
+  const { data: templateData, loading, error, reload } = useApi(() => certificatesApi.templates({ library: 0 }), [], []);
+  const templates = templateData || [];
+  const { data: workshopData = [] } = useApi(() => workshopsApi.list(), []);
+  const kegiatanOptions = (workshopData || []).map(w => w.nama);
+  const [actionError, setActionError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const run = async fn => {
+    setSaving(true);
+    try { await fn(); setActionError(''); await reload(); return true; }
+    catch (err) { setActionError(err.message); return false; }
+    finally { setSaving(false); }
+  };
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
@@ -70,6 +67,8 @@ export default function TemplateSertifikat() {
     const matchStatus = filterStatus ? t.status === filterStatus : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const handleBerkasTambah = (e) => {
     const file = e.target.files?.[0];
@@ -79,21 +78,19 @@ export default function TemplateSertifikat() {
     }
   };
 
-  const handleSimpanTambah = () => {
-    if (!form.nama) return;
-    setTemplates(prev => [
-      ...prev,
-      {
-        id: Date.now(),
-        nama: form.nama,
-        kegiatanTerkait: form.kegiatanTerkait || '—',
-        penerbit: form.penerbit,
-        status: 'dapat-dipakai',
-        berkasNama: form.berkasNama || `${form.nama}.pdf`,
-      },
-    ]);
-    setForm(defaultForm);
-    setShowTambahModal(false);
+  const handleSimpanTambah = async () => {
+    if (!form.nama || saving) return;
+    const ok = await run(async () => certificatesApi.createTemplate({
+      nama: form.nama,
+      penerbit: form.penerbit,
+      kegiatanTerkait: form.kegiatanTerkait,
+      berkasNama: form.berkasNama || `${form.nama}.pdf`,
+      berkas: form.berkas ? await readFileAsDataUrl(form.berkas) : undefined,
+    }));
+    if (ok) {
+      setForm(defaultForm);
+      setShowTambahModal(false);
+    }
   };
 
   const handleOpenEdit = (t) => {
@@ -120,31 +117,26 @@ export default function TemplateSertifikat() {
     }
   };
 
-  const handleSimpanEdit = () => {
-    if (!editForm.nama) return;
-    setTemplates(prev =>
-      prev.map(t => {
-        if (t.id === editForm.id) {
-          return {
-            ...t,
-            nama: editForm.nama,
-            kegiatanTerkait: editForm.kegiatanTerkait || '—',
-            berkasNama: editForm.berkasNama || t.berkasNama,
-          };
-        }
-        return t;
-      })
-    );
-    setShowEditModal(false);
+  const handleSimpanEdit = async () => {
+    if (!editForm.nama || saving) return;
+    const ok = await run(async () => certificatesApi.updateTemplate(editForm.id, {
+      nama: editForm.nama,
+      kegiatanTerkait: editForm.kegiatanTerkait,
+      ...(editForm.berkas ? { berkas: await readFileAsDataUrl(editForm.berkas), berkasNama: editForm.berkasNama } : {}),
+    }));
+    if (ok) setShowEditModal(false);
   };
 
-  const handleHapus = (id) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
+  const handleHapus = async (id) => {
+    if (window.confirm('Hapus template ini?')) await run(() => certificatesApi.deleteTemplate(id));
   };
 
   return (
     <>
       <div className="humas-list-page">
+        <ErrorNotice error={error} onRetry={reload} />
+        {actionError && <ErrorNotice error={{ message: actionError }} />}
+        {loading && !templates.length && <PageLoader />}
         {/* Header bar dengan notifikasi dan tombol aksi kanan atas */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
           <div>
@@ -201,7 +193,7 @@ export default function TemplateSertifikat() {
                   </td>
                 </tr>
               ) : (
-                filtered.map(t => {
+                pg_filtered.map(t => {
                   const cfg = statusConfig[t.status] ?? statusConfig['dapat-dipakai'];
                   const locked = t.status === 'dipakai' || t.status === 'diterbitkan';
                   return (
@@ -225,31 +217,13 @@ export default function TemplateSertifikat() {
                         <span className={cfg.className}>● {cfg.label}</span>
                       </td>
                       <td>
-                        <div className="humas-tindakan-group">
-                          <button
-                            type="button"
-                            className="humas-tindakan-btn humas-tindakan-view"
-                            onClick={() => setPreviewTemplate(t)}
-                          >
-                            <Eye size={12} /> Detail
-                          </button>
+                        <div className="ui-row-actions">
+                          <IconAction icon={Eye} label="Lihat detail" onClick={() => setPreviewTemplate(t)} />
                           {!locked && (
-                            <button
-                              type="button"
-                              className="humas-tindakan-btn humas-tindakan-edit"
-                              onClick={() => handleOpenEdit(t)}
-                            >
-                              <Pencil size={12} /> Edit
-                            </button>
+                            <IconAction icon={Pencil} label="Edit" onClick={() => handleOpenEdit(t)} />
                           )}
                           {!locked && (
-                            <button
-                              type="button"
-                              className="humas-tindakan-btn humas-tindakan-delete"
-                              onClick={() => handleHapus(t.id)}
-                            >
-                              <Trash2 size={12} /> Hapus
-                            </button>
+                            <IconAction icon={Trash2} label="Hapus" tone="danger" onClick={() => handleHapus(t.id)} />
                           )}
                         </div>
                       </td>
@@ -259,6 +233,7 @@ export default function TemplateSertifikat() {
               )}
             </tbody>
           </table>
+          {pager_filtered}
         </div>
 
         {/* Footer note */}

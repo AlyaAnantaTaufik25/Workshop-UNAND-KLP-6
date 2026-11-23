@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CalendarDays, Clock, MapPin, ArrowLeft, Users, CheckCircle2, UserCheck, Calendar, Download } from 'lucide-react';
-import { mitraKegiatan, mitraDetailData } from './data';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
 
@@ -16,6 +17,7 @@ function StatusHadirBadge({ status }) {
 }
 
 export default function DetailKegiatanMitra() {
+  const { mitraKegiatan, mitraDetailData } = usePortalData();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Informasi');
@@ -26,6 +28,8 @@ export default function DetailKegiatanMitra() {
     tentang: '-', manfaat: '-', targetPeserta: '-', narasumber: [],
     peserta: [], rekap: { totalPendaftar: kegiatan?.pendaftar || 0, pesertaHadir: 0 },
   };
+  // Paginasi daftar peserta (tab Peserta & Presensi memakai halaman yang sama)
+  const { pageItems: pesertaPage, pager: pesertaPager } = usePagination(detail.peserta, 15);
 
   if (!kegiatan) {
     return (
@@ -205,7 +209,7 @@ export default function DetailKegiatanMitra() {
                       </td>
                     </tr>
                   ) : (
-                    detail.peserta.map(p => (
+                    pesertaPage.map(p => (
                       <tr key={p.id}>
                         <td><span className="mitra-activity-title">{p.nama}</span></td>
                         <td>{p.jenis || 'Mahasiswa'}</td>
@@ -220,6 +224,7 @@ export default function DetailKegiatanMitra() {
                   )}
                 </tbody>
               </table>
+            {pesertaPager}
             </div>
           </div>
         )}
@@ -245,7 +250,7 @@ export default function DetailKegiatanMitra() {
                       </td>
                     </tr>
                   ) : (
-                    detail.peserta.map(p => (
+                    pesertaPage.map(p => (
                       <tr key={p.id}>
                         <td><span className="mitra-activity-title">{p.nama}</span></td>
                         <td>{p.kegiatan || kegiatan.nama}</td>
@@ -258,6 +263,7 @@ export default function DetailKegiatanMitra() {
                   )}
                 </tbody>
               </table>
+            {pesertaPager}
             </div>
           </div>
         )}

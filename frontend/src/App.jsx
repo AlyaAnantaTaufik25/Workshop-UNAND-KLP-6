@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import RequireRole from './components/RequireRole';
+import { PortalDataProvider } from './context/PortalData';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import LayoutPeserta from './pages/peserta/LayoutPeserta';
@@ -66,7 +68,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/peserta" element={<LayoutPeserta />}>
+        <Route path="/peserta" element={<RequireRole role="peserta"><LayoutPeserta /></RequireRole>}>
           <Route index element={<Navigate to="cari-workshop" replace />} />
           <Route path="cari-workshop" element={<CariWorkshop />} />
           <Route path="workshop/:id" element={<DetailWorkshop />} />
@@ -82,7 +84,7 @@ function App() {
         </Route>
 
         {/* ── ROLE: SEKRETARIAT REKTOR ── */}
-        <Route path="/sekretariat" element={<Layout />}>
+        <Route path="/sekretariat" element={<RequireRole role="sekretariat"><PortalDataProvider role="sekretariat"><Layout /></PortalDataProvider></RequireRole>}>
           <Route index element={<Navigate to="kegiatan" replace />} />
           <Route path="kegiatan" element={<Kegiatan />} />
           <Route path="kegiatan/:id" element={<DetailKegiatanKegiatan />} />
@@ -95,7 +97,7 @@ function App() {
         </Route>
 
         {/* ── ROLE: REKTOR ── */}
-        <Route path="/rektor" element={<LayoutRektor />}>
+        <Route path="/rektor" element={<RequireRole role="rektor"><PortalDataProvider role="rektor"><LayoutRektor /></PortalDataProvider></RequireRole>}>
           <Route index element={<Navigate to="pengajuan" replace />} />
           <Route path="pengajuan" element={<PengajuanSertifikat />} />
           <Route path="sertifikat-perbaikan" element={<SertifikatPerbaikanRektor />} />
@@ -107,7 +109,7 @@ function App() {
         </Route>
 
         {/* ── ROLE: HUMAS ── */}
-        <Route path="/humas" element={<LayoutHumas />}>
+        <Route path="/humas" element={<RequireRole role="humas"><LayoutHumas /></RequireRole>}>
           <Route index element={<Navigate to="ringkasan" replace />} />
           <Route path="ringkasan" element={<RingkasanHumas />} />
           <Route path="kelola-kegiatan" element={<KelolaKegiatan />} />
@@ -122,7 +124,7 @@ function App() {
         </Route>
 
         {/* ── ROLE: MITRA ── */}
-        <Route path="/mitra" element={<LayoutMitra />}>
+        <Route path="/mitra" element={<RequireRole role="mitra"><PortalDataProvider role="mitra"><LayoutMitra /></PortalDataProvider></RequireRole>}>
           <Route index element={<Navigate to="kegiatan-kerja-sama" replace />} />
           <Route path="kegiatan-kerja-sama" element={<KegiatanKerjaSama />} />
           <Route path="kegiatan-kerja-sama/:id" element={<DetailKegiatanMitra />} />

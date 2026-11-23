@@ -77,11 +77,11 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/auth` | **[PLANNED]** | Cek status modul auth | Publik |
-| `POST` | `/api/v1/auth/register` | **[PLANNED]** | Registrasi akun peserta baru | Publik |
-| `POST` | `/api/v1/auth/login` | **[PLANNED]** | Login pengguna (semua role) & perolehan JWT | Publik |
-| `GET` | `/api/v1/auth/me` | **[PLANNED]** | Mengambil profil user yang sedang login | Authenticated |
-| `POST` | `/api/v1/auth/logout` | **[PLANNED]** | Logout & invalidasi token/sesi | Authenticated |
+| `GET` | `/api/v1/auth` | **[ACTIVE]** | Cek status modul auth | Publik |
+| `POST` | `/api/v1/auth/register` | **[ACTIVE]** | Registrasi akun peserta baru | Publik |
+| `POST` | `/api/v1/auth/login` | **[ACTIVE]** | Login pengguna (semua role) & perolehan JWT | Publik |
+| `GET` | `/api/v1/auth/me` | **[ACTIVE]** | Mengambil profil user yang sedang login | Authenticated |
+| `POST` | `/api/v1/auth/logout` | **[ACTIVE]** | Logout & invalidasi token/sesi | Authenticated |
 
 ---
 
@@ -89,12 +89,12 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/roles` | **[PLANNED]** | Daftar 5 role sistem | Humas |
-| `GET` | `/api/v1/users` | **[PLANNED]** | Daftar pengguna sistem dengan filter role | Humas |
-| `POST` | `/api/v1/users` | **[PLANNED]** | Tambah pengguna internal/mitra baru | Humas |
-| `GET` | `/api/v1/users/:id` | **[PLANNED]** | Detail pengguna | Humas, Owner |
-| `PUT` | `/api/v1/users/:id` | **[PLANNED]** | Update data pengguna | Humas, Owner |
-| `DELETE` | `/api/v1/users/:id` | **[PLANNED]** | Nonaktifkan akun pengguna | Humas |
+| `GET` | `/api/v1/roles` | **[ACTIVE]** | Daftar 5 role sistem | Humas |
+| `GET` | `/api/v1/users` | **[ACTIVE]** | Daftar pengguna sistem dengan filter role | Humas |
+| `POST` | `/api/v1/users` | **[ACTIVE]** | Tambah pengguna internal/mitra baru | Humas |
+| `GET` | `/api/v1/users/:id` | **[ACTIVE]** | Detail pengguna | Humas, Owner |
+| `PUT` | `/api/v1/users/:id` | **[ACTIVE]** | Update data pengguna | Humas, Owner |
+| `DELETE` | `/api/v1/users/:id` | **[ACTIVE]** | Nonaktifkan akun pengguna | Humas |
 
 ---
 
@@ -102,11 +102,11 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/workshops` | **[PLANNED]** | Katalog daftar workshop publik (pagination, filter) | Publik |
-| `GET` | `/api/v1/workshops/:id` | **[PLANNED]** | Detail workshop, jadwal, pembicara, kuota | Publik |
-| `POST` | `/api/v1/workshops` | **[PLANNED]** | Membuat kegiatan workshop baru | Humas |
-| `PUT` | `/api/v1/workshops/:id` | **[PLANNED]** | Memperbarui informasi workshop | Humas |
-| `DELETE` | `/api/v1/workshops/:id` | **[PLANNED]** | Membatalkan/menghapus workshop | Humas |
+| `GET` | `/api/v1/workshops` | **[ACTIVE]** | Katalog daftar workshop publik (pagination, filter) | Publik |
+| `GET` | `/api/v1/workshops/:id` | **[ACTIVE]** | Detail workshop, jadwal, pembicara, kuota | Publik |
+| `POST` | `/api/v1/workshops` | **[ACTIVE]** | Membuat kegiatan workshop baru | Humas |
+| `PUT` | `/api/v1/workshops/:id` | **[ACTIVE]** | Memperbarui informasi workshop | Humas |
+| `DELETE` | `/api/v1/workshops/:id` | **[ACTIVE]** | Membatalkan/menghapus workshop | Humas |
 
 ---
 
@@ -114,9 +114,9 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/locations` | **[PLANNED]** | Daftar gedung dan ruangan workshop UNAND | Publik / Humas |
-| `POST` | `/api/v1/locations` | **[PLANNED]** | Tambah lokasi (termasuk koordinat GPS radius) | Humas |
-| `PUT` | `/api/v1/locations/:id` | **[PLANNED]** | Update data ruangan/gedung | Humas |
+| `GET` | `/api/v1/locations` | **[ACTIVE]** | Daftar gedung dan ruangan workshop UNAND | Publik / Humas |
+| `POST` | `/api/v1/locations` | **[ACTIVE]** | Tambah lokasi (termasuk koordinat GPS radius) | Humas |
+| `PUT` | `/api/v1/locations/:id` | **[ACTIVE]** | Update data ruangan/gedung | Humas |
 
 ---
 
@@ -124,9 +124,9 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/partners` | **[PLANNED]** | Daftar instansi mitra workshop | Humas / Mitra |
-| `POST` | `/api/v1/partners` | **[PLANNED]** | Mendaftarkan profil mitra kerja sama baru | Humas |
-| `GET` | `/api/v1/partners/:id/workshops` | **[PLANNED]** | Daftar kegiatan workshop yang melibatkan mitra | Mitra / Humas |
+| `GET` | `/api/v1/partners` | **[ACTIVE]** | Daftar instansi mitra workshop | Humas / Mitra |
+| `POST` | `/api/v1/partners` | **[ACTIVE]** | Mendaftarkan profil mitra kerja sama baru | Humas |
+| `GET` | `/api/v1/partners/:id/workshops` | **[ACTIVE]** | Daftar kegiatan workshop yang melibatkan mitra | Mitra / Humas |
 
 ---
 
@@ -134,10 +134,10 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `POST` | `/api/v1/registrations` | **[PLANNED]** | Mendaftar workshop (tiket atau waiting list) | Peserta |
-| `GET` | `/api/v1/registrations/my` | **[PLANNED]** | Riwayat workshop yang didaftarkan oleh peserta | Peserta |
-| `GET` | `/api/v1/registrations/workshop/:workshopId` | **[PLANNED]** | Daftar seluruh peserta pendaftar kegiatan | Humas |
-| `PATCH` | `/api/v1/registrations/:id/cancel` | **[PLANNED]** | Pembatalan pendaftaran (alokasi ke waiting list) | Peserta / Humas |
+| `POST` | `/api/v1/registrations` | **[ACTIVE]** | Mendaftar workshop (tiket atau waiting list) | Peserta |
+| `GET` | `/api/v1/registrations/my` | **[ACTIVE]** | Riwayat workshop yang didaftarkan oleh peserta | Peserta |
+| `GET` | `/api/v1/registrations/workshop/:workshopId` | **[ACTIVE]** | Daftar seluruh peserta pendaftar kegiatan | Humas |
+| `PATCH` | `/api/v1/registrations/:id/cancel` | **[ACTIVE]** | Pembatalan pendaftaran (alokasi ke waiting list) | Peserta / Humas |
 
 ---
 
@@ -145,9 +145,9 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `POST` | `/api/v1/attendance/generate-qr` | **[PLANNED]** | Membuat token QR Code dinamis per sesi | Humas |
-| `POST` | `/api/v1/attendance/check-in` | **[PLANNED]** | Submit presensi (validasi token QR & GPS Geofence) | Peserta |
-| `GET` | `/api/v1/attendance/workshop/:workshopId` | **[PLANNED]** | Rekap kehadiran peserta per workshop | Humas |
+| `POST` | `/api/v1/attendance/generate-qr` | **[ACTIVE]** | Membuat token QR Code dinamis per sesi | Humas |
+| `POST` | `/api/v1/attendance/check-in` | **[ACTIVE]** | Submit presensi (validasi token QR & GPS Geofence) | Peserta |
+| `GET` | `/api/v1/attendance/workshop/:workshopId` | **[ACTIVE]** | Rekap kehadiran peserta per workshop | Humas |
 
 ---
 
@@ -155,12 +155,12 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `POST` | `/api/v1/certificates/templates` | **[PLANNED]** | Mengunggah template desain sertifikat | Humas |
-| `POST` | `/api/v1/certificates/submissions` | **[PLANNED]** | Pengajuan draft sertifikat kegiatan | Humas |
+| `POST` | `/api/v1/certificates/templates` | **[ACTIVE]** | Mengunggah template desain sertifikat | Humas |
+| `POST` | `/api/v1/certificates/submissions` | **[ACTIVE]** | Pengajuan draft sertifikat kegiatan | Humas |
 | `PATCH` | `/api/v1/certificates/submissions/:id/verify` | **[PLANNED]** | Koreksi & verifikasi draft sertifikat | Sekretariat Rektor |
-| `POST` | `/api/v1/certificates/submissions/:id/sign` | **[PLANNED]** | Approval akhir & pembubuhan TTE sertifikat | Rektor |
-| `GET` | `/api/v1/certificates/my` | **[PLANNED]** | Mengunduh sertifikat milik peserta | Peserta |
-| `GET` | `/api/v1/certificates/verify/:serialNumber` | **[PLANNED]** | Verifikasi keabsahan nomor sertifikat | Publik |
+| `POST` | `/api/v1/certificates/submissions/:id/sign` | **[ACTIVE]** | Approval akhir & pembubuhan TTE sertifikat | Rektor |
+| `GET` | `/api/v1/certificates/my` | **[ACTIVE]** | Mengunduh sertifikat milik peserta | Peserta |
+| `GET` | `/api/v1/certificates/verify/:serialNumber` | **[ACTIVE]** | Verifikasi keabsahan nomor sertifikat | Publik |
 
 ---
 
@@ -168,6 +168,31 @@ Dokumen ini mendefinisikan kontrak antarmuka API antara backend dan frontend.
 
 | Method | Endpoint | Status | Deskripsi | Akses |
 |---|---|---|---|---|
-| `GET` | `/api/v1/reports/summary` | **[PLANNED]** | Statistik ringkasan (workshop, peserta, rasio hadir) | Humas, Rektor |
-| `GET` | `/api/v1/reports/workshops/:id/export` | **[PLANNED]** | Export laporan kegiatan (PDF / Excel) | Humas, Sekretariat |
+| `GET` | `/api/v1/reports/summary` | **[ACTIVE]** | Statistik ringkasan (workshop, peserta, rasio hadir) | Humas, Rektor |
+| `GET` | `/api/v1/reports/workshops/:id/export` | **[ACTIVE]** | Export laporan kegiatan (PDF / Excel) | Humas, Sekretariat |
 
+
+---
+
+### 3.11. Endpoint Tambahan (sudah aktif)
+
+| Method | Endpoint | Deskripsi | Akses |
+|---|---|---|---|
+| `PUT` | `/api/v1/auth/me` | Ubah profil sendiri | Authenticated |
+| `PUT` | `/api/v1/auth/me/password` | Ubah kata sandi | Authenticated |
+| `POST` | `/api/v1/auth/me/pin/verify` · `PUT /auth/me/pin` · `POST /auth/me/pin/reset` | PIN tanda tangan elektronik | Rektor, Mitra |
+| `PATCH` | `/api/v1/workshops/:id/status` | Ubah status kegiatan / pendaftaran / presensi | Humas |
+| `GET` | `/api/v1/registrations` | Peserta lintas kegiatan (mitra: kegiatan instansinya) | Humas, Mitra, Sekretariat, Rektor |
+| `POST` | `/api/v1/attendance/upload` | Presensi online dengan unggah bukti | Peserta |
+| `PATCH` | `/api/v1/attendance/:id/verify` | Terima / tolak bukti presensi | Humas, Mitra |
+| `GET/PUT/DELETE` | `/api/v1/certificates/templates[/:id]` | Kelola template (mitra: miliknya) | Humas, Mitra |
+| `GET` | `/api/v1/certificates/submissions[/:id]` | Daftar & detail pengajuan sertifikat | Humas, Mitra, Sekretariat, Rektor |
+| `GET/POST` | `/api/v1/certificates/corrections` | Perbaikan sertifikat (peserta mengajukan) | Peserta, Humas, Mitra |
+| `PATCH` | `/api/v1/certificates/corrections/:id/process` | `{action: proses|tolak|selesai}` | Humas, Mitra |
+| `PATCH` | `/api/v1/certificates/corrections/:id/cancel` · `/corrections/read` | Batal / tandai dibaca | Peserta |
+| `GET` | `/api/v1/certificates/replacements` | Dokumen pengganti hasil perbaikan | Sekretariat, Rektor, Humas, Mitra |
+| `POST` | `/api/v1/certificates/replacements/:id/sign` | TTE ulang dokumen pengganti | Rektor |
+| `GET` | `/api/v1/reports/workshops` · `/reports/daily` | Laporan per kegiatan & rekap presensi harian | Humas, Mitra, Sekretariat, Rektor |
+| `GET` · `PATCH` | `/api/v1/notifications` · `/notifications/read` | Notifikasi user & role | Authenticated |
+
+Alur status pengajuan sertifikat: `menunggu-mitra` → (TTE Mitra) → `menunggu-rektor` → (TTE Rektor) → `diterbitkan`. Saat terbit, sertifikat individual otomatis dibuat untuk setiap peserta dengan presensi `hadir`.

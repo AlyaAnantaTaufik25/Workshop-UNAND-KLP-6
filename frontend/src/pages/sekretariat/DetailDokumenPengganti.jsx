@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AlertTriangle, CheckCircle, FileText, ArrowRight } from 'lucide-react';
-import { dokumenPengganti } from '../../data/mockData';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
+import { usePortalData } from '../../context/PortalData';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
 
 export default function DetailDokumenPengganti() {
+  const { dokumenPengganti } = usePortalData();
   const { id }    = useParams();
   const navigate  = useNavigate();
   const [processed, setProcessed]   = useState(false);

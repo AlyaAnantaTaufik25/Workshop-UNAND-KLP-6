@@ -23,6 +23,8 @@ const config = {
     database: process.env.DB_NAME || 'sim_workshop_unand',
     connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 10,
     connectTimeout: 2000,
+    // DATE/DATETIME dikembalikan sebagai string agar tidak bergeser zona waktu
+    dateStrings: true,
     waitForConnections: true,
     queueLimit: 0,
   },

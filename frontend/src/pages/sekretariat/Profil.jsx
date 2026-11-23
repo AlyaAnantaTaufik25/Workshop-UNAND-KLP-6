@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { currentUser } from './data';
+import { usePortalData } from '../../context/PortalData';
+import { useAuth } from '../../context/AuthContext';
 
 function initials(name) {
   if (!name) return 'RM';
@@ -7,6 +8,8 @@ function initials(name) {
 }
 
 export default function Profil() {
+  const { currentUser } = usePortalData();
+  const { updateProfile } = useAuth();
   const [form, setForm] = useState({ ...currentUser });
   const [savedMessage, setSavedMessage] = useState('');
   const [error, setError] = useState('');
@@ -15,13 +18,19 @@ export default function Profil() {
     setForm(val => ({ ...val, [event.target.name]: event.target.value }));
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
     const next = Object.fromEntries(
       Object.entries(form).map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
     );
     if (!next.nama || !next.email || !next.telepon) {
       setError('Lengkapi semua data profil sebelum menyimpan.');
+      return;
+    }
+    try {
+      await updateProfile({ nama: next.nama, email: next.email, telepon: next.telepon, nip: next.nip, unitKerja: next.unitKerja, jabatan: next.jabatan });
+    } catch (err) {
+      setError(err.message);
       return;
     }
     setError('');

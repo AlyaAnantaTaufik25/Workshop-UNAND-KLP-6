@@ -1,16 +1,10 @@
 import { useRef, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
-import { Award, Bell, Building2, Download, LoaderCircle, SearchX } from 'lucide-react';
+import { Award, Building2, Download, LoaderCircle, SearchX } from 'lucide-react';
 import UnandLogo from '../../components/UnandLogo';
 import { getWorkshopLocation } from './data';
 import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
-
-export function CertificateNotificationsLink() {
-  const { corrections, certificates } = useOutletContext();
-  const count = corrections.filter(item => !item.notificationRead && ['selesai', 'ditolak'].includes(item.status) && certificates.some(certificate => certificate.id === item.certificateId)).length;
-  return <div className="peserta-certificate-notifications-link"><Link to="/peserta/sertifikat/notifikasi"><Bell size={17} />Notifikasi perbaikan ({count})</Link></div>;
-}
 
 export function CertificateHeading({ title, description, children }) {
   return <section className="peserta-certificate-heading"><div><span className="peserta-tag">SERTIFIKAT SAYA</span><h2>{title}</h2><p>{description}</p></div><div className="peserta-certificate-actions">{children}</div></section>;
@@ -33,7 +27,7 @@ export function CertificateDocument({ certificate }) {
     <p>Atas partisipasinya sebagai peserta dalam kegiatan</p><h3>{certificate.workshop.title}</h3><p>{certificate.workshop.date} &middot; {getWorkshopLocation(certificate.workshop)}</p>
     {certificate.additionalInfo && <p>{certificate.additionalInfo}</p>}
     <div className="peserta-certificate-issued">Diterbitkan pada {certificate.issued}<br />{certificate.issuer || 'Universitas Andalas'}</div>
-    <p className="peserta-certificate-demo">Dokumen contoh · Prototipe Workshop UNAND</p>
+    <p className="peserta-certificate-demo">Dokumen resmi · SIM Workshop UNAND</p>
   </div>;
 }
 

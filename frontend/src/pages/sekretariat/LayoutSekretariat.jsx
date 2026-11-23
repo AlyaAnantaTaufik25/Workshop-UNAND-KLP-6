@@ -3,9 +3,12 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   CalendarDays, ClipboardCheck, Award, User, LogOut, Bell
 } from 'lucide-react';
-import { currentUser } from './data';
 import UnandLogo from '../../components/UnandLogo';
 import './sekretariat.css';
+import { usePortalData } from '../../context/PortalData';
+import { useAuth } from '../../context/AuthContext';
+import useNotifications from '../../hooks/useNotifications';
+import { useMobileNav } from '../../components/MobileNav';
 
 const navItems = [
   { to: '/sekretariat/kegiatan',  label: 'Kegiatan', icon: CalendarDays },
@@ -24,6 +27,11 @@ const pageTitles = {
 };
 
 export default function Layout() {
+  // Navigasi sidebar untuk layar kecil
+  const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
+  const { currentUser } = usePortalData();
+  const { logout } = useAuth();
+  const { items: notifications, unread, markRead } = useNotifications();
   const navigate  = useNavigate();
   const location  = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -60,7 +68,8 @@ export default function Layout() {
       'Dashboard');
 
   return (
-    <div className="app-layout role-sekretariat">
+    <div className={`app-layout role-sekretariat${navClass}`}>
+      {navOverlay}
 
       {/* ── SIDEBAR (Selaras dengan Peserta) ── */}
       <aside className="sidebar" aria-label="Navigasi Sekretariat Rektor">
@@ -104,7 +113,7 @@ export default function Layout() {
         {/* Logout */}
         <button
           className="sidebar-logout"
-          onClick={() => navigate('/')}
+          onClick={() => { logout(); navigate('/', { replace: true }); }}
         >
           <LogOut size={20} />
           <span>Keluar</span>
@@ -117,6 +126,7 @@ export default function Layout() {
         {/* Top Header (Selaras dengan Peserta) */}
         <header className="top-header">
           <div className="top-header-left">
+            {navToggle}
             <span className="top-header-crumb">WORKSHOP UNAND</span>
             <h1 className="top-header-title">{pageTitle}</h1>
           </div>
@@ -134,24 +144,28 @@ export default function Layout() {
                 }}
               >
                 <Bell size={20} />
-                {!notifRead && <i className="top-header-notif-dot" />}
+                {unread > 0 && <i className="top-header-notif-dot" />}
               </button>
 
               {notifOpen && (
                 <div className="header-notif-popover">
                   <h2>Notifikasi</h2>
-                  <NavLink
-                    to="/sekretariat/sertifikat-perbaikan"
-                    className="header-notif-item"
-                    onClick={() => setNotifOpen(false)}
-                  >
-                    <Award size={18} />
-                    <div>
-                      <strong>Permohonan Perbaikan Sertifikat</strong>
-                      <p>Nadia Amelia mengajukan revisi judul kegiatan.</p>
-                      <small>17 Mei 2026 · Baru</small>
-                    </div>
-                  </NavLink>
+                  {notifications.length === 0 && <p style={{ padding: '8px 4px', fontSize: 13, color: '#6b7280' }}>Belum ada notifikasi.</p>}
+                  {notifications.map(n => (
+                    <NavLink
+                      key={n.id}
+                      to={n.link || '#'}
+                      className="header-notif-item"
+                      onClick={() => { setNotifOpen(false); if (n.belumDibaca) markRead(n.id); }}
+                    >
+                      <Award size={18} />
+                      <div>
+                        <strong>{n.judul}</strong>
+                        <p>{n.deskripsi}</p>
+                        <small>{n.waktu}</small>
+                      </div>
+                    </NavLink>
+                  ))}
                 </div>
               )}
             </div>

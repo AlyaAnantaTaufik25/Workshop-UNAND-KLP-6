@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { sertifikatData } from '../../data/mockData';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 export default function RiwayatTandaTangan() {
+  const { sertifikatData } = usePortalData();
   const navigate = useNavigate();
   const [search, setSearch]             = useState('');
   const [filterJenis, setFilterJenis]   = useState('');
@@ -19,6 +21,8 @@ export default function RiwayatTandaTangan() {
     const matchStatus = filterStatus ? s.statusTandaTangan === filterStatus : true;
     return matchSearch && matchJenis && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   return (
     <div>
@@ -82,7 +86,7 @@ export default function RiwayatTandaTangan() {
                 </td>
               </tr>
             )}
-            {filtered.map(s => (
+            {pg_filtered.map(s => (
               <tr key={s.id}>
                 <td><span className="table-name-bold">{s.namaKegiatan}</span></td>
                 <td>{s.jenis}</td>
@@ -113,6 +117,7 @@ export default function RiwayatTandaTangan() {
             ))}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

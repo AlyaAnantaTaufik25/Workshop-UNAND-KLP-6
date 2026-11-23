@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Search, Download, ArrowLeft, Users, CheckCircle, Clock } from 'lucide-react';
-import { workshops, presensiData } from '../../data/mockData';
 import { downloadPresensiCSV } from './utils/exportHelper';
+import { usePortalData } from '../../context/PortalData';
+import { usePagination } from '../../components/Pagination';
 
 export default function Presensi() {
+  const { workshops, presensiData } = usePortalData();
   const [search, setSearch]             = useState('');
   const [filterJenis, setFilterJenis]   = useState('');
   const [selectedWorkshopId, setSelectedWorkshopId] = useState(null);
@@ -18,6 +20,8 @@ export default function Presensi() {
     const matchJenis  = filterJenis ? w.jenis === filterJenis : true;
     return matchSearch && matchJenis;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filteredWorkshops, pager: pager_filteredWorkshops } = usePagination(filteredWorkshops, 10);
 
   const selectedWorkshop = workshops.find(w => w.id === selectedWorkshopId);
 
@@ -29,6 +33,8 @@ export default function Presensi() {
     const matchStatus = pesertaStatusFilter ? p.statusKehadiran === pesertaStatusFilter : true;
     return matchSearch && matchStatus;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filteredPeserta, pager: pager_filteredPeserta } = usePagination(filteredPeserta, 10);
 
   const handleDownload = (workshop, pesertaList) => {
     const dataToExport = pesertaList && pesertaList.length > 0 
@@ -200,7 +206,7 @@ export default function Presensi() {
                     </td>
                   </tr>
                 ) : (
-                  filteredPeserta.map(p => (
+                  pg_filteredPeserta.map(p => (
                     <tr key={p.id}>
                       <td><span className="table-name-bold">{p.namaPeserta}</span></td>
                       <td>{selectedWorkshop.nama}</td>
@@ -217,6 +223,7 @@ export default function Presensi() {
                 )}
               </tbody>
             </table>
+          {pager_filteredPeserta}
           </div>
         </div>
       ) : (
@@ -308,7 +315,7 @@ export default function Presensi() {
                     </td>
                   </tr>
                 ) : (
-                  filteredWorkshops.map(w => {
+                  pg_filteredWorkshops.map(w => {
                     const ratio = w.pendaftar > 0 ? Math.round((w.hadir / w.pendaftar) * 100) : 0;
                     return (
                       <tr key={w.id}>
@@ -358,6 +365,7 @@ export default function Presensi() {
                 )}
               </tbody>
             </table>
+          {pager_filteredWorkshops}
           </div>
         </div>
       )}

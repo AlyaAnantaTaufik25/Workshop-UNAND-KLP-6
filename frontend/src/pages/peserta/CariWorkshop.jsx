@@ -45,7 +45,7 @@ export default function CariWorkshop() {
         <div className="peserta-facts">
           <p><CalendarDays size={17} /><span>{workshop.date} &middot; {workshop.time}</span></p>
           <p><MapPin size={17} /><span>{getWorkshopLocation(workshop)}</span></p>
-          <p><Users size={17} /><span>{workshop.remaining > 0 ? `${workshop.remaining} kursi tersisa` : workshop.waitingListEnabled === false ? 'Kuota penuh' : 'Kuota penuh · Waiting list tersedia'}</span></p>
+          <p><Users size={17} /><span>{workshop.capacity == null ? 'Kuota tidak terbatas' : workshop.remaining > 0 ? `${workshop.remaining} kursi tersisa` : workshop.waitingListEnabled === false ? 'Kuota penuh' : 'Kuota penuh · Waiting list tersedia'}</span></p>
           {workshop.mode === 'online' && <p className="peserta-link-timing"><Clock3 size={17} /><span>Link pertemuan tersedia dan dikirim H-1.</span></p>}
         </div>
         <Link className="peserta-button peserta-button--secondary" to={`/peserta/workshop/${workshop.id}`}>Lihat Detail</Link>

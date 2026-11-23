@@ -21,8 +21,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { mitraTandaTangan, currentMitra } from './data';
 import UnandLogo from '../../components/UnandLogo';
+import { usePortalData } from '../../context/PortalData';
+import { certificatesApi } from '../../api';
+import { useEffect as useSyncEffect } from 'react';
+import { usePagination } from '../../components/Pagination';
 
 /* ------------------------------------------------------------------ */
 /* Canvas Tanda Tangan — mendukung Pen & Eraser, expose via ref        */
@@ -153,8 +156,10 @@ const statusConfig = {
 };
 
 export default function TandaTanganMitra() {
+  const { mitraTandaTangan, currentMitra, reload } = usePortalData();
   const navigate = useNavigate();
   const [data, setData] = useState(mitraTandaTangan);
+  useSyncEffect(() => { setData(mitraTandaTangan); }, [mitraTandaTangan]);
   const [search, setSearch] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
   const [filterKegiatan, setFilterKegiatan] = useState('');
@@ -204,6 +209,8 @@ export default function TandaTanganMitra() {
     const matchTanggal  = filterTanggal  ? d.isoTanggal === filterTanggal : true;
     return matchSearch && matchJenis && matchKegiatan && matchStatus && matchTanggal;
   });
+  // Paginasi tabel
+  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
 
   const resetFilter = () => {
     setSearch('');
@@ -219,20 +226,23 @@ export default function TandaTanganMitra() {
   };
 
   // Konfirmasi dan Pembubuhan TTE — dipanggil dari view 'sign'
-  const handleProsesTTE = () => {
-    const validPin = localStorage.getItem('mitra_pin') || '123456';
+  const handleProsesTTE = async () => {
     if (!signPin || signPin.length !== 6) {
       setSignPinError('PIN harus 6 digit');
-      return;
-    }
-    if (signPin !== validPin) {
-      setSignPinError('PIN salah. Silakan coba lagi atau reset/ubah PIN di menu Profil.');
       return;
     }
     if (canvasRef.current?.isEmpty()) {
       setSignPinError('Harap gambar tanda tangan terlebih dahulu');
       return;
     }
+    // PIN diverifikasi server; status lanjut ke Rektor atau langsung terbit
+    try {
+      await certificatesApi.sign(selectedItem.id, signPin, canvasRef.current?.getDataURL());
+    } catch (err) {
+      setSignPinError(err.message);
+      return;
+    }
+    reload();
 
     const waktuSekarang = new Date().toLocaleDateString('id-ID', {
       day: 'numeric',
@@ -1048,7 +1058,7 @@ export default function TandaTanganMitra() {
                 </td>
               </tr>
             ) : (
-              filtered.map((item, idx) => {
+              pg_filtered.map((item, idx) => {
                 const cfg = statusConfig[item.statusTandaTangan] ?? statusConfig['menunggu-ttd'];
                 return (
                   <tr key={item.id}>
@@ -1142,6 +1152,7 @@ export default function TandaTanganMitra() {
             )}
           </tbody>
         </table>
+          {pager_filtered}
       </div>
     </div>
   );

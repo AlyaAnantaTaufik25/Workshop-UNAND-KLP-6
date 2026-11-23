@@ -1,37 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, User } from 'lucide-react';
-import { currentHumas } from './data';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ProfilHumas() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    nama: currentHumas?.name || 'Nadia Amelia',
-    email: currentHumas?.email || 'humas@unand.ac.id',
-    telepon: '0812 6789 4321',
-  });
+  const { user, updateProfile } = useAuth();
+  const fromUser = () => ({ nama: user?.nama || '', email: user?.email || '', telepon: user?.telepon || '' });
+  const [form, setForm] = useState(fromUser);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   const set = (k, v) => {
     setForm(prev => ({ ...prev, [k]: v }));
     setSaved(false);
   };
 
-  const handleSimpan = () => {
-    setSaved(true);
+  const handleSimpan = async () => {
+    try {
+      await updateProfile(form);
+      setError('');
+      setSaved(true);
+    } catch (err) {
+      setError(err.message);
+      setSaved(false);
+    }
   };
 
   const handleBatal = () => {
-    setForm({
-      nama: currentHumas?.name || 'Nadia Amelia',
-      email: currentHumas?.email || 'humas@unand.ac.id',
-      telepon: '0812 6789 4321',
-    });
+    setForm(fromUser());
+    setError('');
     setSaved(false);
   };
 
   return (
     <div className="humas-list-page">
+      {error && <p role="alert" style={{ color: '#b91c1c', background: '#fef2f2', padding: '8px 12px', borderRadius: 8 }}>{error}</p>}
       {/* Heading di luar card */}
       <div style={{ marginBottom: 20 }}>
         <h2 className="humas-section-title">Profil pribadi</h2>
