@@ -1,24 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import {
-  CalendarDays, ClipboardCheck, Award, User, LogOut, Bell
-} from 'lucide-react';
-import UnandLogo from '../../components/UnandLogo';
+import { CalendarDays, ClipboardCheck, Award, Bell, LayoutDashboard } from 'lucide-react';
 import './sekretariat.css';
 import { usePortalData } from '../../context/PortalData';
-import { useAuth } from '../../context/AuthContext';
 import useNotifications from '../../hooks/useNotifications';
 import { useMobileNav } from '../../components/MobileNav';
+import Sidebar from '../../components/Sidebar';
 
-const navItems = [
-  { to: '/sekretariat/kegiatan',  label: 'Kegiatan', icon: CalendarDays },
-  { to: '/sekretariat/presensi',  label: 'Presensi', icon: ClipboardCheck },
-  { to: '/sekretariat/sertifikat',label: 'Sertifikat',icon: Award          },
-  { to: '/sekretariat/profil',    label: 'Profil',   icon: User           },
+const SECTIONS = [
+  { items: [{ to: '/sekretariat/dashboard', label: 'Dashboard', icon: LayoutDashboard }] },
+  { title: 'Kegiatan', items: [
+    { to: '/sekretariat/kegiatan', label: 'Kegiatan', icon: CalendarDays },
+    { to: '/sekretariat/presensi', label: 'Presensi', icon: ClipboardCheck },
+  ] },
+  { title: 'Sertifikat', items: [
+    { to: '/sekretariat/sertifikat', label: 'Sertifikat', icon: Award, match: ['/sekretariat/sertifikat', '/sekretariat/sertifikat-perbaikan', '/sekretariat/dokumen-pengganti'] },
+  ] },
 ];
+
 
 // Maps route path → page title shown in header
 const pageTitles = {
+  '/sekretariat/dashboard':            'Dashboard',
   '/sekretariat/kegiatan':             'Kegiatan',
   '/sekretariat/presensi':             'Presensi',
   '/sekretariat/sertifikat':           'Sertifikat',
@@ -30,12 +33,11 @@ export default function Layout() {
   // Navigasi sidebar untuk layar kecil
   const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
   const { currentUser } = usePortalData();
-  const { logout } = useAuth();
   const { items: notifications, unread, markRead } = useNotifications();
   const navigate  = useNavigate();
   const location  = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifRead, setNotifRead] = useState(false);
+  const [, setNotifRead] = useState(false);
   const notifRef = useRef(null);
 
   useEffect(() => {
@@ -72,53 +74,7 @@ export default function Layout() {
       {navOverlay}
 
       {/* ── SIDEBAR (Selaras dengan Peserta) ── */}
-      <aside className="sidebar" aria-label="Navigasi Sekretariat Rektor">
-        {/* Brand */}
-        <div className="sidebar-brand">
-          <UnandLogo className="sidebar-brandmark" />
-          <div>
-            <strong>Workshop UNAND</strong>
-            <span>Sistem Informasi Workshop</span>
-          </div>
-        </div>
-
-        {/* Role badge */}
-        <div className="sidebar-role-badge">
-          <span>MASUK SEBAGAI</span>
-          <strong>Sekretariat Rektor</strong>
-        </div>
-
-        {/* Navigation */}
-        <nav aria-label="Navigasi Menu">
-          {navItems.map(({ to, label, icon: Icon }) => {
-            const isActive = to === '/sekretariat/sertifikat'
-              ? location.pathname.startsWith('/sekretariat/sertifikat') || 
-                location.pathname.startsWith('/sekretariat/sertifikat-perbaikan') ||
-                location.pathname.startsWith('/sekretariat/dokumen-pengganti')
-              : location.pathname.startsWith(to);
-
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                className={isActive ? 'is-active' : ''}
-              >
-                <Icon size={20} />
-                <span>{label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Logout */}
-        <button
-          className="sidebar-logout"
-          onClick={() => { logout(); navigate('/', { replace: true }); }}
-        >
-          <LogOut size={20} />
-          <span>Keluar</span>
-        </button>
-      </aside>
+      <Sidebar className="sidebar" ariaLabel="Navigasi Sekretariat Rektor" portal="Sekretariat Rektor" sections={SECTIONS} />
 
       {/* ── MAIN CONTENT AREA ── */}
       <div className="main-content">

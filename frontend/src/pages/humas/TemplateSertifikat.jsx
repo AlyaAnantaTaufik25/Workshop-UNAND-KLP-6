@@ -5,6 +5,8 @@ import useApi from '../../hooks/useApi';
 import { certificatesApi, readFileAsDataUrl, workshopsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
+import { dialog } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 const defaultForm = {
   nama: '',
@@ -128,7 +130,7 @@ export default function TemplateSertifikat() {
   };
 
   const handleHapus = async (id) => {
-    if (window.confirm('Hapus template ini?')) await run(() => certificatesApi.deleteTemplate(id));
+    if (await dialog.confirm({ title: 'Hapus template?', message: 'Template sertifikat ini akan dihapus permanen.', confirmText: 'Hapus Template', tone: 'danger' })) await run(() => certificatesApi.deleteTemplate(id));
   };
 
   return (
@@ -161,7 +163,7 @@ export default function TemplateSertifikat() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <select
+          <Select
             className="filter-select"
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
@@ -170,7 +172,7 @@ export default function TemplateSertifikat() {
             <option value="dapat-dipakai">Dapat dikelola</option>
             <option value="dipakai">Dipakai</option>
             <option value="diterbitkan">Diterbitkan</option>
-          </select>
+          </Select>
         </div>
 
         {/* Table */}
@@ -298,7 +300,7 @@ export default function TemplateSertifikat() {
                 <label className="form-label">
                   Kegiatan terkait <span className="form-label-opt">(opsional)</span>
                 </label>
-                <select
+                <Select
                   className="form-input"
                   value={form.kegiatanTerkait}
                   onChange={e => setTambahField('kegiatanTerkait', e.target.value)}
@@ -309,7 +311,7 @@ export default function TemplateSertifikat() {
                       {k}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="form-group">
@@ -419,7 +421,7 @@ export default function TemplateSertifikat() {
                 <label className="form-label">
                   Kegiatan terkait <span className="form-label-opt">(opsional)</span>
                 </label>
-                <select
+                <Select
                   className="form-input"
                   value={editForm.kegiatanTerkait}
                   onChange={e =>
@@ -432,7 +434,7 @@ export default function TemplateSertifikat() {
                       {k}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="form-group">

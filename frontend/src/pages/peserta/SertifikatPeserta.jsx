@@ -4,6 +4,7 @@ import { Award, Eye, FilePenLine, History, Search, SearchX } from 'lucide-react'
 import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
 import { CertificateDownloadButton, CertificateEmpty, CertificateHeading, CorrectionStatus, useCertificateDownload } from './CertificateUi';
+import Select from '../../components/Select';
 
 export default function SertifikatPeserta() {
   const { certificates, corrections } = useOutletContext();
@@ -23,8 +24,8 @@ export default function SertifikatPeserta() {
     </CertificateHeading>
     <section className="peserta-filterbar peserta-certificate-filters" aria-label="Filter sertifikat">
       <label className="peserta-searchbox"><Search size={18} /><input type="search" aria-label="Cari sertifikat" placeholder="Cari kegiatan, nomor, atau penerbit..." value={query} onChange={event => setQuery(event.target.value)} /></label>
-      <select aria-label="Penerbit sertifikat" value={issuer} onChange={event => setIssuer(event.target.value)}><option value="">Semua penerbit</option><option value="unand">UNAND</option><option value="mitra">Mitra</option></select>
-      <select aria-label="Status perbaikan sertifikat" value={status} onChange={event => setStatus(event.target.value)}><option value="">Semua perbaikan</option><option value="none">Belum ada pengajuan</option>{Object.entries(correctionStatuses).map(([key, config]) => <option value={key} key={key}>{config.label}</option>)}</select>
+      <Select aria-label="Penerbit sertifikat" value={issuer} onChange={event => setIssuer(event.target.value)}><option value="">Semua penerbit</option><option value="unand">UNAND</option><option value="mitra">Mitra</option></Select>
+      <Select aria-label="Status perbaikan sertifikat" value={status} onChange={event => setStatus(event.target.value)}><option value="">Semua perbaikan</option><option value="none">Belum ada pengajuan</option>{Object.entries(correctionStatuses).map(([key, config]) => <option value={key} key={key}>{config.label}</option>)}</Select>
     </section>
     <div className="peserta-section-line"><h2>Daftar sertifikat <span className="peserta-count" aria-live="polite">{filtered.length}</span></h2></div>
     {download.error && <p className="peserta-inline-error" role="alert">{download.error}</p>}

@@ -4,6 +4,9 @@ import useApi from '../../hooks/useApi';
 import { certificatesApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination } from '../../components/Pagination';
+import { dialog } from '../../components/Dialog';
+import Select from '../../components/Select';
+import BackButton from '../../components/BackButton';
 
 const statusConfig = {
   menunggu: { label: 'Menunggu Pemeriksaan', className: 'humas-badge humas-badge-draft' },
@@ -80,7 +83,7 @@ export default function PerbaikanSertifikat() {
   };
 
   const handleTolak = async () => {
-    const note = window.prompt('Alasan penolakan perbaikan:');
+    const note = await dialog.prompt({ title: 'Tolak pengajuan perbaikan?', message: 'Alasan ini dikirim ke peserta sebagai tanggapan penerbit.', label: 'Alasan penolakan', placeholder: 'Contoh: Dokumen pendukung belum sesuai dengan data peserta.', confirmText: 'Tolak Pengajuan', tone: 'danger' });
     if (!note || !note.trim()) return;
     if (await process('tolak', { note: note.trim() })) setMode('list');
   };
@@ -245,21 +248,7 @@ export default function PerbaikanSertifikat() {
       {/* ────────────────────────────────────────────────────────── */}
       {mode === 'list' && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-          </div>
-
           <div>
-            <p
-              style={{
-                fontSize: '11px',
-                fontWeight: '700',
-                color: '#166534',
-                letterSpacing: '0.05em',
-                marginBottom: '4px',
-              }}
-            >
-              KOREKSI OLEH PENERBIT
-            </p>
             <h2 className="humas-section-title">Perbaikan Sertifikat</h2>
             <p className="humas-section-sub">
               Periksa pengajuan dan lanjutkan dokumen pengganti sesuai alur penerbitan.
@@ -279,7 +268,7 @@ export default function PerbaikanSertifikat() {
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
-            <select
+            <Select
               className="filter-select"
               value={filterStatus}
               onChange={e => setFilterStatus(e.target.value)}
@@ -289,7 +278,7 @@ export default function PerbaikanSertifikat() {
               <option value="menunggu">Menunggu Pemeriksaan</option>
               <option value="selesai">Selesai</option>
               <option value="ditolak">Ditolak</option>
-            </select>
+            </Select>
           </div>
 
           {/* Data Table */}
@@ -368,38 +357,12 @@ export default function PerbaikanSertifikat() {
             }}
           >
             <div>
-              <p
-                style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#166534',
-                  letterSpacing: '0.05em',
-                  marginBottom: '4px',
-                }}
-              >
-                KOREKSI OLEH PENERBIT
-              </p>
               <h2 className="humas-section-title">Detail Pengajuan Perbaikan</h2>
               <p className="humas-section-sub">
                 Periksa pengajuan dan lanjutkan dokumen pengganti sesuai alur penerbitan.
               </p>
             </div>
-            <button
-              type="button"
-              style={{
-                background: '#ffffff',
-                border: '1px solid #d1d5db',
-                color: '#374151',
-                padding: '8px 18px',
-                borderRadius: '6px',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-              }}
-              onClick={() => setMode('list')}
-            >
-              Kembali ke Daftar
-            </button>
+            <BackButton onClick={() => setMode('list')} label="Kembali ke Daftar" />
           </div>
 
 
@@ -602,38 +565,12 @@ export default function PerbaikanSertifikat() {
             }}
           >
             <div>
-              <p
-                style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  color: '#166534',
-                  letterSpacing: '0.05em',
-                  marginBottom: '4px',
-                }}
-              >
-                KOREKSI OLEH PENERBIT
-              </p>
               <h2 className="humas-section-title">Koreksi Sertifikat</h2>
               <p className="humas-section-sub">
                 Periksa pengajuan dan lanjutkan dokumen pengganti sesuai alur penerbitan.
               </p>
             </div>
-            <button
-              type="button"
-              style={{
-                background: '#ffffff',
-                border: '1px solid #d1d5db',
-                color: '#374151',
-                padding: '8px 18px',
-                borderRadius: '6px',
-                fontSize: '13px',
-                fontWeight: '600',
-                cursor: 'pointer',
-              }}
-              onClick={() => setMode('list')}
-            >
-              Kembali ke Daftar
-            </button>
+            <BackButton onClick={() => setMode('list')} label="Kembali ke Daftar" />
           </div>
 
 

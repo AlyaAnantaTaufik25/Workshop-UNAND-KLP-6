@@ -7,6 +7,7 @@ const { asyncHandler } = require('../../utils/http.util');
 
 router.use(authenticate, authorizeRoles('humas', 'rektor', 'sekretariat', 'mitra'));
 
+router.get('/dashboard', asyncHandler(c.dashboard));
 router.get('/summary', asyncHandler(c.summary));
 router.get('/workshops', asyncHandler(c.workshops));
 router.get('/daily', asyncHandler(c.daily));

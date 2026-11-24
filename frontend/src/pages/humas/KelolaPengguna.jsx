@@ -4,6 +4,8 @@ import useCrud from '../../hooks/useCrud';
 import { usersApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
+import Select from '../../components/Select';
+import BackButton from '../../components/BackButton';
 
 const roleOptions = ['Peserta', 'Humas', 'Sekretariat Rektor', 'Mitra', 'Rektor'];
 const defaultForm = { nama: '', email: '', role: 'Peserta', status: 'Aktif' };
@@ -99,10 +101,10 @@ export default function KelolaPengguna() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <select className="filter-select" value={filterRole} onChange={e => setFilterRole(e.target.value)}>
+          <Select className="filter-select" value={filterRole} onChange={e => setFilterRole(e.target.value)}>
             <option value="">Semua role</option>
             {roleOptions.map(r => <option key={r}>{r}</option>)}
-          </select>
+          </Select>
         </div>
 
         {/* Table */}
@@ -195,13 +197,7 @@ export default function KelolaPengguna() {
             </div>
 
             <div className="modal-footer" style={{ justifyContent: 'flex-end', gap: 10 }}>
-              <button
-                type="button"
-                className="modal-btn modal-btn-batal"
-                onClick={() => setDetailPengguna(null)}
-              >
-                Kembali ke Daftar
-              </button>
+              <BackButton onClick={() => setDetailPengguna(null)} label="Kembali ke Daftar" />
               <button
                 type="button"
                 className="modal-btn modal-btn-publish"
@@ -255,25 +251,25 @@ export default function KelolaPengguna() {
               <div className="modal-grid-2">
                 <div className="form-group">
                   <label className="form-label">Role <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.role}
                     onChange={e => set('role', e.target.value)}
                   >
                     <option value="">Pilih role</option>
                     {roleOptions.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
+                  </Select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">Status akun <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.status}
                     onChange={e => set('status', e.target.value)}
                   >
                     <option value="Aktif">Aktif</option>
                     <option value="Nonaktif">Nonaktif</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -337,24 +333,24 @@ export default function KelolaPengguna() {
               <div className="modal-grid-2">
                 <div className="form-group">
                   <label className="form-label">Role <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.role}
                     onChange={e => set('role', e.target.value)}
                   >
                     {roleOptions.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
+                  </Select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">Status akun <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.status}
                     onChange={e => set('status', e.target.value)}
                   >
                     <option value="Aktif">Aktif</option>
                     <option value="Nonaktif">Nonaktif</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
             </div>

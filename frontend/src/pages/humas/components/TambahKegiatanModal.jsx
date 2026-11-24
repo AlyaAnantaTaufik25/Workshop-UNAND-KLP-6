@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Calendar, Clock } from 'lucide-react';
 import useApi from '../../../hooks/useApi';
 import { locationsApi, partnersApi, readFileAsDataUrl } from '../../../api';
+import Select from '../../../components/Select';
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum', 'Pelatihan', 'Konferensi'];
 const jenisPelaksanaanOptions = ['Offline', 'Online'];
@@ -172,13 +173,13 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
               </div>
               <div className="form-group">
                 <label className="form-label">Jenis kegiatan <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.jenis}
                   onChange={e => set('jenis', e.target.value)}
                 >
                   {jenisOptions.map(j => <option key={j} value={j}>{j}</option>)}
-                </select>
+                </Select>
               </div>
             </div>
 
@@ -186,13 +187,13 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
             <div className="modal-grid-2">
               <div className="form-group">
                 <label className="form-label">Jenis Pelaksanaan <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.jenisPelaksanaan}
                   onChange={e => set('jenisPelaksanaan', e.target.value)}
                 >
                   {jenisPelaksanaanOptions.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+                </Select>
               </div>
               <div className="form-group">
                 <label className="form-label">Deskripsi kegiatan <span className="req">*</span></label>
@@ -250,13 +251,13 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
             <div className="modal-grid-2">
               <div className="form-group">
                 <label className="form-label">Penyelenggara / Mitra <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.penyelenggara}
                   onChange={e => set('penyelenggara', e.target.value)}
                 >
                   {mitraOptions.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
+                </Select>
               </div>
               <div className="form-group">
                 <label className="form-label">Poster kegiatan <span className="form-label-opt">(opsional)</span></label>
@@ -341,25 +342,25 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
             <div className="modal-grid-2">
               <div className="form-group">
                 <label className="form-label">Gedung <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.gedung}
                   onChange={e => handleGedungChange(e.target.value)}
                 >
                   <option value="">Pilih gedung</option>
                   {gedungOptions.map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
+                </Select>
               </div>
               <div className="form-group">
                 <label className="form-label">Ruangan <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.ruangan}
                   onChange={e => set('ruangan', e.target.value)}
                 >
                   <option value="">Pilih ruangan</option>
                   {(ruanganMap[form.gedung] ?? []).map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
+                </Select>
               </div>
             </div>
 
@@ -408,14 +409,14 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
             <div className="modal-grid-2">
               <div className="form-group">
                 <label className="form-label">Ketentuan kuota <span className="req">*</span></label>
-                <select
+                <Select
                   className="form-input form-select"
                   value={form.kuotaJenis}
                   onChange={e => set('kuotaJenis', e.target.value)}
                 >
                   <option value="Terbatas">Terbatas</option>
                   <option value="Tanpa Batas">Tanpa Batas</option>
-                </select>
+                </Select>
               </div>
               {form.kuotaJenis === 'Terbatas' && (
                 <div className="form-group">

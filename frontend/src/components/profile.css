@@ -1,0 +1,235 @@
+/* ============================================================
+   PROFIL — tampilan seragam untuk semua role
+   ============================================================ */
+.pf-page { display: grid; gap: 18px; max-width: 1180px; }
+
+/* ── Kepala profil ── */
+.pf-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e3e9e5;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 42, 24, 0.04);
+}
+.pf-hero-band {
+  height: 92px;
+  background:
+    radial-gradient(circle at 85% -40%, rgba(255, 255, 255, 0.18) 0 120px, transparent 121px),
+    radial-gradient(circle at 70% 160%, rgba(255, 255, 255, 0.1) 0 90px, transparent 91px),
+    linear-gradient(120deg, #0f3d21 0%, #14532d 45%, #1f7a43 100%);
+}
+.pf-hero-body { display: flex; align-items: flex-end; gap: 18px; padding: 0 24px 20px; margin-top: -40px; flex-wrap: wrap; }
+.pf-avatar {
+  flex-shrink: 0; width: 88px; height: 88px; display: grid; place-items: center;
+  border-radius: 50%; border: 4px solid #ffffff;
+  background: linear-gradient(135deg, #e7f5ec, #cfe9d8);
+  color: #14532d; font-size: 30px; font-weight: 800; letter-spacing: 0.02em;
+  box-shadow: 0 6px 18px -8px rgba(15, 42, 24, 0.45);
+}
+.pf-hero-text { flex: 1; min-width: 240px; padding-bottom: 2px; }
+.pf-hero-name { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-hero-name h2 { margin: 0; font-size: 22px; font-weight: 800 !important; color: #14271c; letter-spacing: -0.015em; }
+.pf-role {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px;
+  background: #e7f5ec; color: #166534; font-size: 12px; font-weight: 700;
+}
+.pf-hero-sub { margin: 4px 0 0; font-size: 13.5px; color: #4b5852; }
+.pf-hero-meta { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.pf-hero-meta li { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: #4b5852; min-width: 0; overflow-wrap: anywhere; }
+.pf-hero-meta svg { flex-shrink: 0; color: #228b45; }
+
+.pf-intro { margin: 0; font-size: 13px; color: #66736c; }
+
+/* ── Tata letak 2 kolom ── */
+.pf-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr); gap: 18px; align-items: start; }
+.pf-col { display: grid; gap: 18px; min-width: 0; }
+@media (max-width: 1050px) { .pf-layout { grid-template-columns: 1fr; } }
+
+/* ── Kartu ── */
+.pf-card {
+  padding: 20px 22px;
+  border: 1px solid #e3e9e5;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 42, 24, 0.04);
+}
+.pf-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; }
+.pf-card-head h3 { margin: 0; font-size: 15px; font-weight: 700 !important; color: #14271c; }
+.pf-card-head p { margin: 3px 0 0; font-size: 12.5px; color: #66736c; line-height: 1.45; }
+.pf-card-icon {
+  flex-shrink: 0; width: 36px; height: 36px; display: grid; place-items: center;
+  border-radius: 10px; background: #edf7ef; color: #14532d;
+}
+.pf-card-icon--gold { background: #fff6e5; color: #b45309; }
+
+/* ── Field ── */
+.pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+.pf-grid--single { grid-template-columns: 1fr; gap: 12px; }
+@media (max-width: 640px) { .pf-grid { grid-template-columns: 1fr; } }
+.pf-field { display: grid; gap: 6px; min-width: 0; }
+.pf-field--full { grid-column: 1 / -1; }
+.pf-label { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: #2f3d35; }
+.pf-label i { font-style: normal; color: #dc2626; }
+.pf-label svg { color: #8a958f; }
+.pf-field input,
+.pf-field textarea,
+.pf-field select {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d5ddd8;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 13.5px;
+  color: #1f2a24;
+  outline: none;
+}
+.pf-field select { padding-right: 34px; }
+.pf-field textarea { height: auto; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.pf-field input:focus,
+.pf-field textarea:focus,
+.pf-field select:focus { border-color: #228b45; box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.14); }
+.pf-field.is-readonly input,
+.pf-field.is-readonly textarea { background: #f5f8f6; border-color: #e3e9e5; color: #5a6761; cursor: default; }
+.pf-field.is-readonly input:focus { box-shadow: none; border-color: #e3e9e5; }
+.pf-hint { font-size: 11.5px; color: #8a958f; }
+.pf-error { font-size: 11.5px; color: #b91c1c; font-weight: 600; }
+
+.pf-secret { position: relative; display: block; }
+.pf-secret input { padding-right: 42px; letter-spacing: 0.04em; }
+.pf-secret button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 7px;
+  background: transparent; color: #66736c; cursor: pointer;
+}
+.pf-secret button:hover { background: #f1f5f3; color: #14271c; }
+
+.pf-alert { margin: 14px 0 0; padding: 9px 12px; border-radius: 9px; background: #fef2f2; color: #b91c1c; font-size: 12.5px; font-weight: 600; }
+
+/* ── Tombol & aksi ── */
+.pf-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+.pf-actions--split { justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 40px; padding: 0 16px; border-radius: 10px;
+  font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+}
+.pf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pf-btn--primary { border: 1px solid #14532d; background: #14532d; color: #ffffff; }
+.pf-btn--primary:not(:disabled):hover { background: #0f3d21; }
+.pf-btn--ghost { border: 1px solid #d5ddd8; background: #ffffff; color: #1f2a24; }
+.pf-btn--ghost:not(:disabled):hover { background: #f4f7f5; }
+.pf-link {
+  display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: none;
+  font: inherit; font-size: 12.5px; font-weight: 600; color: #b45309; cursor: pointer;
+}
+.pf-link:hover { text-decoration: underline; }
+.pf-spin { animation: pf-spin 0.8s linear infinite; }
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+/* Bar simpan: menempel di bawah saat ada perubahan */
+.pf-savebar {
+  position: sticky; bottom: 16px; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 12px 14px 12px 18px; border: 1px solid #e3e9e5; border-radius: 14px; background: #ffffff;
+  font-size: 13px; color: #66736c;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pf-savebar > div { display: flex; gap: 10px; }
+.pf-savebar.is-dirty { border-color: #b9cec0; box-shadow: 0 14px 30px -16px rgba(15, 42, 24, 0.4); color: #14532d; font-weight: 600; }
+@media (max-width: 520px) {
+  .pf-savebar > div { width: 100%; }
+  .pf-savebar .pf-btn { flex: 1; }
+}
+
+/* ── Detail akun ── */
+.pf-details { margin: 0; display: grid; gap: 0; }
+.pf-details > div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #f0f3f1; font-size: 13px; }
+.pf-details > div:first-child { border-top: 0; padding-top: 0; }
+.pf-details dt { display: inline-flex; align-items: center; gap: 5px; color: #66736c; }
+.pf-details dd { margin: 0; font-weight: 600; color: #1f2a24; text-align: right; }
+.pf-status { display: inline-flex; align-items: center; gap: 6px; color: #166534; }
+.pf-status i { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 3px #dcfce7; }
+
+@media (max-width: 640px) {
+  .pf-hero-body { padding: 0 16px 16px; }
+  .pf-avatar { width: 72px; height: 72px; font-size: 24px; }
+  .pf-card { padding: 16px; }
+}
+
+/* ── Perbaikan: hanya avatar yang menumpuk ke pita, teks tetap di area putih ── */
+.pf-hero-body { margin-top: 0; align-items: flex-start; padding-top: 0; }
+.pf-avatar { margin-top: -44px; }
+.pf-hero-text { padding-top: 14px; }
+
+/* Ukuran huruf tombol konsisten (portal peserta/mitra menimpa font tombol) */
+.pf-page .pf-btn { font-size: 13.5px; font-weight: 600; line-height: 1; white-space: nowrap; }
+.pf-page .pf-link { font-size: 12.5px; }
+.pf-page .pf-secret button { font-size: 0; }
+
+/* Bar simpan hanya melayang saat ada perubahan */
+.pf-savebar { position: static; }
+.pf-savebar.is-dirty { position: sticky; }
+@media (max-width: 640px) {
+  .pf-hero-body { flex-direction: column; gap: 6px; }
+  .pf-hero-text { padding-top: 0; min-width: 0; }
+  /* Di HP bar simpan baru muncul setelah ada perubahan */
+  .pf-savebar:not(.is-dirty) { display: none; }
+  .pf-savebar { padding: 12px; }
+  .pf-savebar > span { width: 100%; }
+}
+
+/* ============================================================
+   PENYERAGAMAN dengan bahasa desain aplikasi
+   (judul halaman, kartu putih, input & tombol 42px / sudut 8px,
+    badge pil, ikon kartu 36px — sama seperti dashboard & tabel)
+   ============================================================ */
+
+/* Judul halaman: sama dengan "Kelola Kegiatan", "Laporan", dll. */
+.pf-header h2 { margin: 0; font-size: 18px; font-weight: 700 !important; color: #14271c; letter-spacing: -0.01em; }
+.pf-header p { margin: 4px 0 0; font-size: 13px; color: #66736c; }
+
+/* Kartu ringkasan menggantikan pita hijau dekoratif */
+.pf-summary { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.pf-summary .pf-avatar {
+  width: 64px; height: 64px; margin: 0; border: 0; box-shadow: none;
+  background: #edf7ef; color: #14532d; font-size: 22px;
+}
+.pf-summary-main { flex: 1; min-width: 240px; }
+.pf-hero-name h3 { margin: 0; font-size: 18px; font-weight: 700 !important; color: #14271c; }
+.pf-role { padding: 3px 9px; font-size: 11.5px; font-weight: 600; }
+.pf-hero-sub { margin-top: 3px; font-size: 13px; color: #66736c; }
+.pf-hero-meta { margin-top: 8px; }
+.pf-summary-stats {
+  margin: 0; display: grid; grid-auto-flow: column; gap: 0;
+  border-left: 1px solid #eef2ef; padding-left: 18px;
+}
+.pf-summary-stats > div { display: grid; gap: 3px; padding: 0 16px; border-left: 1px solid #eef2ef; }
+.pf-summary-stats > div:first-child { border-left: 0; padding-left: 0; }
+.pf-summary-stats dt { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #66736c; }
+.pf-summary-stats dd { margin: 0; font-size: 13.5px; font-weight: 700; color: #14271c; white-space: nowrap; }
+@media (max-width: 1050px) {
+  .pf-summary-stats { width: 100%; border-left: 0; padding-left: 0; padding-top: 14px; border-top: 1px solid #eef2ef; grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .pf-summary-stats { grid-template-columns: 1fr; gap: 10px; }
+  .pf-summary-stats > div { border-left: 0; padding: 0; display: flex; justify-content: space-between; }
+}
+
+/* Input & tombol mengikuti komponen form aplikasi */
+.pf-field input,
+.pf-field select { height: 42px; border-radius: 8px; }
+.pf-field textarea { border-radius: 8px; }
+.pf-page .pf-btn { height: 42px; padding: 0 18px; border-radius: 8px; }
+.pf-secret button { border-radius: 6px; }
+
+/* Kartu & ikon kartu seperti dashboard */
+.pf-card { border-radius: 14px; padding: 20px; }
+.pf-card-head { margin-bottom: 16px; }
+.pf-card-icon { width: 36px; height: 36px; border-radius: 10px; }
+
+/* Bar simpan memakai gaya kartu yang sama */
+.pf-savebar { border-radius: 14px; }

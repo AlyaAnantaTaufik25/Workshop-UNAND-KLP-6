@@ -10,6 +10,8 @@ class ReportsController {
     this.service = reportsService;
   }
 
+  dashboard = async (req, res) => successResponse(res, 'Data dashboard', await this.service.dashboard(req.user));
+
   summary = async (req, res) => successResponse(res, 'Ringkasan statistik', await this.service.summary(req.user));
 
   workshops = async (req, res) => successResponse(res, 'Laporan per kegiatan', await this.service.workshops(req.user));

@@ -4,6 +4,7 @@ import { CalendarDays, Clock3, MapPin, Search, SearchX, Users } from 'lucide-rea
 import { getWorkshopLocation } from './data';
 import { EmptyState, Status } from './components';
 import { getRegistrationState, registrationStates } from './workshopStates';
+import Select from '../../components/Select';
 
 export default function CariWorkshop() {
   const { workshops, registrations } = useOutletContext();
@@ -73,24 +74,24 @@ export default function CariWorkshop() {
             onChange={event => setSearch(event.target.value)}
           />
         </label>
-        <select aria-label="Tema workshop" value={theme} onChange={event => setTheme(event.target.value)}>
+        <Select aria-label="Tema workshop" value={theme} onChange={event => setTheme(event.target.value)}>
           <option value="">Semua tema</option>
           {[...new Set(available.map(workshop => workshop.theme))].map(value => <option key={value}>{value}</option>)}
-        </select>
-        <select aria-label="Kategori mode pelaksanaan" value={mode} onChange={event => setMode(event.target.value)}>
+        </Select>
+        <Select aria-label="Kategori mode pelaksanaan" value={mode} onChange={event => setMode(event.target.value)}>
           <option value="">Semua mode</option>
           <option value="offline">Offline (Tatap Muka)</option>
           <option value="online">Online (Daring)</option>
-        </select>
-        <select aria-label="Tanggal workshop" value={date} onChange={event => setDate(event.target.value)}>
+        </Select>
+        <Select aria-label="Tanggal workshop" value={date} onChange={event => setDate(event.target.value)}>
           <option value="">Semua tanggal</option>
           <option value="week">Minggu ini</option>
           <option value="month">Bulan ini</option>
-        </select>
-        <select aria-label="Status pendaftaran" value={status} onChange={event => setStatus(event.target.value)}>
+        </Select>
+        <Select aria-label="Status pendaftaran" value={status} onChange={event => setStatus(event.target.value)}>
           <option value="">Semua status</option>
           {Object.entries(registrationStates).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}
-        </select>
+        </Select>
       </section>
 
       <div className="peserta-section-line">

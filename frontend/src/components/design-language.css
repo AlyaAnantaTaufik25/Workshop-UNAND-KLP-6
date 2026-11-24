@@ -1,0 +1,403 @@
+/* ══════════════════════════════════════════════════════════════
+   Bahasa desain bersama untuk SEMUA portal
+   (Peserta, Humas, Sekretariat, Rektor, Mitra)
+
+   File ini dimuat paling akhir. Ia menyamakan elemen yang di tiap portal
+   punya nama kelas berbeda: kepala halaman, tombol kembali, kartu statistik,
+   lencana status, tombol aksi di tabel, dan panel informasi.
+══════════════════════════════════════════════════════════════ */
+:root {
+  --ui-ink: #10291b;
+  --ui-text: #33433a;
+  --ui-muted: #66736c;
+  --ui-line: #e3eae5;
+  --ui-line-strong: #cfdcd4;
+  --ui-surface: #ffffff;
+  --ui-soft: #f4f8f5;
+  --ui-brand: #14532d;
+  --ui-brand-hover: #0f3d24;
+  --ui-accent: #1a7f45;
+  --ui-brand-soft: #e7f3ec;
+  --ui-radius: 14px;
+  --ui-radius-sm: 10px;
+  --ui-shadow: 0 1px 2px rgba(16, 41, 27, .04);
+
+  /* Nada semantik lencana */
+  --ui-good-fg: #17663a;  --ui-good-bg: #e6f4ec;
+  --ui-warn-fg: #8a5300;  --ui-warn-bg: #fff4dc;
+  --ui-info-fg: #1f5f8b;  --ui-info-bg: #e8f2fa;
+  --ui-bad-fg: #a8322d;   --ui-bad-bg: #fdecea;
+  --ui-mute-fg: #5d6a63;  --ui-mute-bg: #eef1ef;
+}
+
+/* ── 1. Kepala halaman ─────────────────────────────────────── */
+.ui-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.ui-page-head-text { min-width: 0; flex: 1 1 320px; }
+.ui-page-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+:root .ui-page-head h2,
+:root .humas-section-title,
+:root .mitra-intro h2,
+:root .section-heading,
+:root .peserta-intro h2,
+:root .peserta-certificate-heading h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  color: var(--ui-ink);
+}
+:root .ui-page-head p,
+:root .humas-section-sub,
+:root .mitra-intro p,
+:root .section-subheading,
+:root .peserta-intro p,
+:root .peserta-certificate-heading p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ui-muted);
+}
+/* Label kecil di atas judul tidak dipakai lagi */
+.peserta-certificate-heading .peserta-tag,
+.ui-eyebrow { display: none !important; }
+
+/* Baris judul + aksi milik portal lama: ratakan bawah seperti .ui-page-head */
+:root .humas-list-header,
+:root .mitra-list-header { align-items: flex-end; margin-bottom: 20px; }
+
+/* ── 2. Tombol ─────────────────────────────────────────────── */
+.ui-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 38px; padding: 0 16px;
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--ui-line-strong);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  font: inherit; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.ui-btn:hover { background: var(--ui-soft); border-color: #a9c6b3; }
+.ui-btn--primary { background: var(--ui-brand); border-color: var(--ui-brand); color: #fff; }
+.ui-btn--primary:hover { background: var(--ui-brand-hover); border-color: var(--ui-brand-hover); }
+.ui-btn--warning { background: var(--ui-warn-bg); border-color: #f3d48e; color: var(--ui-warn-fg); }
+.ui-btn--warning:hover { background: #ffeab8; border-color: #e9c066; }
+.ui-btn .ui-btn-count {
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+  display: inline-grid; place-items: center;
+  background: rgba(255, 255, 255, .75); font-size: 11.5px; font-weight: 700;
+}
+
+/* ── 3. Tombol kembali ─────────────────────────────────────── */
+.ui-back,
+button.mitra-back-btn,
+a.mitra-back-btn,
+.peserta-back-link,
+.humas-detail-back-link,
+.dk-back-link,
+.dp-btn-kembali-box {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-height: 36px;
+  padding: 0 14px 0 12px !important;
+  margin: 0 0 16px;
+  border: 1px solid var(--ui-line-strong) !important;
+  border-radius: var(--ui-radius-sm) !important;
+  background: var(--ui-surface) !important;
+  box-shadow: var(--ui-shadow);
+  color: var(--ui-ink) !important;
+  font: inherit;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background-color .15s ease;
+}
+.ui-back:hover,
+.mitra-back-btn:hover,
+.peserta-back-link:hover,
+.humas-detail-back-link:hover,
+.dk-back-link:hover,
+.dp-btn-kembali-box:hover {
+  border-color: #9fc4ad !important;
+  color: var(--ui-brand) !important;
+  background: var(--ui-soft) !important;
+}
+.ui-back svg,
+.mitra-back-btn svg,
+.peserta-back-link svg,
+.humas-detail-back-link svg { flex: none; }
+
+/* ── 4. Kartu statistik ────────────────────────────────────── */
+/* Acuan: .dash-stat (kartu di Dashboard). Kartu lain disamakan. */
+.mitra-stats-grid,
+.laporan-summary-row,
+.peserta-stat-grid,
+.kelola-absensi-stats-grid { gap: 14px !important; }
+
+.mitra-stat-box,
+.laporan-summary-card,
+.peserta-stat,
+.kelola-absensi-stat-card,
+.rekap-stat-card {
+  border: 1px solid var(--ui-line) !important;
+  border-radius: var(--ui-radius) !important;
+  background: var(--ui-surface) !important;
+  box-shadow: var(--ui-shadow) !important;
+  padding: 16px 18px !important;
+}
+/* Kartu mitra: ikon di kiri seperti kartu dashboard */
+.mitra-stat-box {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'icon title' 'icon value';
+  column-gap: 14px;
+  align-items: center;
+  outline-offset: -1px;
+}
+.mitra-stat-box .mitra-stat-top { display: contents; }
+.mitra-stat-box .mitra-stat-icon {
+  grid-area: icon;
+  width: 40px !important; height: 40px !important;
+  border-radius: 11px !important;
+  background: var(--ui-brand-soft) !important;
+  color: var(--ui-accent) !important;
+  display: grid; place-items: center;
+}
+:root .mitra-stat-box .mitra-stat-title { grid-area: title; align-self: end; }
+:root .mitra-stat-box .mitra-stat-val { grid-area: value; align-self: start; }
+
+.mitra-stat-title,
+.laporan-summary-label,
+.peserta-stat span,
+.kelola-absensi-stat-label,
+.rekap-stat-label {
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--ui-muted) !important;
+}
+.mitra-stat-val,
+.laporan-summary-value,
+.peserta-stat strong,
+.kelola-absensi-stat-num,
+.rekap-stat-value {
+  margin: 2px 0 0 !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  color: #14271c !important;
+  font-variant-numeric: tabular-nums;
+}
+/* Kartu yang bisa diklik sebagai filter */
+.peserta-stat:hover,
+.mitra-stat-box[title]:hover { border-color: #b9cec0 !important; }
+.peserta-stat.is-selected { border-color: var(--ui-accent) !important; background: #f5faf7 !important; box-shadow: inset 0 0 0 1px var(--ui-accent) !important; }
+
+/* ── 5. Lencana status ─────────────────────────────────────── */
+/* Bentuk seragam: pil lembut, teks 12px tebal */
+.badge,
+.humas-badge,
+.mitra-badge,
+.mitra-badge-status,
+.mitra-mode-badge,
+.mitra-jenis-badge,
+.humas-jenis-badge,
+.humas-pelaksanaan-badge,
+.badge-absensi-dibuka,
+.badge-absensi-ditutup,
+.peserta-status,
+.badge-sumber-outline,
+.detail-source-tag,
+.mode-badge,
+.status-pill,
+.ui-badge {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 3px 10px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap;
+}
+/* Lencana kategori (jenis/sumber/mode): abu-abu netral, bukan blok gelap */
+.mitra-jenis-badge,
+.humas-jenis-badge,
+.humas-pelaksanaan-badge,
+.mitra-mode-badge,
+.badge-sumber-outline,
+.detail-source-tag {
+  background: var(--ui-mute-bg) !important;
+  color: var(--ui-mute-fg) !important;
+}
+
+/* ── 6. Aksi baris tabel ───────────────────────────────────── */
+/* Tautan teks "Lihat Detail →" & tombol kecil disamakan menjadi tombol garis */
+.table-action-link,
+.mitra-action-link,
+.btn-lihat-dokumen-figma,
+.btn-table-action,
+.ui-row-action {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px !important;
+  border: 1px solid var(--ui-line-strong) !important;
+  border-radius: 8px !important;
+  background: var(--ui-surface) !important;
+  color: var(--ui-ink) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.table-action-link:hover,
+.mitra-action-link:hover,
+.btn-lihat-dokumen-figma:hover,
+.btn-table-action:hover,
+.ui-row-action:hover {
+  border-color: #9fc4ad !important;
+  background: var(--ui-soft) !important;
+  color: var(--ui-brand) !important;
+}
+
+/* ── 7. Kartu & panel ──────────────────────────────────────── */
+.ui-card {
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow);
+}
+
+@media (max-width: 640px) {
+  .ui-page-head { align-items: stretch; }
+  .ui-page-actions { width: 100%; }
+  .ui-page-actions > * { flex: 1 1 auto; }
+  .ui-page-head h2,
+  .humas-section-title,
+  .mitra-intro h2,
+  .section-heading,
+  .peserta-intro h2,
+  .peserta-certificate-heading h2 { font-size: 19px; }
+}
+
+/* Tautan teks di dalam kalimat */
+.ui-link {
+  padding: 0; border: 0; background: none;
+  font: inherit; font-weight: 600; color: var(--ui-accent);
+  text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+}
+.ui-link:hover { color: var(--ui-brand); }
+
+/* ── 8. Lencana sumber (UNAND / Mitra) ─────────────────────── */
+:root .source-tag {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 999px; border: 0;
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+:root .source-tag.source-unand { background: var(--ui-good-bg); color: var(--ui-good-fg); }
+:root .source-tag.source-mitra { background: var(--ui-info-bg); color: var(--ui-info-fg); }
+
+/* ── 9. Bilah atas (judul halaman di header) ───────────────── */
+:root .top-header-crumb,
+:root .mitra-topbar .mitra-eyebrow,
+:root .peserta-topbar .peserta-eyebrow {
+  display: block;
+  color: #228b45;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+:root .top-header-title,
+:root .mitra-topbar h1,
+:root .peserta-topbar h1 {
+  margin: 3px 0 0;
+  font-size: 21px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: #263238;
+  letter-spacing: 0;
+}
+
+/* ── 10. Panel informasi (label kiri, nilai kanan) ─────────── */
+:root .humas-info-card,
+:root .mitra-info-card,
+:root .dk-info-panel {
+  padding: 18px 20px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow);
+}
+:root .humas-info-card-title,
+:root .mitra-info-card-title,
+:root .dk-info-panel-title {
+  margin: 0 0 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ui-ink);
+}
+:root .humas-info-rows,
+:root .mitra-info-rows { display: flex; flex-direction: column; gap: 0; }
+:root .humas-info-row,
+:root .mitra-info-row,
+:root .dk-info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  margin: 0;
+  border-top: 1px solid #eef2ef;
+}
+:root .humas-info-rows > .humas-info-row:first-child,
+:root .mitra-info-rows > .mitra-info-row:first-child,
+:root .dk-info-panel-title + .dk-info-row { border-top: 0; }
+:root .humas-info-label,
+:root .mitra-info-label,
+:root .dk-info-label {
+  flex: 0 0 auto;
+  max-width: 45%;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ui-muted);
+}
+:root .humas-info-value,
+:root .mitra-info-value,
+:root .dk-info-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-ink);
+  overflow-wrap: anywhere;
+}

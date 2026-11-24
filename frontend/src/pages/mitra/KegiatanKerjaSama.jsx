@@ -3,9 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Search, SearchX, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
+import { TaskPanel } from '../../components/Dashboard';
+import { FileSignature, FilePenLine } from 'lucide-react';
 
 export default function KegiatanKerjaSama() {
-  const { mitraKegiatan } = usePortalData();
+  const { mitraKegiatan, mitraTandaTangan, mitraPerbaikan } = usePortalData();
+  // Tugas yang menunggu tindakan Mitra
+  const menungguTte = mitraTandaTangan.filter(t => t.statusTandaTangan === 'menunggu-ttd');
+  const perbaikanAktif = mitraPerbaikan.filter(p => ['menunggu', 'diproses'].includes(p.status));
   const navigate = useNavigate();
   const [search, setSearch]             = useState('');
   const [filterJenis, setFilterJenis]   = useState('');
@@ -36,15 +42,36 @@ export default function KegiatanKerjaSama() {
       {/* ── PAGE TITLE / HEADER ── */}
       <div className="mitra-list-header">
         <div className="mitra-intro">
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--mitra-green)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-            Dashboard Mitra
-          </span>
           <h2 style={{ margin: '2px 0 4px 0' }}>Kegiatan Kerja Sama</h2>
           <p>Hanya kegiatan yang ditautkan Humas kepada instansi Anda.</p>
         </div>
       </div>
 
       {/* ── RINGKASAN STATISTIK (CARDS) ── */}
+      {/* ── Perlu tindakan Anda (satu panel ringkas) ── */}
+      <TaskPanel
+        title="Perlu tindakan Anda"
+        columns={2}
+        tasks={[
+          {
+            key: 'tte', icon: FileSignature, title: 'Sertifikat menunggu tanda tangan Anda', unit: 'pengajuan',
+            total: menungguTte.length, items: menungguTte, to: '/mitra/tanda-tangan', actionLabel: 'Tanda tangani',
+            doneText: 'tidak ada sertifikat yang menunggu tanda tangan',
+            renderItem: t => (
+              <span className="dash-item-main"><strong>{t.namaKegiatan}</strong><small>{t.jumlahSertifikat} sertifikat · diajukan {t.tanggalPengajuan}</small></span>
+            ),
+          },
+          {
+            key: 'perbaikan', icon: FilePenLine, tone: 'info', title: 'Perbaikan sertifikat perlu ditinjau', unit: 'pengajuan',
+            total: perbaikanAktif.length, items: perbaikanAktif, to: '/mitra/perbaikan-sertifikat', actionLabel: 'Tinjau',
+            doneText: 'tidak ada pengajuan perbaikan yang menunggu',
+            renderItem: p => (
+              <span className="dash-item-main"><strong>{p.namaPeserta}</strong><small>{p.namaKegiatan} · {p.jenisPerbaikan}</small></span>
+            ),
+          },
+        ]}
+      />
+
       <div className="mitra-stats-grid">
         <div
           className="mitra-stat-box"
@@ -115,7 +142,7 @@ export default function KegiatanKerjaSama() {
             onChange={e => setSearch(e.target.value)}
           />
         </label>
-        <select
+        <Select
           value={filterJenis}
           onChange={e => setFilterJenis(e.target.value)}
         >
@@ -123,15 +150,15 @@ export default function KegiatanKerjaSama() {
           {jenisOptions.map(j => (
             <option key={j} value={j}>{j}</option>
           ))}
-        </select>
-        <select
+        </Select>
+        <Select
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
         >
           <option value="">Semua status</option>
           <option value="berlangsung">Berlangsung</option>
           <option value="selesai">Selesai</option>
-        </select>
+        </Select>
       </div>
 
       {/* ── DATA TABLE ── */}

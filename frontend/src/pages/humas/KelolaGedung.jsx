@@ -5,6 +5,8 @@ import useCrud from '../../hooks/useCrud';
 import { locationsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
+import { dialog } from '../../components/Dialog';
+import BackButton from '../../components/BackButton';
 
 const defaultForm = {
   gedung: '',
@@ -70,7 +72,7 @@ export default function KelolaGedung() {
 
   // ── Handlers Hapus ──
   const handleHapus = async id => {
-    if (window.confirm('Hapus gedung/ruangan ini?')) await remove(id);
+    if (await dialog.confirm({ title: 'Hapus gedung & ruangan?', message: 'Lokasi ini akan dihapus permanen. Kegiatan yang memakai lokasi ini tidak lagi memiliki gedung.', confirmText: 'Hapus', tone: 'danger' })) await remove(id);
   };
 
   return (
@@ -771,23 +773,7 @@ export default function KelolaGedung() {
                 gap: 10,
               }}
             >
-              <button
-                type="button"
-                className="modal-btn modal-btn-batal"
-                style={{
-                  padding: '8px 20px',
-                  borderRadius: 6,
-                  border: '1px solid #d1d5db',
-                  background: '#ffffff',
-                  color: '#374151',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-                onClick={() => setDetailData(null)}
-              >
-                Kembali ke Daftar
-              </button>
+              <BackButton onClick={() => setDetailData(null)} label="Kembali ke Daftar" />
               <button
                 type="button"
                 className="modal-btn modal-btn-publish"

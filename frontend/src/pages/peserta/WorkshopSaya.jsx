@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { CalendarDays, Check, ClipboardCheck, UserPlus } from 'lucide-react';
 import { getWorkshopLocation } from './data';
 import { EmptyState, Modal, Status } from './components';
@@ -7,10 +7,21 @@ import OnlineMeetingInfo from './OnlineMeetingInfo';
 import { attendanceStates, canSubmitAttendance, getAttendanceState, getRegistrationAvailability, getRegistrationState, registrationStates } from './workshopStates';
 import { AttendancePanel } from './WorkshopStatePanels';
 import WorkshopRegistrationDialog from './WorkshopRegistrationDialog';
+import Select from '../../components/Select';
 
 export default function WorkshopSaya() {
   const { workshops, registrations, submitAttendance, notify } = useOutletContext();
-  const [attendanceId, setAttendanceId] = useState(null);
+  // Tautan dari QR panitia: ?presensi=<slug>&kode=<KODE> langsung membuka form presensi
+  const [params, setParams] = useSearchParams();
+  const qrCode = params.get('kode') || '';
+  const [attendanceId, setAttendanceIdState] = useState(() => params.get('presensi'));
+  const setAttendanceId = value => {
+    setAttendanceIdState(value);
+    if (!value && (params.has('presensi') || params.has('kode'))) {
+      const next = new URLSearchParams(params); next.delete('presensi'); next.delete('kode');
+      setParams(next, { replace: true });
+    }
+  };
   const [registrationAction, setRegistrationAction] = useState(null);
   const [filter, setFilter] = useState('');
   const [mode, setMode] = useState('');
@@ -45,8 +56,8 @@ export default function WorkshopSaya() {
     <div className="peserta-section-line peserta-my-workshop-heading">
       <h2>Daftar workshop <span className="peserta-count" aria-live="polite">{filtered.length}</span></h2>
       <div className="peserta-workshop-filters">
-        <label className="peserta-status-filter"><span className="peserta-sr-only" id="my-workshop-mode">Mode workshop saya</span><select aria-labelledby="my-workshop-mode" value={mode} onChange={event => setMode(event.target.value)}><option value="">Semua mode</option><option value="online">Online</option><option value="offline">Offline</option></select></label>
-        <label className="peserta-status-filter"><span className="peserta-sr-only" id="my-workshop-status">Filter status workshop saya</span><select aria-labelledby="my-workshop-status" value={filter} onChange={event => setFilter(event.target.value)}><option value="">Semua status</option><option value="saved">Belum terdaftar</option>{counts.map(item => <option key={item.status} value={item.status}>{item.label}</option>)}</select></label>
+        <label className="peserta-status-filter"><span className="peserta-sr-only" id="my-workshop-mode">Mode workshop saya</span><Select aria-labelledby="my-workshop-mode" value={mode} onChange={event => setMode(event.target.value)}><option value="">Semua mode</option><option value="online">Online</option><option value="offline">Offline</option></Select></label>
+        <label className="peserta-status-filter"><span className="peserta-sr-only" id="my-workshop-status">Filter status workshop saya</span><Select aria-labelledby="my-workshop-status" value={filter} onChange={event => setFilter(event.target.value)}><option value="">Semua status</option><option value="saved">Belum terdaftar</option>{counts.map(item => <option key={item.status} value={item.status}>{item.label}</option>)}</Select></label>
       </div>
     </div>
     {filtered.length ? <div className="peserta-list-cards">{filtered.map(({ workshop, registration, status }) => {
@@ -86,7 +97,7 @@ export default function WorkshopSaya() {
       </article>;
     })}</div> : <EmptyState icon={CalendarDays} title={entries.length ? 'Tidak ada workshop dengan filter ini' : 'Belum ada workshop yang diikuti'} action={entries.length ? <button className="peserta-button peserta-button--secondary" onClick={() => { setFilter(''); setMode(''); }}>Tampilkan Semua</button> : <Link className="peserta-button" to="/peserta/cari-workshop">Cari Workshop</Link>}>{entries.length ? 'Pilih status atau mode lain untuk melihat kegiatan Anda.' : 'Temukan kegiatan yang sesuai dengan minat Anda.'}</EmptyState>}
     {registrationWorkshop && <WorkshopRegistrationDialog key={`${registrationWorkshop.id}-${registrationAction.action}`} workshop={registrationWorkshop} registration={registrations.find(item => item.workshopId === registrationWorkshop.id)} action={registrationAction.action} onClose={() => setRegistrationAction(null)} />}
-    {selected && <Modal title={selectedRegistration?.status === 'waiting' ? 'Status Antrean Workshop' : 'Presensi Workshop'} wide onClose={() => setAttendanceId(null)}><div className="peserta-modal-body"><h3>{selected.title}</h3><p>{selected.time} &middot; {getWorkshopLocation(selected)}</p>{selectedRegistration?.status === 'waiting' && <div className="peserta-queue"><span>Nomor antrean Anda</span><strong>{String(selectedRegistration.queue).padStart(2, '0')}</strong><small>Kursi diberikan sesuai urutan antrean.</small></div>}<AttendancePanel key={selected.id} workshop={selected} state={getAttendanceState(selected, selectedRegistration)} attendance={selectedRegistration?.attendance} onSubmit={async evidence => {
+    {selected && <Modal title={selectedRegistration?.status === 'waiting' ? 'Status Antrean Workshop' : 'Presensi Workshop'} wide onClose={() => setAttendanceId(null)}><div className="peserta-modal-body"><h3>{selected.title}</h3><p>{selected.time} &middot; {getWorkshopLocation(selected)}</p>{selectedRegistration?.status === 'waiting' && <div className="peserta-queue"><span>Nomor antrean Anda</span><strong>{String(selectedRegistration.queue).padStart(2, '0')}</strong><small>Kursi diberikan sesuai urutan antrean.</small></div>}<AttendancePanel key={selected.id} workshop={selected} state={getAttendanceState(selected, selectedRegistration)} attendance={selectedRegistration?.attendance} initialCode={selected.id === params.get('presensi') ? qrCode : ''} onSubmit={async evidence => {
       const success = await submitAttendance(selected.id, evidence);
       if (success) notify(evidence.method === 'upload' ? 'Bukti presensi terkirim. Status menunggu verifikasi panitia.' : 'Presensi berhasil. Kehadiran Anda tervalidasi.');
       return success;

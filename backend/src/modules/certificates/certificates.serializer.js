@@ -70,6 +70,9 @@ function serializeSubmission(s, role) {
     penandatanganMitra: s.mitra_signer || null,
     penandatanganRektor: s.rektor_signer || null,
     catatan: s.catatan || '',
+    terverifikasi: !!s.verified_at,
+    waktuVerifikasi: s.verified_at ? formatTanggalJam(s.verified_at, ' WIB') : null,
+    verifikator: s.verifier || null,
   };
 }
 
@@ -160,6 +163,9 @@ function serializeReplacement(c) {
     status: c.tte_status === 'selesai' ? 'selesai' : 'sedang-diproses',
     waktuTte: c.tte_signed_at ? formatTanggalJam(c.tte_signed_at, ' WIB') : null,
     penandatangan: c.tte_signer || null,
+    disetujuiMitra: !!c.mitra_approved_at,
+    waktuSetujuMitra: c.mitra_approved_at ? formatTanggalJam(c.mitra_approved_at, ' WIB') : null,
+    penyetujuMitra: c.mitra_approver || null,
     sumber: c.sumber,
   };
 }

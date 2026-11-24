@@ -1,0 +1,330 @@
+/* ============================================================
+   DASHBOARD — kartu, antrean tugas, & grafik bersama
+   ============================================================ */
+.dash-page { display: grid; gap: 20px; }
+.dash-hero h2 { margin: 0; font-size: 22px; font-weight: 700; color: #14271c; letter-spacing: -0.015em; }
+.dash-hero p { margin: 4px 0 0; font-size: 13.5px; color: #66736c; }
+
+.dash-grid-4 { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.dash-grid-3 { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.dash-grid-2 { display: grid; gap: 16px; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+@media (max-width: 1100px) { .dash-grid-2 { grid-template-columns: 1fr; } }
+
+.dash-card {
+  position: relative;
+  min-width: 0;
+  padding: 18px 20px;
+  border: 1px solid #e3e9e5;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 42, 24, 0.04);
+}
+.dash-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.dash-card-head h3 { margin: 0; font-size: 15px; font-weight: 700; color: #14271c; }
+.dash-card-head p { margin: 3px 0 0; font-size: 12.5px; color: #66736c; }
+.dash-head-link, .dash-task-link {
+  display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;
+  font-size: 12.5px; font-weight: 600; color: #14532d; text-decoration: none;
+}
+.dash-head-link:hover, .dash-task-link:hover { text-decoration: underline; }
+.dash-empty { margin: 0; padding: 14px 0 4px; font-size: 13px; color: #8a958f; }
+
+/* ── Stat tile ── */
+.dash-stat { display: flex; align-items: center; gap: 14px; color: inherit; text-decoration: none; }
+.dash-stat.is-link:hover { border-color: #b9cec0; }
+.dash-stat-icon {
+  width: 42px; height: 42px; flex-shrink: 0; display: grid; place-items: center;
+  border-radius: 11px; background: #edf7ef; color: #14532d;
+}
+.dash-stat-label { margin: 0; font-size: 12.5px; color: #66736c; }
+.dash-stat-value { margin: 2px 0 0; font-size: 26px; font-weight: 800; line-height: 1.1; color: #14271c; font-variant-numeric: tabular-nums; }
+.dash-stat-hint { margin: 3px 0 0; font-size: 12px; color: #66736c; }
+
+/* ── Antrean tugas ── */
+.dash-task { display: flex; flex-direction: column; gap: 10px; }
+.dash-task-head { display: flex; align-items: center; gap: 12px; }
+.dash-task-icon {
+  width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center;
+  border-radius: 10px; background: #fff6e5; color: #b45309;
+}
+.dash-task--danger .dash-task-icon { background: #fef2f2; color: #b91c1c; }
+.dash-task--info .dash-task-icon { background: #eff6ff; color: #1d4ed8; }
+.dash-task.is-done .dash-task-icon { background: #edf7ef; color: #15803d; }
+.dash-task-title { flex: 1; min-width: 0; }
+.dash-task-title h3 { margin: 0; font-size: 14px; font-weight: 700; color: #14271c; }
+.dash-task-title p { margin: 2px 0 0; font-size: 12.5px; color: #66736c; }
+.dash-task-count { font-size: 24px; font-weight: 800; color: #14271c; font-variant-numeric: tabular-nums; }
+.dash-task.is-done .dash-task-count { color: #a3ada7; }
+.dash-task-list, .dash-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.dash-task-list li, .dash-list li {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 0; border-top: 1px solid #f0f3f1; font-size: 13px; color: #263238;
+}
+.dash-task-list li:first-child, .dash-list li:first-child { border-top: 0; }
+.dash-item-main { min-width: 0; }
+.dash-item-main strong { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-item-main small { display: block; margin-top: 1px; font-size: 12px; color: #66736c; }
+.dash-item-num { flex-shrink: 0; font-weight: 700; font-variant-numeric: tabular-nums; color: #14271c; }
+.dash-item-link { color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; }
+.dash-item-link:hover strong { color: #14532d; text-decoration: underline; }
+.dash-task-link { margin-top: auto; align-self: flex-start; }
+
+/* ── Alur sertifikat ── */
+.dash-pipeline-steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dash-pipe { position: relative; display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; background: #f7f9f8; }
+.dash-pipe strong { display: block; font-size: 22px; font-weight: 800; line-height: 1.1; color: #14271c; font-variant-numeric: tabular-nums; }
+.dash-pipe span:not(.dash-pipe-icon) { font-size: 12.5px; color: #4b5852; }
+.dash-pipe-icon { width: 32px; height: 32px; flex-shrink: 0; display: grid; place-items: center; border-radius: 9px; }
+.dash-pipe--warning .dash-pipe-icon { background: #fff6e5; color: #b45309; }
+.dash-pipe--serious .dash-pipe-icon { background: #fff1ea; color: #c2410c; }
+.dash-pipe--good .dash-pipe-icon { background: #e7f5ec; color: #15803d; }
+.dash-pipe-arrow { position: absolute; right: -14px; top: 50%; transform: translateY(-50%); color: #b4bfb8; background: #fff; border-radius: 50%; z-index: 1; }
+@media (max-width: 640px) {
+  .dash-pipeline-steps { grid-template-columns: 1fr; }
+  .dash-pipe-arrow { display: none; }
+}
+
+/* ── Badge status ── */
+.dash-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; background: #f1f5f3; color: #4b5852; }
+.dash-badge--warning { background: #fff6e5; color: #92400e; }
+.dash-badge--serious { background: #fff1ea; color: #9a3412; }
+.dash-badge--good { background: #e7f5ec; color: #166534; }
+
+/* ── Legenda & alat grafik ── */
+.dash-chart-tools { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.dash-legend { display: flex; gap: 14px; margin: 0; padding: 0; list-style: none; font-size: 12.5px; color: #4b5852; }
+.dash-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.dash-legend i, .dash-tooltip i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.dash-toggle {
+  width: 30px; height: 30px; display: grid; place-items: center; padding: 0;
+  border: 1px solid #dfe6e1; border-radius: 8px; background: #fff; color: #4b5852; cursor: pointer;
+}
+.dash-toggle:hover { background: #f4f7f5; }
+
+/* ── Grafik kolom berkelompok ── */
+.dash-cols { display: grid; grid-template-columns: auto 1fr; gap: 10px; }
+.dash-yaxis {
+  height: var(--plot-h); display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: #8a958f; text-align: right; font-variant-numeric: tabular-nums;
+  transform: translateY(6px);
+}
+.dash-plot { position: relative; height: var(--plot-h); margin-bottom: 26px; }
+.dash-grid { position: absolute; left: 0; right: 0; border-top: 1px solid #eef2ef; }
+.dash-grid:first-child { border-top-color: #cfd8d3; } /* garis dasar */
+.dash-groups { position: absolute; inset: 0; display: flex; align-items: stretch; justify-content: space-around; }
+.dash-group { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; outline: none; cursor: default; }
+.dash-group::before { content: ''; position: absolute; inset: 0 8%; border-radius: 8px; background: transparent; transition: background-color 120ms; }
+.dash-group.is-hover::before, .dash-group:focus-visible::before { background: rgba(20, 83, 45, 0.05); }
+.dash-bars { position: relative; flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 2px; }
+.dash-bar { width: min(24px, 30%); border-radius: 4px 4px 0 0; transition: height 400ms cubic-bezier(0.22, 1, 0.36, 1); }
+.dash-xlabel { position: absolute; top: 100%; margin-top: 8px; font-size: 11.5px; color: #66736c; white-space: nowrap; }
+
+/* ── Tooltip ── */
+.dash-tooltip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); z-index: 5;
+  display: grid; gap: 4px; min-width: 170px; padding: 10px 12px;
+  border: 1px solid #e3e9e5; border-radius: 10px; background: #fff;
+  box-shadow: 0 12px 28px -12px rgba(15, 42, 24, 0.35);
+  font-size: 12.5px; color: #263238; pointer-events: none; white-space: nowrap;
+}
+.dash-group .dash-tooltip { bottom: auto; top: 0; transform: translate(-50%, -105%); }
+.dash-tooltip span { display: flex; align-items: center; gap: 6px; }
+.dash-tooltip b { margin-left: auto; padding-left: 12px; font-variant-numeric: tabular-nums; }
+.dash-tooltip-muted { color: #66736c; font-size: 12px; }
+.dash-tooltip--inline { left: 0; transform: none; bottom: calc(100% + 2px); }
+
+/* ── Batang horizontal (persentase) ── */
+.dash-rates { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.dash-rates li { position: relative; }
+.dash-rate-row {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(80px, 1fr) 42px; align-items: center; gap: 12px;
+  padding: 6px 8px; margin: 0 -8px; border-radius: 8px; color: inherit; text-decoration: none;
+}
+.dash-rate-row:hover { background: #f6f9f7; }
+.dash-rate-name { font-size: 13px; color: #263238; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-rate-track { height: 10px; border-radius: 4px; background: #eef2ef; overflow: hidden; }
+.dash-rate-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1); }
+.dash-rate-value { font-size: 13px; font-weight: 700; color: #14271c; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── Tabel data (tampilan alternatif grafik) ── */
+.dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dash-table th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 700; color: #66736c; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e3e9e5; }
+.dash-table td { padding: 9px 10px; border-bottom: 1px solid #f0f3f1; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-bar, .dash-rate-fill { transition: none; }
+}
+
+/* Teks item mengecil (ellipsis) agar badge/angka di kanan tidak keluar kartu */
+.dash-item-main { flex: 1 1 auto; min-width: 0; }
+.dash-item-link { min-width: 0; }
+.dash-item-link > :not(.dash-item-main),
+.dash-task-list li > :not(.dash-item-main):not(.dash-item-link),
+.dash-list li > :not(.dash-item-main):not(.dash-item-link) { flex-shrink: 0; }
+/* Item grid tidak boleh melebar melebihi kolomnya */
+.dash-task-list, .dash-list { grid-template-columns: minmax(0, 1fr); }
+.dash-task-list li, .dash-list li { min-width: 0; }
+
+/* ============================================================
+   TATA LETAK DASHBOARD v2 — kolom utama + kolom samping
+   ============================================================ */
+.dash-page { gap: 18px; }
+.dash-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.dash-hero-date { font-size: 12.5px; font-weight: 600; color: #228b45; letter-spacing: 0.02em; margin: 0 0 4px; text-transform: capitalize; }
+.dash-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* 4 kartu statistik selalu sejajar rapi */
+.dash-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .dash-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px)  { .dash-grid-4 { grid-template-columns: 1fr; } }
+.dash-stat { min-height: 92px; }
+
+/* Kolom utama (2/3) + kolom samping (1/3); tinggi kartu mengikuti isinya */
+.dash-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap: 18px; align-items: start; }
+.dash-col { display: grid; gap: 18px; min-width: 0; align-content: start; }
+@media (max-width: 1100px) { .dash-layout { grid-template-columns: 1fr; } }
+
+/* Grafik berdampingan dengan tinggi seimbang */
+.dash-grid-2 { align-items: stretch; }
+.dash-chart { display: flex; flex-direction: column; }
+.dash-chart > .dash-cols, .dash-chart > .dash-rates, .dash-chart > .dash-table { flex: 1; }
+.dash-rates { align-content: space-between; }
+
+/* ── Panel "Perlu tindakan" ── */
+.dash-taskpanel { padding-bottom: 8px; }
+.dash-tp-group { padding: 14px 0; border-top: 1px solid #eef2ef; }
+.dash-taskpanel .dash-card-head + .dash-tp-group { border-top: 0; padding-top: 2px; }
+.dash-tp-head { display: flex; align-items: center; gap: 12px; }
+.dash-tp-head .dash-task-icon { width: 34px; height: 34px; border-radius: 9px; }
+.dash-tp-head h4 { margin: 0; font-size: 13.5px; font-weight: 700; color: #14271c; }
+.dash-tp-head p { margin: 1px 0 0; font-size: 12px; color: #66736c; }
+.dash-tp-action {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
+  height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #dfe6e1;
+  font-size: 12.5px; font-weight: 600; color: #14532d; text-decoration: none; background: #fff;
+}
+.dash-tp-action:hover { background: #edf7ef; border-color: #228b45; }
+.dash-tp-list { margin-top: 8px !important; padding-left: 46px !important; }
+.dash-tp-list li { padding: 7px 0; }
+.dash-tp-more a { font-size: 12.5px; font-weight: 600; color: #14532d; text-decoration: none; }
+.dash-tp-more a:hover { text-decoration: underline; }
+.dash-tp-done { margin: 0; padding: 12px 0 8px; list-style: none; display: grid; gap: 8px; border-top: 1px solid #eef2ef; }
+.dash-taskpanel .dash-card-head + .dash-tp-done { border-top: 0; padding-top: 0; }
+.dash-tp-done li { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: #66736c; line-height: 1.45; }
+.dash-tp-done svg { flex-shrink: 0; margin-top: 1px; color: #15803d; }
+.dash-tp-done strong { color: #2f3d35; font-weight: 600; }
+@media (max-width: 520px) { .dash-tp-list { padding-left: 0 !important; } }
+
+/* ── Alur sertifikat vertikal (kolom samping) ── */
+.dash-pipeline-steps.is-vertical { grid-template-columns: 1fr; gap: 8px; }
+.dash-pipeline-steps.is-vertical .dash-pipe { padding: 10px 12px; }
+.dash-pipeline-steps.is-vertical .dash-pipe strong { font-size: 18px; }
+.dash-pipeline-steps.is-vertical .dash-pipe-arrow { display: none; }
+.dash-pipeline-steps.is-vertical .dash-pipe > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex: 1; flex-direction: row-reverse; }
+
+/* Kartu tugas lama (TaskCard) tidak lagi menyisakan ruang kosong */
+.dash-grid-3 { align-items: start; }
+.dash-task { min-height: 0; }
+.dash-task-link { margin-top: 4px; }
+
+/* Badge tanggal kecil di daftar kegiatan terdekat */
+.dash-date-badge {
+  flex-shrink: 0; width: 44px; height: 46px; display: grid; place-content: center; text-align: center;
+  border-radius: 10px; background: #edf7ef; color: #14532d; line-height: 1.1;
+}
+.dash-date-badge b { font-size: 17px; font-weight: 800; }
+.dash-date-badge small { font-size: 10.5px; font-weight: 600; text-transform: uppercase; color: #3f6b4f; }
+.dash-item-link .dash-date-badge + .dash-item-main { margin-left: 2px; }
+.dash-item-link:has(.dash-date-badge) { justify-content: flex-start; gap: 12px; }
+
+/* Kelompok tugas berdampingan (TaskPanel columns={2}) */
+.dash-tp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+.dash-tp-grid > .dash-tp-group { border-top: 0; padding-top: 2px; }
+.dash-tp-grid > .dash-tp-group + .dash-tp-group { border-left: 1px solid #eef2ef; padding-left: 28px; margin-left: -14px; }
+@media (max-width: 900px) {
+  .dash-tp-grid { grid-template-columns: 1fr; }
+  .dash-tp-grid > .dash-tp-group + .dash-tp-group { border-left: 0; padding-left: 0; margin-left: 0; border-top: 1px solid #eef2ef; padding-top: 14px; }
+}
+
+/* Judul kartu dashboard selalu tebal (portal peserta menimpa bobot h2/h3) */
+.dash-page h2, .dash-page h3, .dash-page h4,
+.dash-card h3, .dash-card h4 { font-weight: 700 !important; }
+.dash-page .dash-hero h2 { font-size: 22px; color: #14271c; }
+
+/* ============================================================
+   BERANDA PESERTA — agenda selebar halaman & dua kolom sejajar
+   ============================================================ */
+.dash-section { display: grid; gap: 12px; }
+.dash-section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.dash-section-head h3 { margin: 0; font-size: 16px; font-weight: 700 !important; color: #14271c; }
+.dash-section-head p { margin: 3px 0 0; font-size: 12.5px; color: #66736c; }
+
+.dash-agenda-row { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.dash-agenda-card {
+  display: flex; flex-direction: column; gap: 10px; padding: 16px;
+  color: inherit; text-decoration: none;
+}
+.dash-agenda-card:hover { border-color: #b9cec0; box-shadow: 0 10px 24px -14px rgba(15, 42, 24, 0.3); }
+.dash-agenda-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.dash-agenda-date {
+  width: 50px; height: 54px; display: grid; place-content: center; text-align: center;
+  border-radius: 12px; background: #14532d; color: #ffffff; line-height: 1.05;
+}
+.dash-agenda-date b { font-size: 20px; font-weight: 800; }
+.dash-agenda-date small { font-size: 11px; font-weight: 600; text-transform: uppercase; opacity: 0.85; }
+.dash-agenda-title {
+  margin: 2px 0 0; font-size: 14.5px; font-weight: 700 !important; line-height: 1.4; color: #14271c;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em;
+}
+.dash-agenda-meta { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 12.5px; color: #4b5852; }
+.dash-agenda-meta li { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.dash-agenda-meta li svg { flex-shrink: 0; color: #228b45; }
+.dash-agenda-more { margin-top: auto; padding-top: 10px; border-top: 1px solid #eef2ef; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; color: #14532d; }
+.dash-agenda-card:hover .dash-agenda-more { text-decoration: underline; }
+.dash-badge--info { background: #eaf1fd; color: #1e4fa3; }
+
+.dash-empty-card { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.dash-empty-card > svg { flex-shrink: 0; color: #228b45; }
+.dash-empty-card > div { flex: 1; min-width: 220px; }
+.dash-empty-card strong { font-size: 14px; color: #14271c; }
+.dash-empty-card p { margin: 3px 0 0; font-size: 13px; color: #66736c; }
+
+/* Dua kolom sama lebar, kartu mengikuti tinggi isi */
+.dash-grid-2--even { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+@media (max-width: 1000px) { .dash-grid-2--even { grid-template-columns: 1fr; } }
+
+/* Ikon & tombol kecil pada item daftar */
+.dash-item-icon {
+  flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 9px; background: #edf7ef; color: #14532d;
+}
+.dash-item-icon--accent { background: #fff6e5; color: #b45309; }
+.dash-item-link:has(.dash-item-icon) { justify-content: flex-start; gap: 12px; }
+.dash-item-cta {
+  flex-shrink: 0; margin-left: auto; padding: 5px 12px; border-radius: 8px;
+  border: 1px solid #dfe6e1; font-size: 12px; font-weight: 600; color: #14532d; background: #fff;
+}
+.dash-item-link:hover .dash-item-cta { background: #edf7ef; border-color: #228b45; }
+
+/* ── Layar HP: statistik 2 kolom & agenda digeser ke samping ── */
+@media (max-width: 600px) {
+  .dash-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px; }
+  .dash-stat { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; min-height: 0; }
+  .dash-stat-icon { width: 34px; height: 34px; border-radius: 9px; }
+  .dash-stat-value { font-size: 22px; }
+  .dash-stat-hint { font-size: 11.5px; }
+
+  .dash-agenda-row {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 80%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  .dash-agenda-row::-webkit-scrollbar { display: none; }
+  .dash-agenda-card { scroll-snap-align: start; }
+
+  .dash-hero h2 { font-size: 20px !important; }
+}

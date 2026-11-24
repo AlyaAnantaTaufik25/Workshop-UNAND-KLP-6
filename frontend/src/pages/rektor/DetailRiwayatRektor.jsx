@@ -3,6 +3,7 @@ import { Eye, Check, PenTool, FileText, CheckCircle2 } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
 import { usePortalData } from '../../context/PortalData';
+import { dialog } from '../../components/Dialog';
 
 export default function DetailRiwayatRektor() {
   const { sertifikatData, currentRektor } = usePortalData();
@@ -21,7 +22,7 @@ export default function DetailRiwayatRektor() {
   const handlePratinjauPDF = () => {
     const printWindow = window.open('', '_blank', 'width=950,height=750');
     if (!printWindow) {
-      alert('Harap izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.');
+      dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.', tone: 'warning' });
       return;
     }
 

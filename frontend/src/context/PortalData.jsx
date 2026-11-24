@@ -12,7 +12,7 @@ import { PageLoader, ErrorNotice } from '../components/RequireRole';
 const PortalDataContext = createContext(null);
 
 const LOADERS = {
-  sekretariat: ['workshops', 'submissions', 'replacements', 'registrations', 'library'],
+  sekretariat: ['workshops', 'submissions', 'replacements', 'registrations', 'templatesUnand'],
   rektor: ['workshops', 'submissions', 'replacements', 'library'],
   mitra: ['workshops', 'submissions', 'replacements', 'registrations', 'templates', 'corrections'],
 };
@@ -24,6 +24,7 @@ const FETCH = {
   registrations: () => registrationsApi.list(),
   library: () => certificatesApi.templates({ library: 1 }),
   templates: () => certificatesApi.templates(),
+  templatesUnand: () => certificatesApi.templates(),
   corrections: () => certificatesApi.corrections(),
 };
 
@@ -81,7 +82,7 @@ export function PortalDataProvider({ role, children }) {
       sertifikatData: raw.submissions || [],
       dokumenPengganti: raw.replacements || [],
       presensiData,
-      humasTemplates: raw.library || [],
+      humasTemplates: raw.library || raw.templatesUnand || [],
       mitraKegiatan: workshops.filter(w => w.status !== 'draft'),
       mitraDetailData,
       mitraPeserta: registrations.filter(r => r.registrationStatus !== 'dibatalkan').map(r => ({ ...r, id: r.registrationId })),

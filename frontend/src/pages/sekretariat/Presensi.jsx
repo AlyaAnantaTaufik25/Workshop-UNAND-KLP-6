@@ -3,6 +3,8 @@ import { Search, Download, ArrowLeft, Users, CheckCircle, Clock } from 'lucide-r
 import { downloadPresensiCSV } from './utils/exportHelper';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import { toast } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 export default function Presensi() {
   const { workshops, presensiData } = usePortalData();
@@ -11,7 +13,6 @@ export default function Presensi() {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState(null);
   const [pesertaSearch, setPesertaSearch]           = useState('');
   const [pesertaStatusFilter, setPesertaStatusFilter] = useState('');
-  const [downloadSuccess, setDownloadSuccess]       = useState('');
 
   // Filter daftar kegiatan workshop
   const filteredWorkshops = workshops.filter(w => {
@@ -41,40 +42,13 @@ export default function Presensi() {
       ? pesertaList 
       : presensiData.filter(p => p.kegiatanId === workshop.id);
     
-    downloadPresensiCSV(workshop.nama, dataToExport.length > 0 ? dataToExport : [
-      { namaPeserta: 'Nadia Amelia', kegiatan: workshop.nama, waktuPresensi: null, statusKehadiran: 'belum-hadir' },
-      { namaPeserta: 'Rafi Pratama', kegiatan: workshop.nama, waktuPresensi: `${workshop.tanggal} - 08.47 WIB`, statusKehadiran: 'hadir-valid' },
-      { namaPeserta: 'Siti Rahmah', kegiatan: workshop.nama, waktuPresensi: null, statusKehadiran: 'belum-hadir' },
-    ]);
+    downloadPresensiCSV(workshop.nama, dataToExport);
 
-    setDownloadSuccess(`Rekap presensi "${workshop.nama}" berhasil diunduh!`);
-    setTimeout(() => setDownloadSuccess(''), 3000);
+    toast(`Rekap presensi "${workshop.nama}" berhasil diunduh!`);
   };
 
   return (
     <div>
-      {/* ── NOTIFIKASI UNDUH BERHASIL ── */}
-      {downloadSuccess && (
-        <div style={{
-          position: 'fixed',
-          top: '24px',
-          right: '24px',
-          background: 'var(--green-900)',
-          color: 'white',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '13.5px',
-          fontWeight: 600,
-        }}>
-          <CheckCircle size={18} color="#bbf7d0" />
-          {downloadSuccess}
-        </div>
-      )}
 
       {/* ════════════════════════════════════════════════════════════════════
           VIEW 1: DETAIL PRESENSI PESERTA PER-KEGIATAN
@@ -176,7 +150,7 @@ export default function Presensi() {
                 onChange={e => setPesertaSearch(e.target.value)}
               />
             </div>
-            <select
+            <Select
               className="filter-select"
               value={pesertaStatusFilter}
               onChange={e => setPesertaStatusFilter(e.target.value)}
@@ -184,7 +158,7 @@ export default function Presensi() {
               <option value="">Semua status kehadiran</option>
               <option value="hadir-valid">Hadir</option>
               <option value="belum-hadir">Belum hadir</option>
-            </select>
+            </Select>
           </div>
 
           {/* Tabel Presensi Peserta Kegiatan Ini */}
@@ -244,8 +218,7 @@ export default function Presensi() {
               type="button"
               onClick={() => {
                 downloadPresensiCSV('Semua_Kegiatan_Workshop_UNAND', presensiData);
-                setDownloadSuccess('Seluruh data presensi berhasil diunduh!');
-                setTimeout(() => setDownloadSuccess(''), 3000);
+                toast('Seluruh data presensi berhasil diunduh!');
               }}
               style={{
                 display: 'inline-flex',
@@ -281,7 +254,7 @@ export default function Presensi() {
               />
             </div>
 
-            <select
+            <Select
               className="filter-select"
               value={filterJenis}
               onChange={e => setFilterJenis(e.target.value)}
@@ -289,7 +262,7 @@ export default function Presensi() {
               <option value="">Semua jenis kegiatan</option>
               <option value="Workshop">Workshop</option>
               <option value="Seminar">Seminar</option>
-            </select>
+            </Select>
           </div>
 
           {/* Tabel Presensi Per-Kegiatan */}

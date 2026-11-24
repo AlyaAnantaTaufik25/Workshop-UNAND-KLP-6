@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import QrScanner from '../../components/QrScanner';
 import { AlertCircle, Check, CheckCircle2, ClipboardCheck, Clock3, FileImage, LoaderCircle, LockKeyhole, MapPin, QrCode, Upload, Users, XCircle } from 'lucide-react';
 import { Status } from './components';
 import { attendanceStates, getRegistrationAvailability, registrationStates } from './workshopStates';
@@ -35,8 +36,10 @@ const formatTime = value => {
   return Number.isNaN(date.getTime()) ? 'Belum tercatat' : new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', dateStyle: 'medium', timeStyle: 'short' }).format(date) + ' WIB';
 };
 
-export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmit }) {
-  const [code, setCode] = useState('');
+export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmit, initialCode = '' }) {
+  const [code, setCode] = useState(initialCode);
+  const [scanning, setScanning] = useState(false);
+  const onScan = useCallback(({ code: scanned }) => { setCode(scanned); setScanning(false); setFeedbackState(null); }, []);
   const [file, setFile] = useState(null);
   const [agreed, setAgreed] = useState(false);
   const [location, setLocation] = useState(null);
@@ -110,7 +113,7 @@ export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmi
     {canSubmit && <form className="peserta-attendance-form" onSubmit={submit} aria-busy={submitting}>
       <div className="peserta-method-heading">{online ? <Upload size={19} /> : <QrCode size={19} />}<div><strong>{online ? 'Unggah bukti kehadiran' : 'Kode QR & verifikasi lokasi'}</strong><p>{online ? 'Lampirkan tangkapan layar sesi dengan nama Anda terlihat.' : 'Masukkan kode dari QR panitia dan sertakan lokasi Anda saat ini.'}</p></div></div>
       {online ? <label className="peserta-upload"><Upload size={26} /><strong>{file ? file.name : 'Pilih bukti kehadiran'}</strong><span>{file ? `${(file.size / 1024).toFixed(0)} KB · Klik untuk mengganti` : 'JPG, PNG, atau PDF · Maksimal 2 MB'}</span><input type="file" aria-label="Bukti kehadiran" accept="image/jpeg,image/png,application/pdf" onChange={selectFile} disabled={submitting} /></label>
-        : <><label className="peserta-field"><span>Kode presensi dari panitia</span><input value={code} onChange={event => { setCode(event.target.value); setFeedbackState(null); }} placeholder="Masukkan kode sesi" autoComplete="off" maxLength={128} required disabled={submitting} /></label><div className={`peserta-location-check${location ? ' is-ready' : ''}`}><MapPin size={21} /><div><strong>{location ? 'Lokasi berhasil diperoleh' : 'Sertakan lokasi saat ini'}</strong><p>{location ? 'Koordinat akan disertakan untuk diperiksa panitia.' : 'Aktifkan GPS dan izinkan akses lokasi browser.'}</p></div><button type="button" className="peserta-button peserta-button--secondary" onClick={checkLocation} disabled={locating || submitting}>{locating ? <LoaderCircle className="peserta-spin" size={16} /> : <MapPin size={16} />}{locating ? 'Mencari…' : location ? 'Periksa Ulang' : 'Periksa Lokasi'}</button></div></>}
+        : <>{scanning && <QrScanner onResult={onScan} onClose={() => setScanning(false)} />}<label className="peserta-field"><span>Kode presensi dari panitia</span><span className="peserta-code-row"><input value={code} onChange={event => { setCode(event.target.value); setFeedbackState(null); }} placeholder="Pindai QR atau ketik kode sesi" autoComplete="off" maxLength={128} required disabled={submitting} /><button type="button" className="peserta-button peserta-button--secondary" onClick={() => setScanning(v => !v)} disabled={submitting}><QrCode size={16} />{scanning ? 'Tutup Kamera' : 'Pindai QR'}</button></span>{initialCode && code === initialCode && <small className="peserta-field-note">Kode terisi dari QR panitia.</small>}</label><div className={`peserta-location-check${location ? ' is-ready' : ''}`}><MapPin size={21} /><div><strong>{location ? 'Lokasi berhasil diperoleh' : 'Sertakan lokasi saat ini'}</strong><p>{location ? 'Koordinat akan disertakan untuk diperiksa panitia.' : 'Aktifkan GPS dan izinkan akses lokasi browser.'}</p></div><button type="button" className="peserta-button peserta-button--secondary" onClick={checkLocation} disabled={locating || submitting}>{locating ? <LoaderCircle className="peserta-spin" size={16} /> : <MapPin size={16} />}{locating ? 'Mencari…' : location ? 'Periksa Ulang' : 'Periksa Lokasi'}</button></div></>}
       <label className="peserta-checkbox"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} disabled={submitting} /><span>Saya menyatakan benar-benar mengikuti sesi kegiatan ini.</span></label>
       {error && <p className="peserta-inline-error" role="alert"><AlertCircle size={17} />{error}</p>}
       <button className="peserta-button" type="submit" disabled={!ready || submitting}>{submitting ? <LoaderCircle size={17} className="peserta-spin" /> : <Check size={17} />}{submitting ? 'Mengirim Presensi…' : stateKey === 'rejected' ? 'Kirim Ulang Presensi' : 'Kirim Presensi'}</button>

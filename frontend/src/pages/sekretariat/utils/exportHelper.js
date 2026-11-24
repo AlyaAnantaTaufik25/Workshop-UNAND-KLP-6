@@ -1,54 +1,62 @@
-// Utility function untuk mengunduh rekap peserta & presensi ke format CSV/Excel
+// Unduh rekap peserta & presensi Sekretariat Rektor sebagai Excel (.xlsx) yang rapi
+import { exportExcel } from '../../../utils/excel';
+
+const STATUS_LABEL = {
+  'hadir-valid': 'Hadir', hadir: 'Hadir', 'Hadir valid': 'Hadir',
+  'menunggu-verifikasi': 'Menunggu verifikasi',
+  ditolak: 'Ditolak',
+  'tidak-hadir': 'Tidak hadir',
+  'belum-hadir': 'Belum hadir',
+};
+const statusLabel = p => {
+  const s = p.statusKehadiran || p.status || '';
+  return STATUS_LABEL[s] || s || 'Belum hadir';
+};
+const isSemua = nama => !nama || /semua/i.test(nama);
 
 export function downloadPesertaCSV(kegiatanNama, dataPeserta) {
-  const headers = ['No', 'Nama Peserta', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran', 'Status Kehadiran'];
-  const rows = dataPeserta.map((p, idx) => {
-    const isHadir = (p.statusKehadiran || p.status) === 'Hadir' || (p.statusKehadiran || p.status) === 'hadir-valid' || (p.statusKehadiran || p.status) === 'Hadir valid';
-    return [
-      idx + 1,
-      `"${p.namaPeserta || p.nama}"`,
-      `"${p.jenis || 'Mahasiswa'}"`,
-      `"${p.kegiatan || kegiatanNama}"`,
-      `"${p.statusPendaftaran || 'Terdaftar'}"`,
-      `"${isHadir ? 'Hadir' : 'Belum hadir'}"`
-    ];
+  const semua = isSemua(kegiatanNama);
+  return exportExcel({
+    fileName: `Daftar_Peserta_${semua ? 'Semua_Kegiatan' : kegiatanNama}`,
+    title: 'Daftar Peserta Kegiatan',
+    subtitle: 'Sekretariat Rektor · Sistem Informasi Workshop UNAND',
+    info: [['Kegiatan', semua ? 'Semua kegiatan' : kegiatanNama], ['Jumlah peserta', `${dataPeserta.length} orang`]],
+    sheets: [{
+      name: 'Peserta',
+      numbered: true,
+      columns: [
+        { header: 'Nama Peserta', key: 'nama', value: p => p.namaPeserta || p.nama },
+        { header: 'Jenis Peserta', key: 'jenis', value: p => p.jenis || '-' },
+        ...(semua ? [{ header: 'Kegiatan', key: 'kegiatan', value: p => p.kegiatan || '-' }] : []),
+        { header: 'Status Pendaftaran', key: 'statusPendaftaran', value: p => p.statusPendaftaran || 'Terdaftar' },
+        { header: 'Status Kehadiran', key: 'status', value: statusLabel },
+      ],
+      rows: dataPeserta,
+    }],
   });
-
-  const csvContent = 'data:text/csv;charset=utf-8,' + 
-    [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-  
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement('a');
-  link.setAttribute('href', encodedUri);
-  const cleanName = kegiatanNama ? kegiatanNama.replace(/[^a-zA-Z0-9]/g, '_') : 'Semua_Kegiatan';
-  link.setAttribute('download', `Daftar_Peserta_${cleanName}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 
 export function downloadPresensiCSV(kegiatanNama, dataPeserta) {
-  const headers = ['No', 'Nama Peserta', 'Kegiatan', 'Waktu Presensi', 'Status Kehadiran'];
-  const rows = dataPeserta.map((p, idx) => {
-    const isHadir = (p.statusKehadiran || p.status) === 'Hadir' || (p.statusKehadiran || p.status) === 'hadir-valid' || (p.statusKehadiran || p.status) === 'Hadir valid';
-    return [
-      idx + 1,
-      `"${p.namaPeserta || p.nama}"`,
-      `"${p.kegiatan || kegiatanNama}"`,
-      `"${p.waktuPresensi || p.waktu || '-'}"`,
-      `"${isHadir ? 'Hadir' : 'Belum hadir'}"`
-    ];
+  const semua = isSemua(kegiatanNama);
+  const hadir = dataPeserta.filter(p => statusLabel(p) === 'Hadir').length;
+  return exportExcel({
+    fileName: `Rekap_Presensi_${semua ? 'Semua_Kegiatan' : kegiatanNama}`,
+    title: 'Rekap Presensi Kegiatan',
+    subtitle: 'Sekretariat Rektor · Sistem Informasi Workshop UNAND',
+    info: [
+      ['Kegiatan', semua ? 'Semua kegiatan' : kegiatanNama],
+      ['Kehadiran', `${hadir} dari ${dataPeserta.length} peserta hadir`],
+    ],
+    sheets: [{
+      name: 'Presensi',
+      numbered: true,
+      columns: [
+        { header: 'Nama Peserta', key: 'nama', value: p => p.namaPeserta || p.nama },
+        ...(semua ? [{ header: 'Kegiatan', key: 'kegiatan', value: p => p.kegiatan || '-' }] : []),
+        { header: 'Waktu Presensi', key: 'waktu', value: p => p.waktuPresensi || p.waktu || '-' },
+        { header: 'Status Kehadiran', key: 'status', value: statusLabel },
+      ],
+      rows: dataPeserta,
+    }],
   });
-
-  const csvContent = 'data:text/csv;charset=utf-8,' + 
-    [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-  
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement('a');
-  link.setAttribute('href', encodedUri);
-  const cleanName = kegiatanNama ? kegiatanNama.replace(/[^a-zA-Z0-9]/g, '_') : 'Semua_Kegiatan';
-  link.setAttribute('download', `Rekap_Presensi_${cleanName}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }

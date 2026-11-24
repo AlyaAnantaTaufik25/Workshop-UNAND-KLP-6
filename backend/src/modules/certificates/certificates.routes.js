@@ -24,6 +24,7 @@ router.get('/submissions', auth('humas', 'mitra', 'sekretariat', 'rektor'), asyn
 router.get('/submissions/:id', auth('humas', 'mitra', 'sekretariat', 'rektor'), asyncHandler(c.getSubmission));
 router.post('/submissions', auth('humas'), validate(v.submission), asyncHandler(c.createSubmission));
 router.post('/submissions/:id/sign', auth('mitra', 'rektor'), validate(v.sign), asyncHandler(c.signSubmission));
+router.patch('/submissions/:id/verify', auth('sekretariat'), asyncHandler(c.verifySubmission));
 
 // Sertifikat peserta
 router.get('/my', auth('peserta'), asyncHandler(c.my));
@@ -40,5 +41,6 @@ router.patch('/corrections/:id/process', auth('humas', 'mitra'), validate(v.proc
 router.get('/replacements', auth('sekretariat', 'rektor', 'humas', 'mitra'), asyncHandler(c.listReplacements));
 router.get('/replacements/:id', auth('sekretariat', 'rektor', 'humas', 'mitra'), asyncHandler(c.getReplacement));
 router.post('/replacements/:id/sign', auth('rektor'), validate(v.sign), asyncHandler(c.signReplacement));
+router.post('/replacements/:id/approve', auth('mitra'), asyncHandler(c.approveReplacement));
 
 module.exports = router;

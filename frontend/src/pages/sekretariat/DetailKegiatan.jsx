@@ -4,6 +4,9 @@ import { Upload, Check, CheckCircle } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import CertificateTemplateRenderer from '../../components/CertificateTemplateRenderer';
 import { usePortalData } from '../../context/PortalData';
+import { dialog, toast } from '../../components/Dialog';
+import { certificatesApi } from '../../api';
+import Select from '../../components/Select';
 
 /* ─── Status maps ─────────────────────────────────────── */
 const sertStatusClass = {
@@ -32,31 +35,53 @@ function getSteps(status) {
 
 /* ─── Main Component ──────────────────────────────────── */
 export default function DetailKegiatan() {
-  const { sertifikatData, humasTemplates } = usePortalData();
+  const { sertifikatData, humasTemplates, reload } = usePortalData();
+  const [saving, setSaving] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [toastMessage, setToastMessage] = useState('');
 
   const sert = sertifikatData.find(s => String(s.id) === id);
 
+  // Daftar template: template UNAND + template yang sedang dipakai pengajuan (mis. template mitra)
+  const templateOptions = sert && sert.templateId && !humasTemplates.some(t => t.id === sert.templateId)
+    ? [{ id: sert.templateId, nama: sert.template, desainKey: sert.desainKey }, ...humasTemplates]
+    : humasTemplates;
   const [selectedTemplate, setSelectedTemplate] = useState(() => {
-    if (!sert) return humasTemplates[0];
-    return humasTemplates.find(t => t.nama === sert.template) || humasTemplates[0];
+    if (!sert) return templateOptions[0];
+    return templateOptions.find(t => t.id === sert.templateId) || { id: '', nama: 'Belum dipilih', desainKey: sert.desainKey || 'klasik' };
   });
+
+  // Simpan verifikasi draft (template & catatan) ke server
+  const simpanVerifikasi = async (data, pesan) => {
+    setSaving(true);
+    try {
+      await certificatesApi.verifySubmission(sert.id, data);
+      await reload();
+      toast(pesan);
+      return true;
+    } catch (err) {
+      toast(err.message, { tone: 'error' });
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+  const tandaiTerverifikasi = async () => {
+    const catatan = await dialog.prompt({
+      title: 'Verifikasi draft sertifikat',
+      message: 'Draft dinyatakan sudah diperiksa Sekretariat Rektor. Tambahkan catatan untuk Humas/Rektor bila perlu.',
+      label: 'Catatan verifikasi', placeholder: 'Contoh: Nama kegiatan & nomor SK sudah sesuai.',
+      required: false, confirmText: 'Tandai Terverifikasi', defaultValue: sert.catatan || '',
+    });
+    if (catatan === null) return;
+    await simpanVerifikasi({ catatan }, 'Draft sertifikat ditandai terverifikasi.');
+  };
 
   if (!sert) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
         <p>Data tidak ditemukan.</p>
-        <button
-          onClick={() => navigate('/sekretariat/sertifikat')}
-          style={{
-            marginTop: '16px', color: 'var(--green-700)', background: 'none',
-            border: 'none', cursor: 'pointer', fontWeight: 600
-          }}
-        >
-          ← Kembali ke Sertifikat
-        </button>
+        <BackButton onClick={() => navigate('/sekretariat/sertifikat')} label="Kembali ke Sertifikat" />
       </div>
     );
   }
@@ -65,28 +90,6 @@ export default function DetailKegiatan() {
 
   return (
     <div>
-      {/* ── TOAST NOTIFIKASI TEMPLATE ── */}
-      {toastMessage && (
-        <div style={{
-          position: 'fixed',
-          top: '24px',
-          right: '24px',
-          background: '#14532d',
-          color: 'white',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          fontSize: '13px',
-          fontWeight: 600,
-        }}>
-          <CheckCircle size={18} color="#86efac" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
 
       {/* ── Back button ── */}
       <BackButton to="/sekretariat/sertifikat" label="Kembali ke Daftar Sertifikat" />
@@ -119,7 +122,7 @@ export default function DetailKegiatan() {
             <CertificateTemplateRenderer
               desainKey={selectedTemplate.desainKey || 'klasik'}
               namaKegiatan={sert.namaKegiatan}
-              namaPeserta="Nadia Amelia"
+              namaPeserta={sert.penerimaContoh && sert.penerimaContoh !== '-' ? sert.penerimaContoh : 'Nama Peserta'}
               tanggal={sert.tanggalPengajuan}
               penyelenggara={sert.penyelenggara}
             />
@@ -135,7 +138,7 @@ export default function DetailKegiatan() {
 
             <div className="info-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
               <span className="info-row-label">Template Sertifikat</span>
-              <select
+              <Select
                 className="filter-select"
                 style={{
                   width: '100%',
@@ -146,21 +149,23 @@ export default function DetailKegiatan() {
                   color: 'var(--gray-900)',
                 }}
                 value={selectedTemplate.id}
-                onChange={(e) => {
-                  const chosen = humasTemplates.find(t => t.id === Number(e.target.value));
-                  if (chosen) {
-                    setSelectedTemplate(chosen);
-                    setToastMessage(`Template "${chosen.nama}" berhasil diterapkan!`);
-                    setTimeout(() => setToastMessage(''), 3500);
-                  }
+                disabled={saving || sert.statusTandaTangan === 'diterbitkan'}
+                onChange={async (e) => {
+                  const chosen = templateOptions.find(t => t.id === Number(e.target.value));
+                  if (!chosen || chosen.id === selectedTemplate.id) return;
+                  const prev = selectedTemplate;
+                  setSelectedTemplate(chosen);
+                  const ok = await simpanVerifikasi({ templateId: chosen.id }, `Template "${chosen.nama}" diterapkan dan disimpan.`);
+                  if (!ok) setSelectedTemplate(prev);
                 }}
               >
-                {humasTemplates.map(t => (
+                {!selectedTemplate.id && <option value="">Belum dipilih</option>}
+                {templateOptions.map(t => (
                   <option key={t.id} value={t.id}>
                     {t.nama}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div className="info-row">
@@ -174,11 +179,28 @@ export default function DetailKegiatan() {
               <span className="info-row-value">{sert.penyelenggara}</span>
             </div>
             <div className="info-row">
+              <span className="info-row-label">Verifikasi Sekretariat</span>
+              <span className="info-row-value" style={{ fontWeight: 600, color: sert.terverifikasi ? 'var(--green-700)' : '#b45309' }}>
+                {sert.terverifikasi ? `Terverifikasi · ${sert.waktuVerifikasi}` : 'Belum diverifikasi'}
+              </span>
+            </div>
+            {sert.catatan && (
+              <div className="info-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+                <span className="info-row-label">Catatan</span>
+                <span className="info-row-value" style={{ textAlign: 'left', fontWeight: 500 }}>{sert.catatan}</span>
+              </div>
+            )}
+            <div className="info-row">
               <span className="info-row-label">Format Dokumen</span>
               <span className="info-row-value" style={{ fontWeight: 600, color: 'var(--gray-900)' }}>
                 PDF
               </span>
             </div>
+            {sert.statusTandaTangan !== 'diterbitkan' && (
+              <button type="button" className="btn-primary" style={{ width: '100%', marginTop: 12 }} disabled={saving} onClick={tandaiTerverifikasi}>
+                {sert.terverifikasi ? 'Perbarui Catatan Verifikasi' : 'Tandai Draft Terverifikasi'}
+              </button>
+            )}
           </div>
 
           {/* Process flow */}

@@ -71,6 +71,7 @@ export const certificatesApi = {
   submission: id => client.get(`/certificates/submissions/${id}`),
   submit: data => client.post('/certificates/submissions', data),
   sign: (id, pin, signature) => client.post(`/certificates/submissions/${id}/sign`, { pin, signature }),
+  verifySubmission: (id, data) => client.patch(`/certificates/submissions/${id}/verify`, data),
 
   my: () => client.get('/certificates/my'),
   verify: nomor => client.get(`/certificates/verify/${encodeURIComponent(nomor)}`),
@@ -84,9 +85,11 @@ export const certificatesApi = {
   replacements: () => client.get('/certificates/replacements'),
   replacement: id => client.get(`/certificates/replacements/${id}`),
   signReplacement: (id, pin) => client.post(`/certificates/replacements/${id}/sign`, { pin }),
+  approveReplacement: id => client.post(`/certificates/replacements/${id}/approve`),
 };
 
 export const reportsApi = {
+  dashboard: () => client.get('/reports/dashboard'),
   summary: () => client.get('/reports/summary'),
   workshops: () => client.get('/reports/workshops'),
   daily: () => client.get('/reports/daily'),

@@ -5,6 +5,9 @@ import useCrud from '../../hooks/useCrud';
 import { partnersApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
+import { dialog } from '../../components/Dialog';
+import Select from '../../components/Select';
+import BackButton from '../../components/BackButton';
 
 const defaultForm = { nama: '', jenis: 'Eksternal', penanggungJawab: '', email: '', kontak: '' };
 
@@ -60,7 +63,7 @@ export default function KelolaMitra() {
   };
 
   const handleHapus = async (id) => {
-    if (window.confirm('Yakin ingin menghapus mitra ini?')) await remove(id);
+    if (await dialog.confirm({ title: 'Hapus mitra?', message: 'Data instansi mitra akan dihapus. Kegiatan yang terkait tetap ada tanpa mitra.', confirmText: 'Hapus Mitra', tone: 'danger' })) await remove(id);
   };
 
   return (
@@ -212,13 +215,7 @@ export default function KelolaMitra() {
             </div>
 
             <div className="modal-footer" style={{ justifyContent: 'flex-end', gap: 10 }}>
-              <button
-                type="button"
-                className="modal-btn modal-btn-batal"
-                onClick={() => setDetailMitra(null)}
-              >
-                Kembali ke Daftar
-              </button>
+              <BackButton onClick={() => setDetailMitra(null)} label="Kembali ke Daftar" />
               <button
                 type="button"
                 className="modal-btn modal-btn-publish"
@@ -271,14 +268,14 @@ export default function KelolaMitra() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Jenis Mitra <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.jenis}
                     onChange={e => set('jenis', e.target.value)}
                   >
                     <option value="Eksternal">Eksternal</option>
                     <option value="Internal">Internal</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -361,14 +358,14 @@ export default function KelolaMitra() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Jenis Mitra <span className="req">*</span></label>
-                  <select
+                  <Select
                     className="form-input form-select"
                     value={form.jenis}
                     onChange={e => set('jenis', e.target.value)}
                   >
                     <option value="Eksternal">Eksternal</option>
                     <option value="Internal">Internal</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 

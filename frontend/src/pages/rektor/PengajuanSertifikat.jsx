@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Search, AlertTriangle } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
+import PageHeader from '../../components/PageHeader';
 
 const ttdLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -22,6 +24,9 @@ export default function PengajuanSertifikat() {
   const [filterJenis, setFilterJenis]       = useState('');
   const [filterKegiatan, setFilterKegiatan] = useState('');
   const [filterStatus, setFilterStatus]     = useState('');
+  // Ringkasan tugas Rektor
+  const menungguSaya = sertifikatData.filter(s => s.statusTandaTangan === 'menunggu-rektor').length;
+  const penggantiTertunda = dokumenPengganti.filter(d => d.status === 'sedang-diproses').length;
 
   const filteredSert = sertifikatData.filter(s => {
     const matchSearch = s.namaKegiatan.toLowerCase().includes(search.toLowerCase());
@@ -34,41 +39,17 @@ export default function PengajuanSertifikat() {
 
   return (
     <div>
-      {/* ── CARD NO. 3: Pengajuan sertifikat ── */}
-      <div className="sert-process-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-          <div className="sert-process-num">3</div>
-          <div className="sert-process-info">
-            <div className="sert-process-title">Pengajuan sertifikat</div>
-            <div className="sert-process-sub">Periksa dokumen dan urutan tanda tangan sebelum melanjutkan.</div>
-          </div>
-        </div>
-
-        {/* Tombol ke Laman Sertifikat Perbaikan */}
-        <button
-          onClick={() => navigate('/rektor/sertifikat-perbaikan')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '9px 18px',
-            borderRadius: '8px',
-            border: '1.5px solid #fcd34d',
-            background: '#fffbeb',
-            color: '#b45309',
-            fontWeight: 700,
-            fontSize: '13px',
-            cursor: 'pointer',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            transition: 'all 0.15s ease'
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = '#fef3c7'}
-          onMouseLeave={e => e.currentTarget.style.background = '#fffbeb'}
-        >
-          <AlertTriangle size={16} color="#d97706" />
-          <span>Sertifikat yang Perlu Diperbaiki ({dokumenPengganti.length})</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Pengajuan Sertifikat"
+        description={menungguSaya
+          ? <>{menungguSaya} sertifikat menunggu tanda tangan Anda. <button type="button" className="ui-link" onClick={() => setFilterStatus(filterStatus === 'menunggu-rektor' ? '' : 'menunggu-rektor')}>{filterStatus === 'menunggu-rektor' ? 'Tampilkan semua' : 'Tampilkan yang perlu ditandatangani'}</button></>
+          : 'Semua pengajuan yang sampai ke Rektor sudah ditandatangani.'}
+        actions={
+          <button type="button" className="ui-btn ui-btn--warning" onClick={() => navigate('/rektor/sertifikat-perbaikan')}>
+            <AlertTriangle size={16} /> Dokumen pengganti perlu TTE ulang <span className="ui-btn-count">{penggantiTertunda}</span>
+          </button>
+        }
+      />
 
       {/* ── Filter Bar ── */}
       <div className="filter-bar">
@@ -81,23 +62,23 @@ export default function PengajuanSertifikat() {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+        <Select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
           <option value="">Semua jenis</option>
           <option value="Workshop">Workshop</option>
           <option value="Seminar">Seminar</option>
-        </select>
-        <select className="filter-select" value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
+        </Select>
+        <Select className="filter-select" value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
           <option value="">Semua kegiatan</option>
           {sertifikatData.map(s => (
             <option key={s.id} value={s.id}>{s.namaKegiatan}</option>
           ))}
-        </select>
-        <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        </Select>
+        <Select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
           <option value="menunggu-rektor">Menunggu Rektor</option>
           <option value="menunggu-mitra">Menunggu Mitra</option>
           <option value="diterbitkan">Diterbitkan</option>
-        </select>
+        </Select>
       </div>
 
       {/* ── Tabel Pengajuan Sertifikat Utama ── */}

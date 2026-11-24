@@ -1,33 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Home, Briefcase, Handshake, MapPin,
-  Users, FileText, BarChart3, User, LogOut, ChevronDown, ChevronRight, Bell, X
-} from 'lucide-react';
-import { useAuth, useCurrentUser } from '../../context/AuthContext';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Home, Briefcase, Handshake, MapPin, Users, FileText, BarChart3, ChevronDown, Bell, X } from 'lucide-react';
+import { useCurrentUser } from '../../context/AuthContext';
 import useNotifications from '../../hooks/useNotifications';
-import UnandLogo from '../../components/UnandLogo';
 import './humas.css';
 import { useMobileNav } from '../../components/MobileNav';
+import Sidebar from '../../components/Sidebar';
+import { Award } from 'lucide-react';
 
-
-const navItems = [
-  { to: '/humas/ringkasan',         label: 'Dashboard',               icon: Home },
-  { to: '/humas/kelola-kegiatan',   label: 'Kelola Kegiatan',         icon: Briefcase },
-  { to: '/humas/kelola-mitra',      label: 'Kelola Mitra',            icon: Handshake },
-  { to: '/humas/kelola-gedung',     label: 'Kelola Gedung & Ruangan', icon: MapPin },
-  { to: '/humas/kelola-pengguna',   label: 'Kelola Pengguna',         icon: Users },
-  {
-    label: 'Kelola Sertifikat',
-    icon: FileText,
-    children: [
-      { to: '/humas/template-sertifikat',  label: 'Template Sertifikat'  },
-      { to: '/humas/perbaikan-sertifikat', label: 'Perbaikan Sertifikat' },
-    ],
-  },
-  { to: '/humas/laporan',           label: 'Laporan',                 icon: BarChart3 },
-  { to: '/humas/profil',            label: 'Profil',                  icon: User },
+const SECTIONS = [
+  { items: [{ to: '/humas/ringkasan', label: 'Dashboard', icon: Home }] },
+  { title: 'Kelola', items: [
+    { to: '/humas/kelola-kegiatan', label: 'Kegiatan', icon: Briefcase, badge: t => t.presensiMenunggu?.total },
+    { to: '/humas/kelola-mitra', label: 'Mitra', icon: Handshake },
+    { to: '/humas/kelola-gedung', label: 'Gedung & Ruangan', icon: MapPin },
+    { to: '/humas/kelola-pengguna', label: 'Pengguna', icon: Users },
+  ] },
+  { title: 'Sertifikat', items: [
+    { to: '/humas/template-sertifikat', label: 'Template', icon: FileText },
+    { to: '/humas/perbaikan-sertifikat', label: 'Perbaikan', icon: Award, badge: t => t.perbaikanAktif?.total },
+  ] },
+  { title: 'Analitik', items: [{ to: '/humas/laporan', label: 'Laporan', icon: BarChart3 }] },
 ];
+
+
 
 const pageTitles = {
   '/humas/ringkasan':            'Dashboard',
@@ -46,14 +42,9 @@ export default function LayoutHumas() {
   const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sertifikatOpen, setSertifikatOpen] = useState(
-    location.pathname.startsWith('/humas/template-sertifikat') ||
-    location.pathname.startsWith('/humas/perbaikan-sertifikat')
-  );
   const [showNotif, setShowNotif] = useState(false);
   const notifRef = useRef(null);
   const currentHumas = useCurrentUser();
-  const { logout } = useAuth();
   const { items: notifikasiData, unread: unreadCount, markRead } = useNotifications();
 
   // Tutup dropdown saat klik luar
@@ -78,79 +69,7 @@ export default function LayoutHumas() {
       {navOverlay}
 
       {/* ── SIDEBAR ── */}
-      <aside className="sidebar" aria-label="Navigasi Humas">
-        {/* Brand */}
-        <div className="sidebar-brand">
-          <UnandLogo className="sidebar-brandmark" />
-          <div>
-            <strong>Workshop UNAND</strong>
-            <span>Sistem Informasi Manajemen Kegiatan</span>
-          </div>
-        </div>
-
-        {/* Role badge */}
-        <div className="sidebar-role-badge">
-          <span>MASUK SEBAGAI</span>
-          <strong>Humas</strong>
-        </div>
-
-        {/* Navigation */}
-        <nav aria-label="Navigasi Menu">
-          {navItems.map((item) => {
-            if (item.children) {
-              const isParentActive = item.children.some(c => location.pathname.startsWith(c.to));
-              return (
-                <div key={item.label} className="sidebar-group">
-                  <button
-                    className={`sidebar-group-btn${isParentActive ? ' is-active active' : ''}`}
-                    onClick={() => setSertifikatOpen(o => !o)}
-                  >
-                    <item.icon size={20} />
-                    <span>{item.label}</span>
-                    {sertifikatOpen
-                      ? <ChevronDown size={14} style={{ marginLeft: 'auto' }} />
-                      : <ChevronRight size={14} style={{ marginLeft: 'auto' }} />
-                    }
-                  </button>
-                  {sertifikatOpen && (
-                    <div className="sidebar-sub-menu">
-                      {item.children.map(child => (
-                        <NavLink
-                          key={child.to}
-                          to={child.to}
-                          className={location.pathname.startsWith(child.to) ? 'is-active active sidebar-sub-link' : 'sidebar-sub-link'}
-                        >
-                          <span>{child.label}</span>
-                        </NavLink>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            const isActive = location.pathname.startsWith(item.to);
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={isActive ? 'is-active active' : ''}
-              >
-                <item.icon size={20} />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Logout */}
-        <button
-          className="sidebar-logout"
-          onClick={() => { logout(); navigate('/', { replace: true }); }}
-        >
-          <LogOut size={20} />
-          <span>Keluar</span>
-        </button>
-      </aside>
+      <Sidebar className="sidebar" ariaLabel="Navigasi Humas" portal="Humas" sections={SECTIONS} />
 
       {/* ── MAIN CONTENT AREA ── */}
       <div className="main-content">

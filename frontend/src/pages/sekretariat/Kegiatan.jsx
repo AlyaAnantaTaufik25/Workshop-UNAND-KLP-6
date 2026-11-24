@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -54,7 +55,7 @@ export default function Kegiatan() {
           />
         </div>
 
-        <select
+        <Select
           className="filter-select"
           value={filterJenis}
           onChange={e => setFilterJenis(e.target.value)}
@@ -62,9 +63,9 @@ export default function Kegiatan() {
           <option value="">Semua jenis</option>
           <option value="Workshop">Workshop</option>
           <option value="Seminar">Seminar</option>
-        </select>
+        </Select>
 
-        <select
+        <Select
           className="filter-select"
           value={filterMode}
           onChange={e => setFilterMode(e.target.value)}
@@ -72,9 +73,9 @@ export default function Kegiatan() {
           <option value="">Semua kategori mode</option>
           <option value="offline">Offline (Tatap Muka)</option>
           <option value="online">Online (Daring)</option>
-        </select>
+        </Select>
 
-        <select
+        <Select
           className="filter-select"
           value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
@@ -83,7 +84,7 @@ export default function Kegiatan() {
           <option value="menunggu-rektor">Menunggu Rektor</option>
           <option value="menunggu-mitra">Menunggu Mitra</option>
           <option value="diterbitkan">Diterbitkan</option>
-        </select>
+        </Select>
       </div>
 
       {/* Table */}

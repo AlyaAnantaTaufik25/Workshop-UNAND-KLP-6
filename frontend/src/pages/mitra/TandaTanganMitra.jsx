@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Search,
   ArrowLeft,
@@ -26,6 +26,8 @@ import { usePortalData } from '../../context/PortalData';
 import { certificatesApi } from '../../api';
 import { useEffect as useSyncEffect } from 'react';
 import { usePagination } from '../../components/Pagination';
+import { dialog, toast } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 /* ------------------------------------------------------------------ */
 /* Canvas Tanda Tangan — mendukung Pen & Eraser, expose via ref        */
@@ -167,8 +169,9 @@ export default function TandaTanganMitra() {
   const [filterTanggal, setFilterTanggal] = useState('');
 
   // Mode View: 'list' | 'detail' | 'sign'
-  const [viewMode, setViewMode] = useState('list');
-  const [selectedId, setSelectedId] = useState(null);
+  const { id: routeId } = useParams();
+  const [viewMode, setViewMode] = useState(routeId ? 'detail' : 'list');
+  const [selectedId, setSelectedId] = useState(routeId ? Number(routeId) : null);
 
   // State untuk halaman tanda tangan
   const [tool, setTool] = useState('pen');
@@ -178,13 +181,10 @@ export default function TandaTanganMitra() {
   const [signPin, setSignPin] = useState('');
   const [signPinError, setSignPinError] = useState('');
   const [signPage, setSignPage] = useState(1);
-  const [toastMsg, setToastMsg] = useState('');
   const canvasRef = useRef(null);
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3500);
-  };
+  // Toast seragam (komponen Dialog global)
+  const showToast = (msg) => toast(msg, { tone: /gagal|salah|tidak|ditolak/i.test(msg) ? 'error' : 'success' });
 
   const selectedItem = data.find((d) => d.id === selectedId) || data[0];
 
@@ -293,7 +293,7 @@ export default function TandaTanganMitra() {
 
     const printWindow = window.open('', '_blank', 'width=950,height=750');
     if (!printWindow) {
-      alert('Harap izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.');
+      dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.', tone: 'warning' });
       return;
     }
 
@@ -432,9 +432,6 @@ export default function TandaTanganMitra() {
         {/* Header Detail */}
         <div className="mitra-list-header">
           <div className="mitra-intro">
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--mitra-green)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-              STATUS DOKUMEN
-            </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 2 }}>
               <h2 style={{ margin: 0 }}>Detail Sertifikat</h2>
               <span className={cfg.className}>{cfg.label}</span>
@@ -674,12 +671,6 @@ export default function TandaTanganMitra() {
 
     return (
       <div className="mitra-stack">
-        {/* Toast */}
-        {toastMsg && (
-          <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1000, background: '#14532d', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
-            <Check size={16} /> {toastMsg}
-          </div>
-        )}
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
@@ -887,36 +878,10 @@ export default function TandaTanganMitra() {
   // =========================================================================
   return (
     <div className="mitra-stack">
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 1000,
-            background: '#14532d',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <Check size={16} /> {toastMsg}
-        </div>
-      )}
 
       {/* Header Halaman Sesuai Desain */}
       <div className="mitra-list-header">
         <div className="mitra-intro">
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--mitra-green)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-            Dashboard Mitra
-          </span>
           <h2 style={{ margin: '2px 0 4px 0' }}>Tanda Tangan</h2>
           <p>Kelola proses penandatanganan sertifikat kegiatan yang menjadi kewenangan Mitra.</p>
         </div>
@@ -975,7 +940,7 @@ export default function TandaTanganMitra() {
           </label>
 
           {/* Filter Jenis Kegiatan */}
-          <select
+          <Select
             value={filterJenis}
             onChange={e => setFilterJenis(e.target.value)}
           >
@@ -983,10 +948,10 @@ export default function TandaTanganMitra() {
             <option value="Workshop">Workshop</option>
             <option value="Seminar">Seminar</option>
             <option value="Kuliah Umum">Kuliah Umum</option>
-          </select>
+          </Select>
 
           {/* Filter Nama Kegiatan */}
-          <select
+          <Select
             value={filterKegiatan}
             onChange={e => setFilterKegiatan(e.target.value)}
             style={{ maxWidth: 220 }}
@@ -995,10 +960,10 @@ export default function TandaTanganMitra() {
             {kegiatanList.map(k => (
               <option key={k} value={k}>{k}</option>
             ))}
-          </select>
+          </Select>
 
           {/* Filter Status Tanda Tangan */}
-          <select
+          <Select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
           >
@@ -1006,7 +971,7 @@ export default function TandaTanganMitra() {
             <option value="menunggu-ttd">Menunggu TTD</option>
             <option value="menunggu-rektor">Menunggu Rektor</option>
             <option value="diterbitkan">Diterbitkan</option>
-          </select>
+          </Select>
 
           {/* Filter Periode Tanggal */}
           <input
@@ -1090,16 +1055,7 @@ export default function TandaTanganMitra() {
 
                     {/* 5. Sumber */}
                     <td>
-                      <span style={{
-                        background: '#F0F9FF',
-                        border: '1px solid #BAE6FD',
-                        borderRadius: 4,
-                        padding: '2px 8px',
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: '#0369A1',
-                        whiteSpace: 'nowrap',
-                      }}>
+                      <span className={`source-tag ${item.sumber === 'UNAND' ? 'source-unand' : 'source-mitra'}`}>
                         {item.sumber}
                       </span>
                     </td>
@@ -1123,26 +1079,7 @@ export default function TandaTanganMitra() {
 
                     {/* 9. Tindakan */}
                     <td style={{ textAlign: 'center' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleBukaDetail(item)}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#14532d',
-                          fontWeight: 600,
-                          fontSize: 13,
-                          cursor: 'pointer',
-                          padding: '6px 10px',
-                          borderRadius: 6,
-                          transition: 'background 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#EBF5EE')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
+                      <button type="button" className="ui-row-action" onClick={() => handleBukaDetail(item)}>
                         Lihat Detail <ArrowRight size={14} />
                       </button>
                     </td>

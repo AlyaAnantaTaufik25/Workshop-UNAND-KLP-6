@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CalendarDays, Clock, MapPin, ArrowLeft, Users, CheckCircle2, UserCheck, Calendar, Download } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import { exportExcel } from '../../utils/excel';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
 
@@ -166,25 +167,21 @@ export default function DetailKegiatanMitra() {
               <button
                 type="button"
                 className="mitra-btn mitra-btn--secondary"
-                onClick={() => {
-                  const list = detail?.peserta ?? [];
-                  const headers = ['No', 'Nama Peserta', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran'];
-                  const rows = list.map((p, i) => [
-                    i + 1,
-                    `"${p.nama}"`,
-                    `"${p.jenis || 'Mahasiswa'}"`,
-                    `"${p.kegiatan || kegiatan.nama}"`,
-                    `"${p.statusPendaftaran || 'Terdaftar'}"`
-                  ]);
-                  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-                  const encodedUri = encodeURI(csvContent);
-                  const link = document.createElement('a');
-                  link.setAttribute('href', encodedUri);
-                  link.setAttribute('download', `Daftar_Peserta_${kegiatan.nama.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
+                onClick={() => exportExcel({
+                  fileName: `Daftar_Peserta_${kegiatan.nama}`,
+                  title: 'Daftar Peserta Kegiatan',
+                  subtitle: `${kegiatan.penyelenggara || 'Mitra'} · Sistem Informasi Workshop UNAND`,
+                  info: [['Kegiatan', kegiatan.nama], ['Tanggal', kegiatan.tanggal || '-'], ['Jumlah peserta', `${(detail?.peserta ?? []).length} orang`]],
+                  sheets: [{
+                    name: 'Peserta', numbered: true,
+                    columns: [
+                      { header: 'Nama Peserta', key: 'nama' },
+                      { header: 'Jenis Peserta', key: 'jenis', value: p => p.jenis || 'Mahasiswa' },
+                      { header: 'Status Pendaftaran', key: 'statusPendaftaran', value: p => p.statusPendaftaran || 'Terdaftar' },
+                    ],
+                    rows: detail?.peserta ?? [],
+                  }],
+                })}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}
               >
                 <Download size={14} />

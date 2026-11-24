@@ -7,7 +7,7 @@ import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
 
 export function CertificateHeading({ title, description, children }) {
-  return <section className="peserta-certificate-heading"><div><span className="peserta-tag">SERTIFIKAT SAYA</span><h2>{title}</h2><p>{description}</p></div><div className="peserta-certificate-actions">{children}</div></section>;
+  return <section className="peserta-certificate-heading"><div><h2>{title}</h2><p>{description}</p></div><div className="peserta-certificate-actions">{children}</div></section>;
 }
 
 export function CertificateMetadata({ certificate }) {

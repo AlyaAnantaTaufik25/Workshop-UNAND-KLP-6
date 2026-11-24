@@ -4,6 +4,7 @@ import { PortalDataProvider } from './context/PortalData';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import LayoutPeserta from './pages/peserta/LayoutPeserta';
+import BerandaPeserta from './pages/peserta/Beranda';
 import CariWorkshop from './pages/peserta/CariWorkshop';
 import DetailWorkshop from './pages/peserta/DetailWorkshop';
 import WorkshopSaya from './pages/peserta/WorkshopSaya';
@@ -17,6 +18,7 @@ import ProfilPeserta from './pages/peserta/ProfilPeserta';
 
 // Sekretariat Rektor
 import Layout from './components/Layout';
+import DashboardSekretariat from './pages/sekretariat/Dashboard';
 import Kegiatan from './pages/sekretariat/Kegiatan';
 import Presensi from './pages/sekretariat/Presensi';
 import Sertifikat from './pages/sekretariat/Sertifikat';
@@ -48,7 +50,6 @@ import TemplateSertifikatMitra from './pages/mitra/TemplateSertifikatMitra';
 import PerbaikanSertifikatMitra from './pages/mitra/PerbaikanSertifikatMitra';
 import DetailDokumenPenggantiMitra from './pages/mitra/DetailDokumenPenggantiMitra';
 import TandaTanganMitra from './pages/mitra/TandaTanganMitra';
-import DetailTandaTanganMitra from './pages/mitra/DetailTandaTanganMitra';
 import LaporanMitra from './pages/mitra/LaporanMitra';
 import ProfilMitra from './pages/mitra/ProfilMitra';
 import RingkasanHumas from './pages/humas/RingkasanHumas';
@@ -69,7 +70,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/peserta" element={<RequireRole role="peserta"><LayoutPeserta /></RequireRole>}>
-          <Route index element={<Navigate to="cari-workshop" replace />} />
+          <Route index element={<Navigate to="beranda" replace />} />
+          <Route path="beranda" element={<BerandaPeserta />} />
           <Route path="cari-workshop" element={<CariWorkshop />} />
           <Route path="workshop/:id" element={<DetailWorkshop />} />
           <Route path="workshop-saya" element={<WorkshopSaya />} />
@@ -85,7 +87,8 @@ function App() {
 
         {/* ── ROLE: SEKRETARIAT REKTOR ── */}
         <Route path="/sekretariat" element={<RequireRole role="sekretariat"><PortalDataProvider role="sekretariat"><Layout /></PortalDataProvider></RequireRole>}>
-          <Route index element={<Navigate to="kegiatan" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardSekretariat />} />
           <Route path="kegiatan" element={<Kegiatan />} />
           <Route path="kegiatan/:id" element={<DetailKegiatanKegiatan />} />
           <Route path="presensi" element={<Presensi />} />
@@ -133,7 +136,7 @@ function App() {
           <Route path="perbaikan-sertifikat" element={<PerbaikanSertifikatMitra />} />
           <Route path="dokumen-pengganti/:id" element={<DetailDokumenPenggantiMitra />} />
           <Route path="tanda-tangan" element={<TandaTanganMitra />} />
-          <Route path="tanda-tangan/:id" element={<DetailTandaTanganMitra />} />
+          <Route path="tanda-tangan/:id" element={<TandaTanganMitra />} />
           <Route path="laporan" element={<LaporanMitra />} />
           <Route path="profil" element={<ProfilMitra />} />
         </Route>

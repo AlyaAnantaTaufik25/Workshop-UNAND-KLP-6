@@ -15,6 +15,7 @@ import UnandLogo from '../../components/UnandLogo';
 import SignatureCanvas from '../../components/SignatureCanvas';
 import { usePortalData } from '../../context/PortalData';
 import { certificatesApi } from '../../api';
+import { toast } from '../../components/Dialog';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
@@ -32,15 +33,12 @@ export default function DetailDokumenPenggantiRektor() {
   const [signPin, setSignPin]             = useState('');
   const [signPinError, setSignPinError]   = useState('');
   const [tool, setTool]                   = useState('pen');
-  const [toastMsg, setToastMsg]           = useState('');
   const canvasRef = useRef(null);
 
   const dp = dokumenPengganti.find(d => String(d.id) === id) || dokumenPengganti[0];
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3500);
-  };
+  // Toast seragam (komponen Dialog global)
+  const showToast = (msg) => toast(msg, { tone: /gagal|salah|tidak|ditolak/i.test(msg) ? 'error' : 'success' });
 
   const handleProsesTTEUlang = async () => {
     if (!signPin || signPin.length !== 6) {
@@ -70,29 +68,6 @@ export default function DetailDokumenPenggantiRektor() {
 
   return (
     <div>
-      {/* Toast Notifikasi */}
-      {toastMsg && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 1000,
-            background: '#14532d',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <Check size={16} /> {toastMsg}
-        </div>
-      )}
 
       <BackButton to="/rektor/sertifikat-perbaikan" label="Kembali ke Sertifikat Perbaikan" />
 
@@ -427,7 +402,7 @@ export default function DetailDokumenPenggantiRektor() {
 
       {/* ── MODAL CANVAS TTE & PIN DIGITAL SIGNATURE REKTOR ── */}
       {showSignModal && (
-        <div
+        <div className="ui-modal-backdrop"
           style={{
             position: 'fixed',
             inset: 0,

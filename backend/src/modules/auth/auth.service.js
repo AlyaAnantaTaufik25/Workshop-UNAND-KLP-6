@@ -34,6 +34,7 @@ function serializeUser(u) {
     alamat: u.partner_alamat || '',
     subtitle: u.role === 'mitra' ? 'Mitra · Penanggung jawab instansi' : u.role_name,
     hasPin: !!u.pin_hash,
+    createdAt: u.created_at || null,
   };
 }
 

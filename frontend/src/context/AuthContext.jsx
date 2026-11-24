@@ -6,9 +6,9 @@ const AuthContext = createContext(null);
 
 /** Halaman awal tiap role setelah login */
 export const ROLE_HOME = {
-  peserta: '/peserta/cari-workshop',
+  peserta: '/peserta/beranda',
   humas: '/humas/ringkasan',
-  sekretariat: '/sekretariat/kegiatan',
+  sekretariat: '/sekretariat/dashboard',
   mitra: '/mitra/kegiatan-kerja-sama',
   rektor: '/rektor/pengajuan',
 };

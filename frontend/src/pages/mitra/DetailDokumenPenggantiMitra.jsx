@@ -3,20 +3,32 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { PenTool, CheckCircle, ArrowLeft, AlertCircle, FileText, Check } from 'lucide-react';
 import UnandLogo from '../../components/UnandLogo';
 import { usePortalData } from '../../context/PortalData';
+import { certificatesApi } from '../../api';
+import { toast } from '../../components/Dialog';
 
 export default function DetailDokumenPenggantiMitra() {
-  const { dokumenPengganti } = usePortalData();
+  const { dokumenPengganti, reload } = usePortalData();
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState('baru');
-  const [approved, setApproved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const dp = dokumenPengganti.find(d => String(d.id) === id) || dokumenPengganti[0];
 
-  const handleApprove = () => {
-    setApproved(true);
-    setShowModal(false);
+  const approved = !!dp?.disetujuiMitra;
+  const handleApprove = async () => {
+    setSaving(true);
+    try {
+      await certificatesApi.approveReplacement(dp.id);
+      await reload();
+      toast('Dokumen pengganti disetujui dan diteruskan ke Rektor.');
+      setShowModal(false);
+    } catch (err) {
+      toast(err.message, { tone: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -196,7 +208,7 @@ export default function DetailDokumenPenggantiMitra() {
         <div>
           <h4 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>Persetujuan Dokumen Hasil Perbaikan</h4>
           <p style={{ fontSize: 13, color: 'var(--mitra-muted)', marginTop: 4 }}>
-            {approved ? 'Dokumen perbaikan telah disetujui oleh Mitra dan diteruskan ke Rektor.' : 'Pastikan rincian data koreksi sudah sesuai dengan kesepakatan kegiatan kerja sama.'}
+            {approved ? `Disetujui oleh ${dp.penyetujuMitra || 'Mitra'} · ${dp.waktuSetujuMitra}. Diteruskan ke Rektor untuk TTE ulang.` : 'Pastikan rincian data koreksi sudah sesuai dengan kesepakatan kegiatan kerja sama.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -245,8 +257,8 @@ export default function DetailDokumenPenggantiMitra() {
               <button className="modal-btn modal-btn-batal" onClick={() => setShowModal(false)}>
                 Batal
               </button>
-              <button className="modal-btn modal-btn-publish" onClick={handleApprove}>
-                Ya, Setujui & Lanjutkan
+              <button className="modal-btn modal-btn-publish" onClick={handleApprove} disabled={saving}>
+                {saving ? 'Menyimpan…' : 'Ya, Setujui & Lanjutkan'}
               </button>
             </div>
           </div>

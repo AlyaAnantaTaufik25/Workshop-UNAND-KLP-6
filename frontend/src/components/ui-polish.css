@@ -333,3 +333,125 @@ h1, h2, h3, .humas-section-title, .ringkasan-title, .humas-detail-title {
   text-align: center;
   box-shadow: 0 0 0 2px #ffffff;
 }
+
+/* ============================================================
+   MODAL SERAGAM — semua popup lama mengikuti gaya Dialog baru
+   (token warna/radius/bayangan ada di components/dialog.css)
+   ============================================================ */
+.modal-overlay,
+.peserta-modal-backdrop,
+.ui-modal-backdrop {
+  background: var(--ui-overlay) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.modal-box,
+.confirm-modal,
+.peserta-modal {
+  border: 0 !important;
+  border-radius: var(--ui-radius-lg) !important;
+  box-shadow: var(--ui-shadow-lg) !important;
+  overflow: hidden;
+}
+.peserta-modal { overflow: auto; }
+
+/* Header */
+.modal-header,
+.confirm-modal-header,
+.peserta-modal > header {
+  padding: 20px 24px !important;
+  border-bottom: 1px solid #eef2ef !important;
+  align-items: center;
+}
+.modal-header-title,
+.confirm-modal-title,
+.peserta-modal > header h2 {
+  margin: 0;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  color: var(--ui-text);
+}
+.modal-header-crumb {
+  margin: 0 0 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #228b45;
+}
+
+/* Tombol tutup (X) */
+.modal-close-btn,
+.peserta-modal > header .peserta-icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  display: grid !important;
+  place-items: center;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: var(--ui-muted) !important;
+  cursor: pointer;
+}
+.modal-close-btn:hover,
+.peserta-modal > header .peserta-icon-button:hover {
+  background: #f1f5f3 !important;
+  color: var(--ui-text) !important;
+}
+
+/* Isi */
+.confirm-modal-body,
+.peserta-modal-body {
+  padding: 20px 24px !important;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #3f4b44;
+}
+
+/* Footer */
+.modal-footer,
+.confirm-modal-footer,
+.peserta-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px !important;
+  padding: 16px 24px !important;
+  border-top: 1px solid #eef2ef !important;
+  background: #fafbfa;
+}
+.modal-btn {
+  min-width: 96px;
+  height: 40px;
+  padding: 0 18px !important;
+  border-radius: var(--ui-radius-md) !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+}
+.modal-btn-batal {
+  border: 1px solid #d5ddd8 !important;
+  background: #ffffff !important;
+  color: var(--ui-text) !important;
+}
+.modal-btn-batal:hover { background: #f4f7f5 !important; }
+
+@media (max-width: 520px) {
+  .modal-footer,
+  .confirm-modal-footer,
+  .peserta-modal > footer { flex-direction: column-reverse; align-items: stretch; }
+  .modal-footer .modal-btn,
+  .confirm-modal-footer .modal-btn,
+  .peserta-modal > footer button { width: 100%; }
+}
+
+/* ============================================================
+   TATA LETAK FORM — kartu profil & form tidak melebar berlebihan
+   ============================================================ */
+.profil-card,
+.profil-new-card,
+.mitra-profil-container,
+.peserta-profile-form {
+  max-width: 880px !important;
+}

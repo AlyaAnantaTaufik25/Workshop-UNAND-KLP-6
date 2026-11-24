@@ -143,6 +143,34 @@ class CertificatesService {
     return this.getSubmission(id, user);
   }
 
+  /**
+   * Sekretariat Rektor memeriksa draft: dapat mengganti template dan memberi catatan.
+   * Tidak mengubah status TTE; menandai pengajuan sudah diverifikasi.
+   */
+  async verifySubmission(id, body, user) {
+    const s = await this.getSubmissionRow(id, user);
+    if (s.status === 'diterbitkan') throw unprocessable('Sertifikat sudah diterbitkan dan tidak dapat diubah');
+    const data = { verified_at: new Date(), verified_by: user.id };
+    if (body.templateId !== undefined) {
+      const t = await repo.template(body.templateId);
+      if (!t) throw notFound('Template tidak ditemukan');
+      if (t.partner_id && t.partner_id !== s.partner_id) throw badRequest('Template mitra lain tidak dapat dipakai');
+      data.template_id = t.id;
+      if (s.template_id && s.template_id !== t.id) {
+        // Template lama kembali tersedia bila tidak dipakai pengajuan lain
+        await repo.db.query(
+          `UPDATE certificate_templates SET status = 'dapat-dipakai'
+           WHERE id = ? AND status = 'dipakai' AND NOT EXISTS (SELECT 1 FROM certificate_submissions WHERE template_id = ? AND id <> ?)`,
+          [s.template_id, s.template_id, s.id]
+        );
+      }
+      if (!t.is_library) await repo.updateRow('certificate_templates', t.id, { status: 'dipakai' });
+    }
+    if (body.catatan !== undefined) data.catatan = String(body.catatan).slice(0, 500) || null;
+    await repo.updateRow('certificate_submissions', s.id, data);
+    return this.getSubmission(s.id, user);
+  }
+
   /** Tanda tangan elektronik oleh mitra atau rektor (diverifikasi dengan PIN) */
   async signSubmission(id, body, user) {
     const s = await this.getSubmissionRow(id, user);
@@ -342,6 +370,18 @@ class CertificatesService {
     const item = list.find((r) => String(r.id) === String(id) || r.code === id);
     if (!item) throw notFound('Dokumen pengganti tidak ditemukan');
     return item;
+  }
+
+  /** Mitra menyetujui dokumen pengganti hasil perbaikan sertifikat instansinya */
+  async approveReplacement(id, user) {
+    await this.getReplacement(id, user);
+    const c = await repo.correction(id);
+    if (c.mitra_approved_at) throw unprocessable('Dokumen pengganti ini sudah disetujui');
+    await repo.updateRow('certificate_corrections', c.id, { mitra_approved_at: new Date(), mitra_approved_by: user.id });
+    if (c.tte_status === 'sedang-diproses') {
+      await repo.notify({ role_code: 'rektor', judul: 'Dokumen Pengganti Disetujui Mitra', deskripsi: `${c.user_nama} · ${c.workshop_nama}`, link: '/rektor/sertifikat-perbaikan' });
+    }
+    return this.getReplacement(c.id, user);
   }
 
   /** Rektor menandatangani ulang dokumen pengganti */

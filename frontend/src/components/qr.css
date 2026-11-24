@@ -1,0 +1,103 @@
+/* ── QR presensi (panitia) ── */
+.qrp-card {
+  position: relative;
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #f4fbf6;
+  border: 1px solid #cfe8d8;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px 22px;
+  align-items: center;
+}
+.qrp-image {
+  position: relative;
+  width: 168px;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #dbe7df;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+}
+.qrp-image img { width: 100%; height: 100%; image-rendering: pixelated; }
+.qrp-image.is-expired img { opacity: .18; filter: grayscale(1); }
+.qrp-expired-tag {
+  position: absolute;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+}
+.qrp-loading { width: 28px; height: 28px; border-radius: 50%; border: 3px solid #d1e7da; border-top-color: #1a7f45; animation: qrp-spin .8s linear infinite; }
+@keyframes qrp-spin { to { transform: rotate(360deg); } }
+.qrp-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.qrp-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #3f6b50; }
+.qrp-code { font-size: 30px; font-weight: 800; letter-spacing: 6px; color: #14532d; font-variant-numeric: tabular-nums; }
+.qrp-timer { font-size: 13px; color: #4b5563; }
+.qrp-timer b { color: #14532d; font-variant-numeric: tabular-nums; }
+.qrp-timer.is-expired { color: #b91c1c; font-weight: 600; }
+.qrp-hint { margin: 6px 0 0; font-size: 12.5px; line-height: 1.5; color: #5b6b62; }
+.qrp-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.qrp-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 14px;
+  border-radius: 10px; border: 1px solid #cfe0d5; background: #fff;
+  font: inherit; font-size: 13px; font-weight: 600; color: #1f3b2b; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.qrp-btn:hover:not(:disabled) { background: #eef7f1; border-color: #9fcdb1; }
+.qrp-btn:disabled { opacity: .5; cursor: not-allowed; }
+.qrp-btn--primary { background: #14532d; border-color: #14532d; color: #fff; }
+.qrp-btn--primary:hover:not(:disabled) { background: #0f3d24; }
+.qrp-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent;
+  display: grid; place-items: center; color: #4b5563; cursor: pointer;
+}
+.qrp-close:hover { background: rgba(15, 61, 36, .08); }
+
+/* Layar penuh untuk proyektor */
+.qrp-full {
+  position: fixed; inset: 0; z-index: 1200;
+  background: rgba(8, 28, 17, .82);
+  display: grid; place-items: center; padding: 24px;
+  animation: qrp-fade .18s ease-out;
+}
+@keyframes qrp-fade { from { opacity: 0; } }
+.qrp-full-inner {
+  background: #fff; border-radius: 20px; padding: 28px 32px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+  max-width: min(560px, 100%);
+}
+.qrp-full-title { margin: 0; font-size: 18px; font-weight: 700; color: #102a1b; }
+.qrp-full .qrp-image { width: min(380px, 72vw, 58vh); }
+.qrp-full .qrp-info { align-items: center; }
+.qrp-full .qrp-code { font-size: 40px; }
+
+@media (max-width: 560px) {
+  .qrp-card { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .qrp-info { align-items: center; }
+}
+
+/* ── Pemindai QR (peserta) ── */
+.qrs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; padding: 14px; border-radius: 14px; border: 1px solid #dbe7df; background: #f8fbf9; position: relative; }
+.qrs-head { display: flex; align-items: center; justify-content: space-between; }
+.qrs-head .qrp-close { position: static; }
+.qrs-view { position: relative; border-radius: 12px; overflow: hidden; background: #0b1f14; min-height: 240px; }
+.qrs-region { width: 100%; }
+.qrs-region video { width: 100% !important; display: block; }
+.qrs-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 20px; text-align: center; color: #e6f2ea; font-size: 13.5px; line-height: 1.5;
+}
+.qrs-overlay--error { color: #fde2e2; }
+.qrs-hint { margin: 0; font-size: 12.5px; color: #5b6b62; }
+.peserta-code-row { display: flex; gap: 8px; align-items: stretch; }
+.peserta-code-row input { flex: 1; min-width: 0; }
+.peserta-code-row .peserta-button { white-space: nowrap; }
+.peserta-field-note { font-size: 12px; color: #1a7f45; font-weight: 600; }

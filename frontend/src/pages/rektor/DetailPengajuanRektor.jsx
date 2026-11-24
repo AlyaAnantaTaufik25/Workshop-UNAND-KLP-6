@@ -20,6 +20,7 @@ import UnandLogo from '../../components/UnandLogo';
 import SignatureCanvas from '../../components/SignatureCanvas';
 import { usePortalData } from '../../context/PortalData';
 import { certificatesApi } from '../../api';
+import { dialog, toast } from '../../components/Dialog';
 
 const statusClass = {
   'menunggu-rektor': 'badge badge-orange',
@@ -57,53 +58,40 @@ export default function DetailPengajuanRektor() {
   const [signPin, setSignPin] = useState('');
   const [signPinError, setSignPinError] = useState('');
   const [signPage, setSignPage] = useState(1);
-  const [toastMsg, setToastMsg] = useState('');
   const canvasRef = useRef(null);
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3500);
-  };
+  // Toast seragam (komponen Dialog global)
+  const showToast = (msg) => toast(msg, { tone: /gagal|salah|tidak|ditolak/i.test(msg) ? 'error' : 'success' });
 
   if (!sert) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
         <p>Data tidak ditemukan.</p>
-        <button
-          onClick={() => navigate('/rektor/pengajuan')}
-          style={{
-            marginTop: '16px',
-            color: 'var(--green-700)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          ← Kembali ke daftar
-        </button>
+        <BackButton onClick={() => navigate('/rektor/pengajuan')} label="Kembali ke daftar" />
       </div>
     );
   }
 
   const isMenungguRektor = !signed;
 
+  // Urutan sesuai alur backend: Humas -> TTE Mitra (bila ada mitra) -> TTE Rektor -> terbit
+  const mitraDone = !sert.perluMitra || sert.statusTandaTangan !== 'menunggu-mitra';
   const steps = [
-    { label: 'Template oleh Humas', done: true },
+    { label: 'Template oleh Humas', done: true, statusText: 'Selesai' },
+    ...(sert.perluMitra ? [{
+      label: 'Pimpinan Mitra',
+      done: mitraDone,
+      statusText: mitraDone ? `Selesai ditandatangani${sert.waktuTtdMitra ? ` · ${sert.waktuTtdMitra}` : ''}` : 'Menunggu tanda tangan',
+    }] : []),
     {
       label: 'Rektor UNAND',
       done: signed,
-      statusText: signed ? 'Selesai ditandatangani' : 'Menunggu tanda tangan',
+      statusText: signed ? 'Selesai ditandatangani' : mitraDone ? 'Menunggu tanda tangan Anda' : 'Menunggu tanda tangan Mitra',
     },
     {
-      label: 'Pimpinan Mitra',
-      done: sert.statusTandaTangan === 'diterbitkan' || signed,
-      statusText: signed ? 'Selesai' : 'Menunggu',
-    },
-    {
-      label: 'Penerbitan oleh Sekretariat',
+      label: 'Sertifikat diterbitkan',
       done: signed,
-      note: 'Setelah tanda tangan lengkap',
+      note: 'Otomatis setelah tanda tangan lengkap',
     },
   ];
 
@@ -155,7 +143,7 @@ export default function DetailPengajuanRektor() {
   const handlePratinjauPDF = () => {
     const printWindow = window.open('', '_blank', 'width=950,height=750');
     if (!printWindow) {
-      alert('Harap izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.');
+      dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk melihat atau mencetak pratinjau sertifikat PDF.', tone: 'warning' });
       return;
     }
 
@@ -262,29 +250,6 @@ export default function DetailPengajuanRektor() {
   if (viewMode === 'sign') {
     return (
       <div>
-        {/* Toast Notifikasi */}
-        {toastMsg && (
-          <div
-            style={{
-              position: 'fixed',
-              bottom: 24,
-              right: 24,
-              zIndex: 1000,
-              background: '#14532d',
-              color: '#fff',
-              padding: '12px 20px',
-              borderRadius: 8,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 13,
-              fontWeight: 600,
-            }}
-          >
-            <Check size={16} /> {toastMsg}
-          </div>
-        )}
 
         {/* Header Tanda Tangan Template */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
@@ -673,29 +638,6 @@ export default function DetailPengajuanRektor() {
   // =========================================================================
   return (
     <div>
-      {/* Toast Notifikasi */}
-      {toastMsg && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 1000,
-            background: '#14532d',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <Check size={16} /> {toastMsg}
-        </div>
-      )}
 
       {/* Back button */}
       <BackButton to="/rektor/pengajuan" label="Kembali ke Daftar Pengajuan" />

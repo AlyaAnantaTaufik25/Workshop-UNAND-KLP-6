@@ -4,7 +4,7 @@ const SUBMISSION_SELECT = `
   SELECT s.*, w.id AS w_id, w.slug, w.nama AS workshop_nama, w.jenis, w.sumber, w.penyelenggara, w.partner_id,
          w.tanggal_mulai, w.tanggal_selesai, p.nama AS partner_nama,
          t.nama AS template_nama, t.desain_key, t.warna_utama,
-         um.nama AS mitra_signer, ur.nama AS rektor_signer,
+         um.nama AS mitra_signer, ur.nama AS rektor_signer, uv.nama AS verifier,
          (SELECT COUNT(DISTINCT r.id) FROM registrations r JOIN attendances a ON a.registration_id = r.id
             WHERE r.workshop_id = w.id AND a.status = 'hadir' AND r.status IN ('terdaftar','selesai')) AS jumlah_hadir,
          (SELECT u.nama FROM registrations r JOIN attendances a ON a.registration_id = r.id JOIN users u ON u.id = r.user_id
@@ -15,19 +15,21 @@ const SUBMISSION_SELECT = `
   LEFT JOIN certificate_templates t ON t.id = s.template_id
   LEFT JOIN users um ON um.id = s.mitra_signed_by
   LEFT JOIN users ur ON ur.id = s.rektor_signed_by
+  LEFT JOIN users uv ON uv.id = s.verified_by
 `;
 
 const CORRECTION_SELECT = `
   SELECT c.*, ce.code AS cert_code, ce.nomor, ce.nama_penerima, ce.gelar, ce.info_tambahan, ce.issued_at,
          w.id AS workshop_id, w.slug, w.nama AS workshop_nama, w.jenis, w.sumber, w.penyelenggara, w.partner_id,
          w.tanggal_mulai, w.tanggal_selesai, p.nama AS partner_nama,
-         u.nama AS user_nama, u.email AS user_email, us.nama AS tte_signer
+         u.nama AS user_nama, u.email AS user_email, us.nama AS tte_signer, ua.nama AS mitra_approver
   FROM certificate_corrections c
   JOIN certificates ce ON ce.id = c.certificate_id
   JOIN workshops w ON w.id = ce.workshop_id
   JOIN users u ON u.id = c.user_id
   LEFT JOIN partners p ON p.id = w.partner_id
   LEFT JOIN users us ON us.id = c.tte_signed_by
+  LEFT JOIN users ua ON ua.id = c.mitra_approved_by
 `;
 
 /**

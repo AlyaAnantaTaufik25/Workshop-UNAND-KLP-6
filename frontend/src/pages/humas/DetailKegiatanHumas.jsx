@@ -6,6 +6,11 @@ import TambahKegiatanModal from './components/TambahKegiatanModal';
 import useApi from '../../hooks/useApi';
 import { attendanceApi, certificatesApi, workshopsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import Select from '../../components/Select';
+import QrPresensi from '../../components/QrPresensi';
+import BackButton from '../../components/BackButton';
+import { exportExcel } from '../../utils/excel';
+import { toast } from '../../components/Dialog';
 
 const TABS = ['Informasi', 'Peserta', 'Presensi', 'Rekap'];
 
@@ -129,19 +134,34 @@ export default function DetailKegiatanHumas() {
     setShowAjukan(false);
   });
 
-  const unduhPeserta = () => {
+  const unduhPeserta = async () => {
     const list = kegiatan.peserta ?? [];
-    const headers = ['No', 'Nama Peserta', 'Email', 'Jenis Peserta', 'Kegiatan', 'Status Pendaftaran', 'Status Kehadiran'];
-    const rows = list.map((p, i) => [
-      i + 1, `"${p.nama}"`, `"${p.email}"`, `"${p.jenis}"`, `"${kegiatan.nama}"`, `"${p.statusPendaftaran}"`, `"${hadirConfig[p.statusHadir]?.label || p.statusHadir}"`,
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const link = document.createElement('a');
-    link.setAttribute('href', encodeURI(csvContent));
-    link.setAttribute('download', `Daftar_Peserta_${kegiatan.nama.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      await exportExcel({
+        fileName: `Daftar_Peserta_${kegiatan.nama}`,
+        title: 'Daftar Peserta Kegiatan',
+        subtitle: 'Hubungan Masyarakat · Sistem Informasi Workshop UNAND',
+        info: [
+          ['Kegiatan', kegiatan.nama],
+          ['Jadwal', [kegiatan.tanggal, kegiatan.waktu].filter(Boolean).join(' · ') || '-'],
+          ['Lokasi', kegiatan.lokasi || (kegiatan.mode === 'online' ? 'Online' : '-')],
+          ['Jumlah peserta', `${list.length} orang`],
+        ],
+        sheets: [{
+          name: 'Peserta', numbered: true,
+          columns: [
+            { header: 'Nama Peserta', key: 'nama' },
+            { header: 'Email', key: 'email' },
+            { header: 'Jenis Peserta', key: 'jenis' },
+            { header: 'Status Pendaftaran', key: 'statusPendaftaran' },
+            { header: 'Status Kehadiran', key: 'statusHadir', value: p => hadirConfig[p.statusHadir]?.label || p.statusHadir },
+          ],
+          rows: list,
+        }],
+      });
+    } catch (err) {
+      toast(`Gagal membuat file Excel: ${err.message}`, { tone: 'error' });
+    }
   };
 
   return (
@@ -149,9 +169,7 @@ export default function DetailKegiatanHumas() {
     <div className="humas-detail-page">
 
       <div className="humas-detail-toprow">
-        <button className="humas-detail-back-link" onClick={() => navigate('/humas/kelola-kegiatan')}>
-          Kembali ke daftar kegiatan
-        </button>
+        <BackButton to="/humas/kelola-kegiatan" label="Kembali ke daftar kegiatan" />
       </div>
 
       <ErrorNotice error={actionError ? { message: actionError } : null} />
@@ -388,16 +406,7 @@ export default function DetailKegiatanHumas() {
                 );
               })}
 
-              {qr && (
-                <div style={{ marginTop: 14, padding: 16, borderRadius: 12, background: '#f0fdf4', border: '1px dashed #16a34a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 12, color: '#166534' }}>Kode presensi aktif (tampilkan ke peserta)</p>
-                    <p style={{ margin: '4px 0 0', fontSize: 30, fontWeight: 800, letterSpacing: 6, color: '#14532d' }}>{qr.token}</p>
-                    <p style={{ margin: '4px 0 0', fontSize: 12, color: '#4b5563' }}>Berlaku sampai {new Date(qr.expiresAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB ({qr.minutes} menit)</p>
-                  </div>
-                  <button className="modal-close-btn" onClick={() => setQr(null)} aria-label="Tutup kode"><X size={15} /></button>
-                </div>
-              )}
+              {qr && <QrPresensi qr={qr} slug={kegiatan.slug} title={kegiatan.nama} onClose={() => setQr(null)} onRenew={buatKode} />}
             </div>
 
             <div className="kelola-absensi-kehadiran-section">
@@ -562,10 +571,10 @@ export default function DetailKegiatanHumas() {
           <div className="confirm-modal-body" style={{ display: 'grid', gap: 10 }}>
             <p style={{ margin: 0 }}>{kegiatan.hadir} peserta hadir akan menerima sertifikat. Alur tanda tangan: {kegiatan.partnerId ? 'Mitra → ' : ''}{ajukanForm.perluRektor ? 'Rektor → ' : ''}Terbit.</p>
             <label className="form-label">Template sertifikat</label>
-            <select className="form-input" value={ajukanForm.templateId} onChange={e => setAjukanForm(f => ({ ...f, templateId: e.target.value }))}>
+            <Select className="form-input" value={ajukanForm.templateId} onChange={e => setAjukanForm(f => ({ ...f, templateId: e.target.value }))}>
               <option value="">— Pilih template —</option>
               {templates.map(t => <option key={t.id} value={t.id}>{t.nama}</option>)}
-            </select>
+            </Select>
             <label className="form-label">Nomor SK</label>
             <input className="form-input" value={ajukanForm.nomorSk} onChange={e => setAjukanForm(f => ({ ...f, nomorSk: e.target.value }))} placeholder="Contoh: WDS/UNAND/001/2026" />
             <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13 }}>

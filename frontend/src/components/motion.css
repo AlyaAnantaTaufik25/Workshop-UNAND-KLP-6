@@ -37,7 +37,7 @@
 .content-container > *,
 .mitra-content > *,
 .peserta-content > * {
-  animation: motion-fade-up var(--motion-slow) var(--ease-out) both;
+  animation: motion-fade-up var(--motion-slow) var(--ease-out) backwards;
 }
 
 /* Kartu & baris muncul berurutan (stagger ringan) */
@@ -48,7 +48,7 @@
 .rekap-cards-grid > *,
 .kelola-absensi-stats-grid > *,
 .peserta-stat-grid > * {
-  animation: motion-fade-up var(--motion-slow) var(--ease-out) both;
+  animation: motion-fade-up var(--motion-slow) var(--ease-out) backwards;
 }
 .ringkasan-stats-row > :nth-child(2), .humas-stats-grid > :nth-child(2), .mitra-stats-grid > :nth-child(2),
 .laporan-summary-row > :nth-child(2), .rekap-cards-grid > :nth-child(2), .kelola-absensi-stats-grid > :nth-child(2),
@@ -66,7 +66,7 @@
 .role-rektor tbody tr,
 .mitra-shell tbody tr,
 .peserta-shell tbody tr {
-  animation: motion-fade var(--motion-base) var(--ease-out) both;
+  animation: motion-fade var(--motion-base) var(--ease-out) backwards;
 }
 
 /* Isi tab berganti dengan lembut */
@@ -74,7 +74,7 @@
 .kelola-absensi-container,
 .rekap-kehadiran-container,
 .humas-detail-body {
-  animation: motion-fade-up var(--motion-base) var(--ease-out) both;
+  animation: motion-fade-up var(--motion-base) var(--ease-out) backwards;
 }
 
 /* ── 2. Modal & overlay ── */
@@ -82,12 +82,12 @@
 .peserta-modal-backdrop,
 .peserta-overlay,
 .ui-nav-overlay {
-  animation: motion-fade var(--motion-base) var(--ease-out) both;
+  animation: motion-fade var(--motion-base) var(--ease-out) backwards;
 }
 .modal-box,
 .confirm-modal,
 .peserta-modal {
-  animation: motion-pop var(--motion-slow) var(--ease-out) both;
+  animation: motion-pop var(--motion-slow) var(--ease-out) backwards;
 }
 
 /* ── 3. Popover notifikasi & dropdown ── */
@@ -96,13 +96,13 @@
 .mitra-notification-popover,
 .peserta-notification-popover {
   transform-origin: top right;
-  animation: motion-drop var(--motion-base) var(--ease-out) both;
+  animation: motion-drop var(--motion-base) var(--ease-out) backwards;
 }
 
 /* ── 4. Toast ── */
 .peserta-toast,
 [role="status"][style*="position: fixed"] {
-  animation: motion-slide-up var(--motion-slow) var(--ease-out) both;
+  animation: motion-slide-up var(--motion-slow) var(--ease-out) backwards;
 }
 
 /* ── 5. Interaksi tombol & tautan ── */
@@ -184,7 +184,7 @@ button:not(:disabled):active,
   padding-left: 16px;
 }
 .sidebar-sub-menu {
-  animation: motion-drop var(--motion-base) var(--ease-out) both;
+  animation: motion-drop var(--motion-base) var(--ease-out) backwards;
 }
 
 /* Garis bawah tab aktif bergeser halus */
@@ -210,7 +210,7 @@ textarea {
 .peserta-notification-dot,
 .mitra-notification-dot,
 .top-header-notif-dot {
-  animation: motion-pop var(--motion-slow) var(--ease-out) both;
+  animation: motion-pop var(--motion-slow) var(--ease-out) backwards;
 }
 
 /* ── Aksesibilitas: hormati pengaturan kurangi gerakan ── */

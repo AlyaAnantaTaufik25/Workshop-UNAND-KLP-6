@@ -20,6 +20,8 @@ import { usePortalData } from '../../context/PortalData';
 import { useEffect as useSyncEffect } from 'react';
 import { certificatesApi } from '../../api';
 import { usePagination } from '../../components/Pagination';
+import { toast } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 const statusConfig = {
   menunggu: {
@@ -71,12 +73,9 @@ export default function PerbaikanSertifikatMitra() {
   const [showTolakModal, setShowTolakModal] = useState(false);
   const [alasanTolak, setAlasanTolak] = useState('');
   const [showOldCertModal, setShowOldCertModal] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3500);
-  };
+  // Toast seragam (komponen Dialog global)
+  const showToast = (msg) => toast(msg, { tone: /gagal|salah|tidak|ditolak/i.test(msg) ? 'error' : 'success' });
 
   const selectedItem = data.find(d => d.id === selectedId) || data[0];
 
@@ -868,36 +867,10 @@ export default function PerbaikanSertifikatMitra() {
   // =========================================================================
   return (
     <div className="mitra-stack">
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 1000,
-            background: '#14532d',
-            color: '#fff',
-            padding: '12px 20px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <Check size={16} /> {toastMsg}
-        </div>
-      )}
 
       {/* Header Halaman */}
       <div className="mitra-list-header">
         <div className="mitra-intro">
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--mitra-green)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>
-            Mitra
-          </span>
           <h2 style={{ margin: '2px 0 4px 0' }}>Perbaikan Sertifikat</h2>
           <p>Kelola dan tindak lanjuti pengajuan perbaikan sertifikat.</p>
         </div>
@@ -947,13 +920,13 @@ export default function PerbaikanSertifikatMitra() {
             onChange={e => setSearch(e.target.value)}
           />
         </label>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
           <option value="menunggu">Menunggu</option>
           <option value="diproses">Sedang Diproses</option>
           <option value="selesai">Selesai</option>
           <option value="ditolak">Ditolak</option>
-        </select>
+        </Select>
       </div>
 
       {/* Tabel Pengajuan */}
@@ -1026,26 +999,7 @@ export default function PerbaikanSertifikatMitra() {
 
                     {/* Aksi: Lihat Detail */}
                     <td style={{ textAlign: 'center' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleBukaDetail(item)}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#14532d',
-                          fontWeight: 600,
-                          fontSize: 13,
-                          cursor: 'pointer',
-                          padding: '6px 10px',
-                          borderRadius: 6,
-                          transition: 'background 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#EBF5EE')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
+                      <button type="button" className="ui-row-action" onClick={() => handleBukaDetail(item)}>
                         Lihat Detail <ArrowRight size={14} />
                       </button>
                     </td>

@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
 
 const dpStatusLabel = { 'sedang-diproses': 'Sedang Diproses' };
 const dpStatusClass = { 'sedang-diproses': 'badge badge-blue' };
@@ -53,10 +54,10 @@ export default function SertifikatPerbaikanRektor() {
                 onChange={e => setDpSearch(e.target.value)}
               />
             </div>
-            <select className="filter-select" value={dpStatus} onChange={e => setDpStatus(e.target.value)}>
+            <Select className="filter-select" value={dpStatus} onChange={e => setDpStatus(e.target.value)}>
               <option value="">Semua status</option>
               <option value="sedang-diproses">Sedang Diproses</option>
-            </select>
+            </Select>
           </div>
 
           {/* Table */}

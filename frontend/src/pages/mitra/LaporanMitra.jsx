@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import { dialog } from '../../components/Dialog';
+import Select from '../../components/Select';
+import { exportExcel } from '../../utils/excel';
 import {
   Search,
   FileSpreadsheet,
@@ -44,45 +47,41 @@ export default function LaporanMitra() {
     setFilterTanggal('');
   };
 
-  // ── FUNGSI EKSPOR EXCEL (CSV dengan BOM UTF-8) ──
-  const handleExportExcel = () => {
-    const headers = [
-      'No',
-      'Kegiatan',
-      'Jenis Pelaksanaan',
-      'Periode',
-      'Pendaftar',
-      'Hadir',
-      'Tidak hadir',
-      'Menunggu Verifikasi',
-      'Ditolak'
-    ];
-
-    const rows = filtered.map((k, idx) => [
-      idx + 1,
-      `"${(k.nama || '').replace(/"/g, '""')}"`,
-      `"${k.mode === 'online' ? 'Online' : 'Offline'}"`,
-      `"${(k.tanggal || '').replace(/"/g, '""')}"`,
-      k.pendaftar || 0,
-      k.hadir || 0,
-      k.belumAbsen || 0,
-      k.menungguVerifikasi || 0,
-      k.ditolak || 0
-    ]);
-
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    const dateStr = new Date().toISOString().slice(0, 10);
-    link.setAttribute('download', `Laporan_Kegiatan_Mitra_${dateStr}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    setExportToast('Laporan Excel (.csv) berhasil diunduh.');
+  // ── Ekspor Excel (.xlsx) ──
+  const handleExportExcel = async () => {
+    try {
+      await exportExcel({
+        fileName: 'Laporan_Kegiatan_Mitra',
+        title: 'Laporan Kegiatan Kerja Sama',
+        subtitle: `${mitraKegiatan[0]?.penyelenggara || 'Mitra'} · Sistem Informasi Workshop UNAND`,
+        info: [
+          ['Jenis', filterJenis || 'Semua jenis'],
+          ...(filterKegiatan ? [['Kegiatan', filterKegiatan]] : []),
+          ...(filterTanggal ? [['Tanggal', filterTanggal]] : []),
+          ...(search ? [['Pencarian', `"${search}"`]] : []),
+          ['Jumlah kegiatan', `${filtered.length} kegiatan`],
+        ],
+        sheets: [{
+          name: 'Rekap Kegiatan', numbered: true, totals: true,
+          columns: [
+            { header: 'Kegiatan', key: 'nama', width: 38 },
+            { header: 'Jenis', key: 'jenis' },
+            { header: 'Pelaksanaan', key: 'mode', value: k => (k.mode === 'online' ? 'Online' : 'Offline') },
+            { header: 'Tanggal', key: 'tanggal', width: 24 },
+            { header: 'Pendaftar', key: 'pendaftar', type: 'number' },
+            { header: 'Hadir', key: 'hadir', type: 'number' },
+            { header: 'Tidak Hadir', key: 'belumAbsen', type: 'number' },
+            { header: 'Menunggu Verifikasi', key: 'menungguVerifikasi', type: 'number' },
+            { header: 'Ditolak', key: 'ditolak', type: 'number' },
+            { header: 'Kehadiran', key: 'persen', type: 'percent', value: k => (k.pendaftar ? (k.hadir || 0) / k.pendaftar : 0) },
+          ],
+          rows: filtered,
+        }],
+      });
+      setExportToast('Laporan Excel (.xlsx) berhasil diunduh.');
+    } catch (err) {
+      setExportToast(`Gagal membuat file Excel: ${err.message}`);
+    }
     setTimeout(() => setExportToast(''), 3500);
   };
 
@@ -394,7 +393,7 @@ export default function LaporanMitra() {
     const printWindow = window.open(blobUrl, '_blank');
 
     if (!printWindow) {
-      alert('Harap izinkan pop-up browser untuk mencetak atau menyimpan PDF laporan.');
+      dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk mencetak atau menyimpan PDF laporan.', tone: 'warning' });
       return;
     }
 
@@ -415,7 +414,7 @@ export default function LaporanMitra() {
             type="button"
             className="mitra-export-btn mitra-export-excel"
             onClick={handleExportExcel}
-            title="Unduh rekapitulasi laporan dalam format Excel (.csv)"
+            title="Unduh rekapitulasi laporan dalam format Excel (.xlsx)"
           >
             <FileSpreadsheet size={15} /> Ekspor Excel
           </button>
@@ -496,15 +495,15 @@ export default function LaporanMitra() {
         </label>
 
         {/* Filter Semua Jenis */}
-        <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+        <Select value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
           <option value="">Semua jenis</option>
           {jenisOptions.map(j => (
             <option key={j} value={j}>{j}</option>
           ))}
-        </select>
+        </Select>
 
         {/* Filter Semua Kegiatan */}
-        <select
+        <Select
           value={filterKegiatan}
           onChange={e => setFilterKegiatan(e.target.value)}
           style={{ maxWidth: 220 }}
@@ -513,7 +512,7 @@ export default function LaporanMitra() {
           {mitraKegiatan.map(k => (
             <option key={k.id} value={k.nama}>{k.nama}</option>
           ))}
-        </select>
+        </Select>
 
         {/* Filter Tanggal */}
         <input

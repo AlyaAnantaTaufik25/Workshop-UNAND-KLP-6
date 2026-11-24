@@ -5,6 +5,8 @@ import { usePagination, IconAction } from '../../components/Pagination';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 import useKegiatan from './useKegiatan';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
+import { dialog } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 const statusConfig = {
   berlangsung: { label: 'Berlangsung', className: 'humas-badge humas-badge-berlangsung' },
@@ -26,7 +28,6 @@ export default function KelolaKegiatan() {
   const [filterStatus, setFilterStatus] = useState('');
   const [showTambah, setShowTambah]     = useState(false);
   const [editTarget, setEditTarget]     = useState(null);
-  const [draftTarget, setDraftTarget]   = useState(null);
 
   useEffect(() => {
     const m = searchParams.get('mitra') || searchParams.get('q') || '';
@@ -45,13 +46,19 @@ export default function KelolaKegiatan() {
   const handleSave = (payload) => save(payload);
 
   const handleJadikanDraft = async (id) => {
+    const ok = await dialog.confirm({
+      title: 'Jadikan kegiatan draft?',
+      message: 'Kegiatan disembunyikan dari pencarian peserta. Data pendaftaran tetap tersimpan dan dapat dipublikasikan kembali.',
+      confirmText: 'Jadikan Draft',
+      tone: 'warning',
+    });
+    if (!ok) return;
     try { await setStatus(id, 'draft'); setActionError(''); }
     catch (err) { setActionError(err.message); }
-    setDraftTarget(null);
   };
 
   const handleHapus = async (id) => {
-    if (!window.confirm('Hapus kegiatan ini beserta seluruh data pendaftarannya?')) return;
+    if (!(await dialog.confirm({ title: 'Hapus kegiatan?', message: 'Kegiatan beserta seluruh data pendaftaran, presensi, dan sertifikatnya akan dihapus permanen.', confirmText: 'Hapus Kegiatan', tone: 'danger' }))) return;
     try { await remove(id); setActionError(''); }
     catch (err) { setActionError(err.message); }
   };
@@ -93,17 +100,18 @@ export default function KelolaKegiatan() {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+          <Select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
             <option value="">Semua jenis</option>
             {jenisOptions.map(j => <option key={j}>{j}</option>)}
-          </select>
-          <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          </Select>
+          <Select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">Semua status</option>
             <option value="berlangsung">Berlangsung</option>
             <option value="publik">Publik</option>
             <option value="selesai">Selesai</option>
             <option value="draft">Draft</option>
-          </select>
+            <option value="dibatalkan">Dibatalkan</option>
+          </Select>
         </div>
 
         {/* Table */}
@@ -155,7 +163,7 @@ export default function KelolaKegiatan() {
                         <IconAction icon={Eye} label="Lihat detail" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}`)} />
                         <IconAction icon={Pencil} label="Edit kegiatan" onClick={() => { setEditTarget(k); setShowTambah(true); }} />
                         <IconAction icon={ClipboardCheck} label="Kelola absensi" onClick={() => navigate(`/humas/kelola-kegiatan/${k.id}?tab=presensi`)} />
-                        {k.status !== 'draft' && <IconAction icon={EyeOff} label="Jadikan draft" tone="warning" onClick={() => setDraftTarget(k.id)} />}
+                        {k.status !== 'draft' && <IconAction icon={EyeOff} label="Jadikan draft" tone="warning" onClick={() => handleJadikanDraft(k.id)} />}
                         <IconAction icon={Trash2} label="Hapus kegiatan" tone="danger" onClick={() => handleHapus(k.id)} />
                       </div>
                     </td>
@@ -177,31 +185,6 @@ export default function KelolaKegiatan() {
         />
       )}
 
-      {/* Jadikan Draft Confirm Modal */}
-      {draftTarget !== null && (
-        <div className="modal-overlay" onClick={() => setDraftTarget(null)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="confirm-modal-header">
-              <div>
-                <p className="modal-header-crumb">WORKSHOP UNAND</p>
-                <h2 className="confirm-modal-title">Jadikan Draft</h2>
-              </div>
-              <button className="modal-close-btn" onClick={() => setDraftTarget(null)}>
-                <X size={16} />
-              </button>
-            </div>
-            <div className="confirm-modal-body">
-              <p>Ubah visibilitas kegiatan pada pencarian peserta?</p>
-            </div>
-            <div className="confirm-modal-footer">
-              <button className="modal-btn modal-btn-batal" onClick={() => setDraftTarget(null)}>Batal</button>
-              <button className="modal-btn modal-btn-publish" onClick={() => handleJadikanDraft(draftTarget)}>
-                Jadikan Draft
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

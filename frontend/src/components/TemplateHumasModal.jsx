@@ -3,6 +3,7 @@ import { X, Search, Check, Eye, Palette } from 'lucide-react';
 import useApi from '../hooks/useApi';
 import { certificatesApi } from '../api';
 import CertificateTemplateRenderer from './CertificateTemplateRenderer';
+import Select from './Select';
 
 export default function TemplateHumasModal({
   isOpen,
@@ -32,7 +33,7 @@ export default function TemplateHumasModal({
   const categories = Array.from(new Set(humasTemplates.map(t => t.kategori)));
 
   return (
-    <div style={{
+    <div className="ui-modal-backdrop" style={{
       position: 'fixed',
       inset: 0,
       zIndex: 1000,
@@ -140,7 +141,7 @@ export default function TemplateHumasModal({
             />
           </div>
 
-          <select
+          <Select
             value={filterKategori}
             onChange={e => setFilterKategori(e.target.value)}
             style={{
@@ -158,7 +159,7 @@ export default function TemplateHumasModal({
             {categories.map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Grid Template List dengan Mini Preview */}
@@ -384,7 +385,7 @@ export default function TemplateHumasModal({
 
       {/* ── MODAL PRATINJAU DESAIN LENGKAP ── */}
       {previewTemplate && (
-        <div style={{
+        <div className="ui-modal-backdrop" style={{
           position: 'fixed',
           inset: 0,
           zIndex: 1100,

@@ -23,6 +23,8 @@ class CertificatesController {
   listSubmissions = async (req, res) => successResponse(res, 'Daftar pengajuan sertifikat', await this.service.listSubmissions(req.user));
   getSubmission = async (req, res) => successResponse(res, 'Detail pengajuan sertifikat', await this.service.getSubmission(req.params.id, req.user));
   createSubmission = async (req, res) => successResponse(res, 'Sertifikat berhasil diajukan', await this.service.createSubmission(req.body, req.user), 201);
+  verifySubmission = async (req, res) => successResponse(res, 'Draft sertifikat diverifikasi', await this.service.verifySubmission(req.params.id, req.body, req.user));
+  approveReplacement = async (req, res) => successResponse(res, 'Dokumen pengganti disetujui', await this.service.approveReplacement(req.params.id, req.user));
   signSubmission = async (req, res) => successResponse(res, 'Tanda tangan elektronik berhasil dibubuhkan', await this.service.signSubmission(req.params.id, req.body, req.user));
 
   // Sertifikat

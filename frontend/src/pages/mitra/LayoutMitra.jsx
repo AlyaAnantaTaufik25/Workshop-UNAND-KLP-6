@@ -1,32 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Briefcase,
-  Users,
-  FileText,
-  Award,
-  Pencil,
-  BarChart3,
-  User,
-  LogOut,
-  Bell,
-} from 'lucide-react';
-import UnandLogo from '../../components/UnandLogo';
+import { Briefcase, Users, FileText, Award, Pencil, BarChart3, Bell } from 'lucide-react';
 import './mitra.css';
 import { usePortalData } from '../../context/PortalData';
-import { useAuth } from '../../context/AuthContext';
 import useNotifications from '../../hooks/useNotifications';
 import { useMobileNav } from '../../components/MobileNav';
+import Sidebar from '../../components/Sidebar';
 
-const navItems = [
-  { to: '/mitra/kegiatan-kerja-sama',  label: 'Kegiatan Kerja Sama',  icon: Briefcase },
-  { to: '/mitra/peserta',              label: 'Peserta',              icon: Users },
-  { to: '/mitra/template-sertifikat',  label: 'Template Sertifikat',  icon: FileText },
-  { to: '/mitra/perbaikan-sertifikat', label: 'Perbaikan Sertifikat', icon: Award },
-  { to: '/mitra/tanda-tangan',         label: 'Tanda Tangan',         icon: Pencil },
-  { to: '/mitra/laporan',              label: 'Laporan',              icon: BarChart3 },
-  { to: '/mitra/profil',               label: 'Profil',               icon: User },
+const SECTIONS = [
+  { items: [
+    { to: '/mitra/kegiatan-kerja-sama', label: 'Kegiatan Kerja Sama', icon: Briefcase },
+    { to: '/mitra/peserta', label: 'Peserta', icon: Users },
+  ] },
+  { title: 'Sertifikat', items: [
+    { to: '/mitra/template-sertifikat', label: 'Template', icon: FileText },
+    { to: '/mitra/perbaikan-sertifikat', label: 'Perbaikan', icon: Award, match: ['/mitra/perbaikan-sertifikat', '/mitra/dokumen-pengganti'], badge: t => t.perbaikanAktif?.total },
+    { to: '/mitra/tanda-tangan', label: 'Tanda Tangan', icon: Pencil, badge: t => t.menungguTtdSaya?.total },
+  ] },
+  { title: 'Analitik', items: [{ to: '/mitra/laporan', label: 'Laporan', icon: BarChart3 }] },
 ];
+
 
 const pageTitles = {
   '/mitra/kegiatan-kerja-sama':  'Kegiatan Kerja Sama',
@@ -43,12 +36,11 @@ export default function LayoutMitra() {
   // Navigasi sidebar untuk layar kecil
   const { navClass, toggle: navToggle, overlay: navOverlay } = useMobileNav();
   const { currentMitra } = usePortalData();
-  const { logout } = useAuth();
   const { items: notifications, unread, markRead } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifRead, setNotifRead] = useState(false);
+  const [, setNotifRead] = useState(false);
   const notifRef = useRef(null);
 
   useEffect(() => {
@@ -82,47 +74,7 @@ export default function LayoutMitra() {
     <div className={`mitra-shell${navClass}`}>
       {navOverlay}
       {/* ── SIDEBAR ── */}
-      <aside className="mitra-sidebar">
-        {/* Brand */}
-        <div className="mitra-brand">
-          <UnandLogo className="mitra-brandmark" />
-          <div>
-            <strong>Workshop UNAND</strong>
-            <span>Sistem Informasi Manajemen Kegiatan</span>
-          </div>
-        </div>
-
-        {/* Role info */}
-        <div className="mitra-role-badge">
-          <span>MASUK SEBAGAI</span>
-          <strong>Mitra</strong>
-          <span className="mitra-role-instansi">{currentMitra.instansi}</span>
-        </div>
-
-        {/* Nav list */}
-        <nav aria-label="Navigasi Mitra">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                isActive || (to.includes('kegiatan-kerja-sama') && location.pathname.includes('/kegiatan-kerja-sama/'))
-                  ? 'is-active'
-                  : ''
-              }
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Logout */}
-        <button className="mitra-logout" onClick={() => { logout(); navigate('/', { replace: true }); }}>
-          <LogOut size={18} />
-          <span>Keluar</span>
-        </button>
-      </aside>
+      <Sidebar className="mitra-sidebar" ariaLabel="Navigasi Mitra" portal="Mitra" sections={SECTIONS} />
 
       {/* ── MAIN CONTENT AREA ── */}
       <div className="mitra-main">

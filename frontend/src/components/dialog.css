@@ -1,0 +1,162 @@
+/* ============================================================
+   DIALOG & TOAST — tampilan seragam untuk semua popup
+   Token ini juga dipakai untuk menyeragamkan modal lama (lihat ui-polish.css)
+   ============================================================ */
+:root {
+  --ui-overlay: rgba(15, 32, 22, 0.48);
+  --ui-surface: #ffffff;
+  --ui-radius-lg: 16px;
+  --ui-radius-md: 10px;
+  --ui-shadow-lg: 0 24px 60px -20px rgba(15, 42, 24, 0.45), 0 2px 8px rgba(15, 42, 24, 0.08);
+  --ui-green: #14532d;
+  --ui-green-dark: #0f3d21;
+  --ui-green-tint: #edf7ef;
+  --ui-line: #e3e9e5;
+  --ui-text: #1f2a24;
+  --ui-muted: #66736c;
+  --ui-danger: #dc2626;
+}
+
+.ui-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--ui-overlay);
+  backdrop-filter: blur(3px);
+  animation: motion-fade 200ms var(--ease-out, ease) backwards;
+}
+.ui-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-lg);
+  color: var(--ui-text);
+  animation: motion-pop 320ms var(--ease-out, ease) backwards;
+}
+.ui-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+.ui-dialog-close:hover { background: #f1f5f3; color: var(--ui-text); }
+.ui-dialog-head { display: flex; gap: 14px; align-items: flex-start; padding-right: 24px; }
+.ui-dialog-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--ui-green-tint);
+  color: var(--ui-green);
+}
+.ui-dialog--danger .ui-dialog-icon { background: #fef2f2; color: var(--ui-danger); }
+.ui-dialog--warning .ui-dialog-icon { background: #fffbeb; color: #b45309; }
+.ui-dialog--info .ui-dialog-icon { background: #eff6ff; color: #1d4ed8; }
+.ui-dialog-title { margin: 2px 0 0; font-size: 17px; font-weight: 700; line-height: 1.35; color: var(--ui-text); }
+.ui-dialog-message { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--ui-muted); }
+
+.ui-dialog-field { display: grid; gap: 6px; margin-top: 18px; }
+.ui-dialog-field label { font-size: 13px; font-weight: 600; color: var(--ui-text); }
+.ui-dialog-field label span { color: var(--ui-danger); }
+.ui-dialog-field input,
+.ui-dialog-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d5ddd8;
+  border-radius: var(--ui-radius-md);
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ui-text);
+  resize: vertical;
+  outline: none;
+}
+.ui-dialog-field input:focus,
+.ui-dialog-field textarea:focus { border-color: #228b45; box-shadow: 0 0 0 3px rgba(34, 139, 69, 0.14); }
+.ui-dialog-error { margin: 0; font-size: 12.5px; color: var(--ui-danger); }
+
+.ui-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.ui-dialog-btn {
+  min-width: 96px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--ui-radius-md);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ui-dialog-btn--secondary { border: 1px solid #d5ddd8; background: #ffffff; color: var(--ui-text); }
+.ui-dialog-btn--secondary:hover { background: #f4f7f5; }
+.ui-dialog-btn--primary { border: 1px solid var(--ui-green); background: var(--ui-green); color: #ffffff; }
+.ui-dialog-btn--primary:hover { background: var(--ui-green-dark); }
+.ui-dialog-btn--danger { border: 1px solid var(--ui-danger); background: var(--ui-danger); color: #ffffff; }
+.ui-dialog-btn--danger:hover { background: #b91c1c; }
+
+@media (max-width: 480px) {
+  .ui-dialog { padding: 20px; }
+  .ui-dialog-actions { flex-direction: column-reverse; }
+  .ui-dialog-btn { width: 100%; }
+}
+
+/* ── Toast ── */
+.ui-toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2100;
+  display: grid;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+}
+.ui-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 12px 16px;
+  border-radius: 12px;
+  background: var(--ui-green);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  box-shadow: 0 14px 34px -12px rgba(15, 42, 24, 0.55);
+  animation: motion-slide-up 320ms var(--ease-out, ease) backwards;
+}
+.ui-toast span { flex: 1; }
+.ui-toast button {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+  cursor: pointer;
+}
+.ui-toast button:hover { background: rgba(255, 255, 255, 0.24); }
+.ui-toast--error { background: #b91c1c; }
+.ui-toast--warning { background: #b45309; }
+.ui-toast--info { background: #1e3a8a; }
+
+@media (max-width: 480px) {
+  .ui-toast-stack { right: 16px; left: 16px; bottom: 16px; max-width: none; }
+}

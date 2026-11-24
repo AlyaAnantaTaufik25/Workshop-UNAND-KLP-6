@@ -1,0 +1,173 @@
+/* ══════════════════════════════════════════
+   Sidebar bersama (semua portal)
+   Selektor "aside.ui-sb.ui-sb" sengaja lebih spesifik dari gaya lama tiap portal.
+══════════════════════════════════════════ */
+aside.ui-sb.ui-sb {
+  --sb-ink: #10291b;
+  --sb-text: #3b4a41;
+  --sb-muted: #7a877f;
+  --sb-icon: #73827a;
+  --sb-line: #e3eae5;
+  --sb-hover: #f1f6f3;
+  --sb-active-bg: #e7f3ec;
+  --sb-active: #0f4a2a;
+  --sb-accent: #1a7f45;
+
+  width: 240px;
+  padding: 20px 14px 14px;
+  gap: 0;
+  background: linear-gradient(180deg, #f2f8f4 0, #ffffff 150px);
+  border-right: 1px solid var(--sb-line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Brand */
+.ui-sb .ui-sb-brand {
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 2px 6px 0;
+}
+.ui-sb .ui-sb-logo {
+  width: 36px;
+  height: auto;
+  flex: none;
+  filter: drop-shadow(0 1px 1px rgba(16, 41, 27, .12));
+}
+.ui-sb .ui-sb-brand-text { min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.ui-sb .ui-sb-brand-text strong { white-space: nowrap; font-size: 15px; font-weight: 700; color: var(--sb-ink); letter-spacing: -.01em; }
+.ui-sb .ui-sb-brand-text span { margin-top: 2px; font-size: 11.5px; color: var(--sb-muted); }
+.ui-sb .ui-sb-close {
+  margin-left: auto;
+  width: 32px; height: 32px;
+  display: none; place-items: center;
+  border: 0; border-radius: 8px; background: transparent; color: var(--sb-muted); cursor: pointer;
+}
+.ui-sb .ui-sb-close:hover { background: var(--sb-hover); color: var(--sb-ink); }
+
+/* ── Navigasi */
+.ui-sb .ui-sb-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 4px 6px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #d4ddd7 transparent;
+}
+.ui-sb .ui-sb-section { display: flex; flex-direction: column; gap: 2px; }
+.ui-sb .ui-sb-section + .ui-sb-section { margin-top: 6px; }
+.ui-sb .ui-sb-section-title {
+  margin: 14px 12px 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #9aa69f;
+}
+
+.ui-sb a.ui-sb-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 10px 0 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--sb-text);
+  text-decoration: none;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  transition: background-color .15s ease, color .15s ease;
+}
+.ui-sb a.ui-sb-link .ui-sb-icon { flex: none; color: var(--sb-icon); transition: color .15s ease; }
+.ui-sb a.ui-sb-link .ui-sb-label { flex: 1; min-width: 0; padding: 9px 0; }
+.ui-sb a.ui-sb-link:hover { background: var(--sb-hover); color: var(--sb-ink); }
+.ui-sb a.ui-sb-link:hover .ui-sb-icon { color: var(--sb-active); }
+.ui-sb a.ui-sb-link:focus-visible { outline: 2px solid var(--sb-accent); outline-offset: 1px; }
+
+.ui-sb a.ui-sb-link.is-current {
+  background: var(--sb-active-bg);
+  color: var(--sb-active);
+  font-weight: 650;
+}
+.ui-sb a.ui-sb-link.is-current .ui-sb-icon { color: var(--sb-accent); }
+.ui-sb a.ui-sb-link.is-current::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 9px;
+  bottom: 9px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sb-accent);
+  animation: ui-sb-in .2s ease-out;
+}
+@keyframes ui-sb-in { from { transform: scaleY(.3); opacity: 0; } }
+
+.ui-sb .ui-sb-badge {
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #fdecc8;
+  color: #8a4b05;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ui-sb a.ui-sb-link.is-current .ui-sb-badge { background: #ffffff; color: var(--sb-active); box-shadow: inset 0 0 0 1px #cfe5d7; }
+
+/* ── Tombol keluar */
+.ui-sb .ui-sb-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 8px;
+  padding: 0 12px;
+  border: 0;
+  border-top: 1px solid var(--sb-line);
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--sb-text);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.ui-sb .ui-sb-logout .ui-sb-icon { color: var(--sb-icon); transition: color .15s ease; }
+.ui-sb .ui-sb-logout:hover { background: #fdf1f0; color: #b42318; border-radius: 10px; }
+.ui-sb .ui-sb-logout:hover .ui-sb-icon { color: #b42318; }
+
+/* Layar pendek: rapatkan */
+@media (max-height: 680px) {
+  aside.ui-sb.ui-sb { padding-top: 14px; }
+  .ui-sb .ui-sb-section-title { margin-top: 10px; }
+  .ui-sb a.ui-sb-link { min-height: 36px; }
+}
+
+/* Panel geser di layar kecil: tampilkan tombol tutup bila ada */
+@media (max-width: 900px) {
+  .ui-sb .ui-sb-close { display: grid; }
+  .ui-sb .ui-sb-brand { gap: 9px; padding-right: 0; }
+  .ui-sb .ui-sb-logo { width: 32px; }
+  .ui-sb .ui-sb-brand-text strong { font-size: 14px; }
+  .ui-sb .ui-sb-close { width: 28px; height: 28px; margin-right: -4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-sb a.ui-sb-link, .ui-sb a.ui-sb-link.is-current::before { transition: none; animation: none; }
+}

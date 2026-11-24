@@ -21,6 +21,8 @@ import { usePortalData } from '../../context/PortalData';
 import { useEffect as useSyncEffect } from 'react';
 import { certificatesApi, readFileAsDataUrl } from '../../api';
 import { usePagination } from '../../components/Pagination';
+import { toast } from '../../components/Dialog';
+import Select from '../../components/Select';
 
 
 const statusConfig = {
@@ -47,14 +49,11 @@ export default function TemplateSertifikatMitra() {
   // Modal pratinjau & modal hapus kustom formal
   const [previewItem, setPreviewItem]   = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [toastMsg, setToastMsg]         = useState('');
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3500);
-  };
+  // Toast seragam (komponen Dialog global)
+  const showToast = (msg) => toast(msg, { tone: /gagal|salah|tidak|ditolak/i.test(msg) ? 'error' : 'success' });
 
   const filtered = templates.filter(t => {
     const q = search.toLowerCase();
@@ -216,7 +215,7 @@ export default function TemplateSertifikatMitra() {
               {/* Kolom 3: Kegiatan Kerja Sama Terkait */}
               <div className="mitra-profil-field">
                 <label>Pilih Kegiatan Kerja Sama Terkait</label>
-                <select
+                <Select
                   value={form.kegiatanTerkait}
                   onChange={e => set('kegiatanTerkait', e.target.value)}
                   className="mitra-profil-input"
@@ -226,7 +225,7 @@ export default function TemplateSertifikatMitra() {
                   {kegiatanOptions.map(k => (
                     <option key={k} value={k}>{k}</option>
                   ))}
-                </select>
+                </Select>
                 <span style={{ fontSize: 11.5, color: '#6B7280', marginTop: 4 }}>
                   Template akan otomatis digunakan saat sertifikat kegiatan diterbitkan.
                 </span>
@@ -331,12 +330,6 @@ export default function TemplateSertifikatMitra() {
   // ── RENDER 2: HALAMAN DAFTAR UTAMA (TABEL TEMPLATE) ──
   return (
     <div className="mitra-stack">
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1000, background: '#14532d', color: '#fff', padding: '12px 20px', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
-          <Check size={16} /> {toastMsg}
-        </div>
-      )}
 
       {/* Header */}
       <div className="mitra-list-header">
@@ -360,12 +353,12 @@ export default function TemplateSertifikatMitra() {
             onChange={e => setSearch(e.target.value)}
           />
         </label>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
           <option value="dapat-dipakai">Dapat dipakai</option>
           <option value="dipakai">Dipakai</option>
           <option value="diterbitkan">Diterbitkan</option>
-        </select>
+        </Select>
       </div>
 
       {/* Table */}

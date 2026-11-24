@@ -43,6 +43,90 @@ class ReportsService {
     };
   }
 
+  /**
+   * Data dashboard per role: antrean tugas ("apa yang perlu dikerjakan sekarang"),
+   * alur sertifikat, tren bulanan pendaftar vs hadir, dan tingkat kehadiran per kegiatan.
+   */
+  async dashboard(user) {
+    // Dimuat saat dipakai agar tidak terjadi dependensi melingkar antar-modul
+    const certificatesService = require('../certificates/certificates.service');
+    const role = user.role;
+    const workshops = (await workshopsService.list(user)).filter((w) => w.status !== 'draft');
+    const [summary, submissions, corrections, replacements] = await Promise.all([
+      this.summary(user),
+      certificatesService.listSubmissions(user),
+      ['humas', 'mitra'].includes(role) ? certificatesService.listCorrections(user) : [],
+      certificatesService.listReplacements(user),
+    ]);
+
+    const count = (list, fn) => list.filter(fn).length;
+    const top = (list, n = 5) => list.slice(0, n);
+    const BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    // Alur penandatanganan sertifikat
+    const pipeline = {
+      menungguMitra: count(submissions, (s) => s.status === 'menunggu-mitra'),
+      menungguRektor: count(submissions, (s) => s.status === 'menunggu-rektor'),
+      diterbitkan: count(submissions, (s) => s.status === 'diterbitkan'),
+    };
+
+    // Antrean tugas
+    const presensiMenunggu = workshops
+      .filter((w) => w.menungguVerifikasi > 0)
+      .sort((a, b) => b.menungguVerifikasi - a.menungguVerifikasi)
+      .map((w) => ({ id: w.id, nama: w.nama, jumlah: w.menungguVerifikasi, tanggal: w.tanggal }));
+    const perbaikanAktif = corrections
+      .filter((c) => ['menunggu', 'diproses'].includes(c.status))
+      .map((c) => ({ id: c.dbId, nama: c.namaPeserta, kegiatan: c.namaKegiatan, status: c.status, tanggal: c.tanggalPengajuan }));
+    const belumDiajukan = workshops
+      .filter((w) => w.status === 'selesai' && !w.statusSertifikat && w.hadir > 0)
+      .map((w) => ({ id: w.id, nama: w.nama, hadir: w.hadir, tanggal: w.tanggal }));
+    const menungguTtdSaya = submissions
+      .filter((s) => (role === 'mitra' && s.status === 'menunggu-mitra') || (role === 'rektor' && s.status === 'menunggu-rektor'))
+      .map((s) => ({ id: s.id, nama: s.namaKegiatan, jumlah: s.jumlahSertifikat, tanggal: s.tanggalPengajuan }));
+    const penggantiTertunda = replacements
+      .filter((r) => r.status === 'sedang-diproses')
+      .map((r) => ({ id: r.id, nama: r.namaPeserta, kegiatan: r.namaKegiatan, tanggal: r.tanggalPengajuan }));
+
+    // Tren bulanan berdasarkan tanggal kegiatan (6 bulan terakhir yang memiliki kegiatan)
+    const perBulan = {};
+    workshops.forEach((w) => {
+      const key = (w.tanggalMulai || '').slice(0, 7);
+      if (!key) return;
+      perBulan[key] = perBulan[key] || { bulan: key, pendaftar: 0, hadir: 0, kegiatan: 0 };
+      perBulan[key].pendaftar += w.pendaftar;
+      perBulan[key].hadir += w.hadir;
+      perBulan[key].kegiatan += 1;
+    });
+    const trend = Object.values(perBulan)
+      .sort((a, b) => a.bulan.localeCompare(b.bulan))
+      .slice(-6)
+      .map((m) => ({ ...m, label: `${BULAN[Number(m.bulan.slice(5, 7)) - 1]} ${m.bulan.slice(0, 4)}` }));
+
+    // Tingkat kehadiran kegiatan yang sudah/ sedang berjalan
+    const kehadiran = workshops
+      .filter((w) => ['berlangsung', 'selesai'].includes(w.status) && w.pendaftar > 0)
+      .map((w) => ({ id: w.id, nama: w.nama, hadir: w.hadir, pendaftar: w.pendaftar, persen: Math.round((w.hadir / w.pendaftar) * 100), status: w.status }))
+      .sort((a, b) => b.persen - a.persen);
+
+    return {
+      role,
+      summary,
+      pipeline,
+      tasks: {
+        presensiMenunggu: { total: presensiMenunggu.reduce((a, x) => a + x.jumlah, 0), items: top(presensiMenunggu) },
+        perbaikanAktif: { total: perbaikanAktif.length, items: top(perbaikanAktif) },
+        belumDiajukan: { total: belumDiajukan.length, items: top(belumDiajukan) },
+        menungguTtdSaya: { total: menungguTtdSaya.length, items: top(menungguTtdSaya) },
+        penggantiTertunda: { total: penggantiTertunda.length, items: top(penggantiTertunda) },
+      },
+      trend,
+      kehadiran,
+      pengajuanTerbaru: top(submissions).map((s) => ({ id: s.id, nama: s.namaKegiatan, status: s.status, jumlah: s.jumlahSertifikat, tanggal: s.tanggalPengajuan, sumber: s.sumber })),
+      kegiatanTerdekat: summary.kegiatanTerdekat,
+    };
+  }
+
   /** Baris laporan per kegiatan */
   async workshops(user) {
     const workshops = (await workshopsService.list(user)).filter((w) => w.status !== 'draft');

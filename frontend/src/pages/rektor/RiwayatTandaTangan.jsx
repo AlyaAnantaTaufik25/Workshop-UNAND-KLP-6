@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
+import PageHeader from '../../components/PageHeader';
 
 export default function RiwayatTandaTangan() {
   const { sertifikatData } = usePortalData();
@@ -26,14 +28,7 @@ export default function RiwayatTandaTangan() {
 
   return (
     <div>
-      {/* ── CARD NO. 1: Riwayat tanda tangan Rektor ── */}
-      <div className="sert-process-banner">
-        <div className="sert-process-num" style={{ color: '#166534', fontSize: '28px' }}>1</div>
-        <div className="sert-process-info">
-          <div className="sert-process-title" style={{ fontSize: '14.5px' }}>Riwayat tanda tangan Rektor</div>
-          <div className="sert-process-sub" style={{ fontSize: '12.5px' }}>Dokumen yang sudah melalui tahap tanda tangan Rektor.</div>
-        </div>
-      </div>
+      <PageHeader title="Riwayat Tanda Tangan" description="Dokumen yang sudah melalui tahap tanda tangan elektronik Rektor." />
 
       {/* ── Filter Bar ── */}
       <div className="filter-bar">
@@ -46,21 +41,21 @@ export default function RiwayatTandaTangan() {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+        <Select className="filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
           <option value="">Semua jenis</option>
           <option value="Workshop">Workshop</option>
           <option value="Seminar">Seminar</option>
-        </select>
-        <select className="filter-select" value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
+        </Select>
+        <Select className="filter-select" value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
           <option value="">Semua kegiatan</option>
           {riwayatList.map(s => (
             <option key={s.id} value={s.id}>{s.namaKegiatan}</option>
           ))}
-        </select>
-        <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        </Select>
+        <Select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
           <option value="diterbitkan">Diterbitkan</option>
-        </select>
+        </Select>
       </div>
 
       {/* ── Tabel Riwayat Tanda Tangan ── */}
@@ -92,7 +87,7 @@ export default function RiwayatTandaTangan() {
                 <td>{s.jenis}</td>
                 <td>{s.mitra}</td>
                 <td>
-                  <span className="badge-sumber-outline">
+                  <span className={`source-tag ${s.sumber === 'UNAND' ? 'source-unand' : 'source-mitra'}`}>
                     {s.sumber}
                   </span>
                 </td>

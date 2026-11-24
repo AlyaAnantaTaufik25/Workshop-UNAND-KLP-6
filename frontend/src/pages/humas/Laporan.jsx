@@ -6,6 +6,10 @@ import useApi from '../../hooks/useApi';
 import { reportsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination } from '../../components/Pagination';
+import { dialog, toast } from '../../components/Dialog';
+import { exportExcel } from '../../utils/excel';
+import Select from '../../components/Select';
+import PageHeader from '../../components/PageHeader';
 
 /* ══════════════════════════════════════════
    DATA
@@ -244,26 +248,67 @@ export default function Laporan() {
   const totalBelum     = filteredKegiatan.reduce((s, k) => s + k.belumAbsen, 0);
 
   /* ── Export Excel ── */
-  const handleExportExcel = () => {
-    const rows = [
-      'KEGIATAN,JENIS,PELAKSANAAN,PERIODE,PENDAFTAR,HADIR,BELUM ABSEN,MENUNGGU VERIFIKASI,DITOLAK',
-      ...filteredKegiatan.map(k =>
-        `"${k.kegiatan}","${k.jenis}","${k.pelaksanaan}","${k.periode}",${k.pendaftar},${k.hadir},${k.belumAbsen},${k.menungguVerifikasi},${k.ditolak}`
-      ),
-    ].join('\n');
-    const link = document.createElement('a');
-    link.href = 'data:text/csv;charset=utf-8,' + encodeURI(rows);
-    link.download = 'Laporan_Kegiatan_UNAND.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportExcel = async () => {
+    const periodeMap = { 'hari-ini': 'Hari ini', '7-hari': '7 hari terakhir', '1-bulan': '1 bulan terakhir' };
+    try {
+      await exportExcel({
+        fileName: 'Laporan_Kegiatan_UNAND',
+        title: 'Laporan Rekapitulasi Kegiatan',
+        subtitle: 'Hubungan Masyarakat · Sistem Informasi Workshop UNAND',
+        info: [
+          ['Periode', periodeMap[filterPeriode] || 'Semua periode'],
+          ['Jenis', filterJenis || 'Semua jenis'],
+          ...(filterKegiatan ? [['Kegiatan', filterKegiatan]] : []),
+          ...(search ? [['Pencarian', `"${search}"`]] : []),
+          ['Jumlah kegiatan', `${filteredKegiatan.length} kegiatan`],
+        ],
+        sheets: [
+          {
+            name: 'Rekap Kegiatan', numbered: true, totals: true,
+            columns: [
+              { header: 'Kegiatan', key: 'kegiatan', width: 38 },
+              { header: 'Jenis', key: 'jenis' },
+              { header: 'Pelaksanaan', key: 'pelaksanaan' },
+              { header: 'Periode', key: 'periode', width: 26 },
+              { header: 'Pendaftar', key: 'pendaftar', type: 'number' },
+              { header: 'Hadir', key: 'hadir', type: 'number' },
+              { header: 'Belum Absen', key: 'belumAbsen', type: 'number' },
+              { header: 'Menunggu Verifikasi', key: 'menungguVerifikasi', type: 'number' },
+              { header: 'Ditolak', key: 'ditolak', type: 'number' },
+              { header: 'Kehadiran', key: 'persen', type: 'percent', value: k => (k.pendaftar ? (k.hadir || 0) / k.pendaftar : 0) },
+            ],
+            rows: filteredKegiatan,
+          },
+          {
+            name: 'Presensi Harian Seminar', numbered: true, totals: true,
+            emptyText: 'Tidak ada rekap harian seminar pada periode ini',
+            columns: [
+              { header: 'Kegiatan', key: 'kegiatan', width: 38 },
+              { header: 'Pelaksanaan', key: 'pelaksanaan' },
+              { header: 'Hari', key: 'hari' },
+              { header: 'Tanggal', key: 'tanggal', width: 20 },
+              { header: 'Absensi', key: 'absensi' },
+              { header: 'Sampel Peserta', key: 'sampelPeserta', type: 'number' },
+              { header: 'Belum Absen', key: 'belumAbsen', type: 'number' },
+              { header: 'Menunggu Verifikasi', key: 'menungguVerifikasi', type: 'number' },
+              { header: 'Hadir', key: 'hadir', type: 'number' },
+              { header: 'Ditolak', key: 'ditolak', type: 'number' },
+            ],
+            rows: filteredSeminar,
+          },
+        ],
+      });
+      toast('Laporan Excel berhasil diunduh.');
+    } catch (err) {
+      toast(`Gagal membuat file Excel: ${err.message}`, { tone: 'error' });
+    }
   };
 
   /* ── Export PDF – buka window baru ── */
   const handleExportPDF = () => {
     const html = buildPrintHTML({ data: filteredKegiatan, dataSeminar: filteredSeminar, filterPeriode, filterJenis });
     const win = window.open('', '_blank', 'width=1200,height=850');
-    if (!win) { alert('Izinkan pop-up browser untuk mencetak laporan.'); return; }
+    if (!win) { dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk mencetak laporan.', tone: 'warning' }); return; }
     win.document.write(html);
     win.document.close();
   };
@@ -272,11 +317,14 @@ export default function Laporan() {
   return (
     <div className="humas-list-page">
 
-      {/* Header */}
-      <div style={{ marginBottom: 16 }}>
-        <h2 className="humas-section-title">Laporan kegiatan</h2>
-        <p className="humas-section-sub">Rekap pendaftaran dan kehadiran kegiatan.</p>
-      </div>
+      <PageHeader
+        title="Laporan Kegiatan"
+        description="Rekap pendaftaran dan kehadiran kegiatan."
+        actions={<>
+          <button type="button" className="ui-btn" onClick={handleExportExcel}><Download size={15} /> Ekspor Excel</button>
+          <button type="button" className="ui-btn ui-btn--primary" onClick={handleExportPDF}><Download size={15} /> Ekspor PDF</button>
+        </>}
+      />
 
       {/* Filter Bar */}
       <div className="filter-bar" style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 14px', display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
@@ -285,33 +333,24 @@ export default function Laporan() {
           <input className="search-input" placeholder="Cari nama kegiatan atau mitra..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
 
-        <select className="filter-select" style={{ minWidth: 130 }} value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+        <Select className="filter-select" style={{ minWidth: 130 }} value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
           <option value="">Semua jenis</option>
           {jenisOptions.map(j => <option key={j} value={j}>{j}</option>)}
-        </select>
+        </Select>
 
-        <select className="filter-select" style={{ minWidth: 180 }} value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
+        <Select className="filter-select" style={{ minWidth: 180 }} value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
           <option value="">Semua kegiatan</option>
           {kegiatanList.map(l => <option key={l.id} value={l.kegiatan}>{l.kegiatan}</option>)}
-        </select>
+        </Select>
 
-        <select className="filter-select" style={{ minWidth: 160 }} value={filterPeriode} onChange={e => setFilterPeriode(e.target.value)}>
+        <Select className="filter-select" style={{ minWidth: 160 }} value={filterPeriode} onChange={e => setFilterPeriode(e.target.value)}>
           <option value="">Semua periode</option>
           <option value="hari-ini">Hari ini</option>
           <option value="7-hari">7 hari terakhir</option>
           <option value="1-bulan">1 bulan terakhir</option>
-        </select>
+        </Select>
       </div>
 
-      {/* Export Buttons */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-        <button onClick={handleExportExcel} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1.5px solid #d1d5db', background: '#fff', color: '#14532d' }}>
-          <Download size={14} /> Ekspor Excel
-        </button>
-        <button onClick={handleExportPDF} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', background: '#14532d', color: '#fff' }}>
-          <Download size={14} /> Ekspor PDF
-        </button>
-      </div>
 
       {/* Summary Cards */}
       <div className="laporan-summary-row" style={{ marginBottom: 20 }}>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, SearchX } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
+import Select from '../../components/Select';
 
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
@@ -49,23 +50,23 @@ export default function PesertaMitra() {
             onChange={e => setSearch(e.target.value)}
           />
         </label>
-        <select value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
+        <Select value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
           <option value="">Semua jenis</option>
           {jenisOptions.map(j => (
             <option key={j} value={j}>{j}</option>
           ))}
-        </select>
-        <select value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
+        </Select>
+        <Select value={filterKegiatan} onChange={e => setFilterKegiatan(e.target.value)}>
           <option value="">Semua kegiatan</option>
           {kegiatanOptions.map(k => (
             <option key={k} value={k}>{k}</option>
           ))}
-        </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        </Select>
+        <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">Semua status</option>
           <option value="hadir-valid">Hadir</option>
           <option value="belum-hadir">Belum hadir</option>
-        </select>
+        </Select>
       </div>
 
       {/* Table */}
