@@ -17,8 +17,8 @@ class RegistrationsRepository {
     return rows[0] || null;
   }
 
-  async findByUserWorkshop(userId, workshopId) {
-    const [rows] = await this.db.query('SELECT * FROM registrations WHERE user_id = ? AND workshop_id = ?', [userId, workshopId]);
+  async findByUserWorkshop(userId, workshopId, conn = this.db) {
+    const [rows] = await conn.query('SELECT * FROM registrations WHERE user_id = ? AND workshop_id = ?', [userId, workshopId]);
     return rows[0] || null;
   }
 

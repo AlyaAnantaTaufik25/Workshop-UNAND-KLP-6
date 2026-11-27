@@ -88,9 +88,21 @@ function distanceMeters(lat1, lng1, lat2, lng2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+/**
+ * Tanggal sesi presensi untuk kegiatan [start..end]:
+ * hari ini bila berada dalam rentang kegiatan, selain itu tanggal mulai.
+ */
+function attendanceSessionDate(start, end) {
+  const today = toISODate(new Date());
+  const s = toISODate(start);
+  const e = toISODate(end) || s;
+  return s && today >= s && today <= e ? today : s;
+}
+
 module.exports = {
   BULAN,
   toISODate,
+  attendanceSessionDate,
   formatTanggal,
   formatRentang,
   formatWaktuPresensi,

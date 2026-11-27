@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const attendanceRepository = require('./attendance.repository');
 const workshopsService = require('../workshops/workshops.service');
 const { notFound, forbidden, unprocessable, badRequest, HttpError } = require('../../utils/http.util');
-const { toISODate, distanceMeters } = require('../../utils/format.util');
+const { attendanceSessionDate, distanceMeters } = require('../../utils/format.util');
 const storage = require('../../services/storage.service');
 
 const MAX_UPLOAD = 2 * 1024 * 1024;
@@ -25,10 +25,7 @@ class AttendanceService {
 
   /** Tanggal presensi = hari ini bila dalam rentang kegiatan, selain itu tanggal mulai */
   sessionDate(w) {
-    const today = toISODate(new Date());
-    const start = toISODate(w.tanggal_mulai);
-    const end = toISODate(w.tanggal_selesai);
-    return today >= start && today <= end ? today : start;
+    return attendanceSessionDate(w.tanggal_mulai, w.tanggal_selesai);
   }
 
   async ensureCanSubmit(user, workshopIdOrSlug) {
@@ -49,6 +46,11 @@ class AttendanceService {
   /** Presensi offline dengan kode QR dan validasi radius lokasi */
   async checkIn(user, body) {
     const { w, reg, tanggal } = await this.ensureCanSubmit(user, body.workshopId);
+    // Kegiatan online wajib mengunggah bukti yang diverifikasi panitia;
+    // check-in langsung akan melewati verifikasi tersebut.
+    if (w.mode === 'online') {
+      throw attendanceError('use-upload', 'Kegiatan online: presensi dilakukan dengan mengunggah bukti kehadiran');
+    }
     const lat = Number(body.latitude);
     const lng = Number(body.longitude);
 
@@ -108,6 +110,11 @@ class AttendanceService {
     await this.repository.update(id, {
       status: body.status, alasan_tolak: body.status === 'ditolak' ? body.reason : null, verified_at: new Date(), verified_by: user.id,
     });
+    // Sertifikat kegiatan sudah terbit → terbitkan juga untuk peserta yang baru divalidasi
+    if (body.status === 'hadir') {
+      // require di sini untuk menghindari ketergantungan melingkar antar-service
+      await require('../certificates/certificates.service').issueLateCertificates(att.workshop_id);
+    }
     return workshopsService.detail(att.workshop_id, user);
   }
 

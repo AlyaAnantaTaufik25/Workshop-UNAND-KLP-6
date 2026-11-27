@@ -209,21 +209,45 @@ class CertificatesService {
     const year = end.slice(0, 4);
     const month = ROMAN[Number(end.slice(5, 7)) - 1];
     const today = toISODate(new Date());
+    // Nomor urut melanjutkan sertifikat yang sudah ada untuk kegiatan ini, sehingga
+    // penerbitan susulan (peserta yang diverifikasi belakangan) tidak bentrok.
+    const [[{ issued }]] = await repo.db.query('SELECT COUNT(*) AS issued FROM certificates WHERE workshop_id = ?', [s.workshop_id]);
+    let seqNo = Number(issued);
     let n = 0;
     for (const a of attendees) {
-      n += 1;
       if (a.nomor) continue;
-      const seq = `${String(s.workshop_id).padStart(3, '0')}${String(n).padStart(3, '0')}`;
-      const nomor = s.sumber === 'Mitra' ? `SRT-M${s.partner_id}-${year}-${seq}` : `${seq}/UN16/WS/${month}/${year}`;
-      await repo.insert('certificates', {
-        code: `cert-${s.workshop_id}-${a.user_id}`, workshop_id: s.workshop_id, user_id: a.user_id, nomor,
-        nama_penerima: a.nama, jenis: s.jenis, issued_at: today,
-      });
+      for (let attempt = 0; ; attempt += 1) {
+        seqNo += 1;
+        const seq = `${String(s.workshop_id).padStart(3, '0')}${String(seqNo).padStart(3, '0')}`;
+        const nomor = s.sumber === 'Mitra' ? `SRT-M${s.partner_id}-${year}-${seq}` : `${seq}/UN16/WS/${month}/${year}`;
+        try {
+          await repo.insert('certificates', {
+            code: `cert-${s.workshop_id}-${a.user_id}`, workshop_id: s.workshop_id, user_id: a.user_id, nomor,
+            nama_penerima: a.nama, jenis: s.jenis, issued_at: today,
+          });
+          break;
+        } catch (err) {
+          // Nomor sudah terpakai → coba nomor berikutnya; selain itu lempar galat
+          if (err.code !== 'ER_DUP_ENTRY' || !String(err.message).includes('nomor') || attempt > 50) throw err;
+        }
+      }
+      n += 1;
       await repo.notify({ user_id: a.user_id, judul: 'Sertifikat Terbit', deskripsi: s.workshop_nama, link: '/peserta/sertifikat' });
     }
     if (s.template_id) await repo.updateRow('certificate_templates', s.template_id, { status: 'diterbitkan' });
     await audit({ action: 'certificate.issue', entity: 'certificate_submission', entityId: s.id, description: `${n} sertifikat "${s.workshop_nama}" diterbitkan`, meta: { jumlah: n } });
     return n;
+  }
+
+  /**
+   * Penerbitan susulan: dipanggil setelah kehadiran peserta divalidasi. Bila
+   * sertifikat kegiatan sudah diterbitkan, peserta yang baru hadir valid ikut
+   * mendapat sertifikat. Mengembalikan jumlah sertifikat baru.
+   */
+  async issueLateCertificates(workshopId) {
+    const sub = await repo.submissionByWorkshop(workshopId);
+    if (!sub || sub.status !== 'diterbitkan') return 0;
+    return this.issueCertificates(sub.id);
   }
 
   // ════════════════ SERTIFIKAT PESERTA ════════════════
@@ -348,7 +372,12 @@ class CertificatesService {
     return serializeCorrection(await repo.correction(c.id));
   }
 
-  async markRead(user, id) {
+  async markRead(user, rawId) {
+    // id opsional: kode pengajuan (PB-...) atau id angka; tipe lain ditolak
+    const id = rawId === undefined || rawId === null || rawId === '' ? null : rawId;
+    if (id !== null && !((typeof id === 'string' && id.length <= 60) || Number.isInteger(id))) {
+      throw badRequest('ID pengajuan tidak valid');
+    }
     const where = id ? 'user_id = ? AND (code = ? OR id = ?)' : 'user_id = ?';
     const params = id ? [user.id, id, id] : [user.id];
     await repo.db.query(`UPDATE certificate_corrections SET notification_read = 1 WHERE ${where} AND status IN ('selesai','ditolak')`, params);

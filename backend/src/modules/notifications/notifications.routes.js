@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../../config/database');
 const { authenticate } = require('../../middlewares/auth.middleware');
-const { asyncHandler } = require('../../utils/http.util');
+const { asyncHandler, badRequest } = require('../../utils/http.util');
 const { successResponse } = require('../../utils/response.util');
 const { formatTanggalJam } = require('../../utils/format.util');
 const realtime = require('../../services/realtime.service');
@@ -35,7 +35,11 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/stream', (req, res) => realtime.subscribe(req, res));
 
 router.patch('/read', asyncHandler(async (req, res) => {
-  const { id } = req.body || {};
+  const raw = (req.body || {}).id;
+  // id opsional: angka positif. Nilai lain (array/objek) ditolak agar tidak
+  // diperluas menjadi SQL oleh placeholder mysql2.
+  const id = raw === undefined || raw === null || raw === '' ? null : Number(raw);
+  if (id !== null && !(Number.isInteger(id) && id > 0)) throw badRequest('ID notifikasi tidak valid');
   await pool.query(
     `UPDATE notifications SET read_at = NOW() WHERE read_at IS NULL AND (user_id = ? OR (role_code = ? AND (partner_id IS NULL OR partner_id = ?))) ${id ? 'AND id = ?' : ''}`,
     id ? [req.user.id, req.user.role, req.user.partnerId || 0, id] : [req.user.id, req.user.role, req.user.partnerId || 0]

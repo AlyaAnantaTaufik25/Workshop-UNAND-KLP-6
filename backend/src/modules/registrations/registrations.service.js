@@ -4,6 +4,7 @@ const { notify } = require('../../services/notifier.service');
 const workshopsService = require('../workshops/workshops.service');
 const { serializeParticipant } = require('../workshops/workshops.serializer');
 const { notFound, forbidden, conflict, unprocessable } = require('../../utils/http.util');
+const { fillSeats, notifyPromoted } = require('./seats');
 
 /**
  * Business Logic Layer untuk modul registrations
@@ -26,7 +27,7 @@ class RegistrationsService {
     await this.repository.transaction(async (conn) => {
       // Kunci baris kegiatan agar perhitungan kuota aman dari pendaftaran bersamaan
       await conn.query('SELECT id FROM workshops WHERE id = ? FOR UPDATE', [w.id]);
-      const existing = await this.repository.findByUserWorkshop(user.id, w.id);
+      const existing = await this.repository.findByUserWorkshop(user.id, w.id, conn);
       if (existing && existing.status !== 'dibatalkan') throw conflict('Anda sudah terdaftar pada kegiatan ini');
 
       const active = await this.repository.countActive(w.id, conn);
@@ -39,6 +40,10 @@ class RegistrationsService {
       if (existing) await this.repository.update(existing.id, data, conn);
       else await this.repository.create({ ...data, workshop_id: w.id, user_id: user.id }, conn);
       finalStatus = data;
+    }).catch((err) => {
+      // Dua permintaan bersamaan dari peserta yang sama → kunci unik (workshop, user)
+      if (err.code === 'ER_DUP_ENTRY') throw conflict('Anda sudah terdaftar pada kegiatan ini');
+      throw err;
     });
 
     // Konfirmasi ke peserta (lonceng + email)
@@ -55,14 +60,16 @@ class RegistrationsService {
     if (user.role === 'peserta' && reg.user_id !== user.id) throw forbidden('Pendaftaran ini bukan milik Anda');
     if (!['terdaftar', 'waiting'].includes(reg.status)) throw unprocessable('Pendaftaran tidak dapat dibatalkan');
 
-    await this.repository.transaction(async (conn) => {
+    const seats = await this.repository.transaction(async (conn) => {
+      // Kunci kegiatan dulu, lalu pastikan status belum berubah oleh permintaan lain
+      await conn.query('SELECT id FROM workshops WHERE id = ? FOR UPDATE', [reg.workshop_id]);
+      const [[current]] = await conn.query('SELECT status FROM registrations WHERE id = ? FOR UPDATE', [reg.id]);
+      if (!current || !['terdaftar', 'waiting'].includes(current.status)) throw unprocessable('Pendaftaran tidak dapat dibatalkan');
       await this.repository.update(reg.id, { status: 'dibatalkan', cancelled_at: new Date(), queue_no: null }, conn);
-      // Kursi kosong -> naikkan antrean waiting list pertama
-      if (reg.status === 'terdaftar') {
-        const next = await this.repository.firstWaiting(reg.workshop_id, conn);
-        if (next) await this.repository.update(next.id, { status: 'terdaftar', queue_no: null }, conn);
-      }
+      // Kursi kosong → naikkan antrean waiting list (berurutan) dan rapikan nomor antrean
+      return fillSeats(reg.workshop_id, conn);
     });
+    await notifyPromoted(seats);
     return workshopsService.detail(reg.workshop_id, user);
   }
 

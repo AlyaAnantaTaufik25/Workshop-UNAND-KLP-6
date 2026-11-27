@@ -3,6 +3,8 @@ const { serializeWorkshop, serializeParticipant, serializeMyRegistration } = req
 const { notFound, forbidden, badRequest } = require('../../utils/http.util');
 const { slugify, formatWaktuPresensi, toISODate } = require('../../utils/format.util');
 const storage = require('../../services/storage.service');
+const registrationsRepository = require('../registrations/registrations.repository');
+const { fillSeats, notifyPromoted } = require('../registrations/seats');
 
 const STATUSES = ['draft', 'publik', 'berlangsung', 'selesai', 'dibatalkan'];
 const REG_STATUSES = ['belum-dibuka', 'dibuka', 'segera-ditutup', 'ditutup'];
@@ -181,6 +183,12 @@ class WorkshopsService {
     if (data.nama === '') throw badRequest('Judul kegiatan wajib diisi');
     await this.repository.update(row.id, data);
     if (data.status === 'selesai') await this.repository.completeRegistrations(row.id);
+    // Kuota dinaikkan / dibuat tak terbatas → isi kursi baru dari waiting list
+    const finalStatus = data.status || row.status;
+    if (data.kuota !== undefined && !['selesai', 'dibatalkan'].includes(finalStatus)) {
+      const seats = await registrationsRepository.transaction((conn) => fillSeats(row.id, conn));
+      await notifyPromoted(seats);
+    }
     return this.detail(row.id, user);
   }
 

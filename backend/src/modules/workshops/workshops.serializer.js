@@ -5,7 +5,7 @@ const storage = require('../../services/storage.service');
  * seluruh portal frontend (humas, sekretariat, rektor, mitra, peserta).
  */
 const {
-  formatRentang, formatTanggal, formatWaktuPresensi, hhmm, initials, toISODate, toISOStringWIB,
+  attendanceSessionDate, formatRentang, formatTanggal, formatWaktuPresensi, hhmm, initials, toISODate, toISOStringWIB,
 } = require('../../utils/format.util');
 
 const REG_STATE = { 'belum-dibuka': 'not-open', dibuka: 'open', 'segera-ditutup': 'open', ditutup: 'closed' };
@@ -113,6 +113,9 @@ function serializeWorkshop(row) {
     statusPresensi: row.status_presensi,
     registrationState: REG_STATE[row.status_pendaftaran] || 'open',
     attendanceState: ATT_STATE[row.status_presensi] || 'not-open',
+    // Tanggal sesi presensi yang dicatat server bila peserta presensi sekarang
+    // (sama dengan AttendanceService.sessionDate): hari ini bila dalam rentang kegiatan, selain itu tanggal mulai
+    attendanceDate: attendanceSessionDate(mulai, selesai),
     closing: row.status_pendaftaran === 'segera-ditutup',
     completed: row.status === 'selesai',
     cancelled: row.status === 'dibatalkan',
@@ -144,6 +147,20 @@ function serializeWorkshop(row) {
 const ATT_FRONT = { pending: 'pending', hadir: 'present', ditolak: 'rejected', 'tidak-hadir': 'absent' };
 const REG_FRONT = { terdaftar: 'registered', waiting: 'waiting', dibatalkan: 'cancelled', selesai: 'completed' };
 
+/** Satu catatan presensi peserta (dipakai portal peserta web & aplikasi mobile) */
+function serializeMyAttendance(a) {
+  return {
+    id: a.id,
+    date: toISODate(a.tanggal),
+    status: ATT_FRONT[a.status],
+    method: a.method,
+    fileName: a.file_name || undefined,
+    fileUrl: storage.publicUrl(a.file_data) || undefined,
+    submittedAt: toISOStringWIB(a.submitted_at),
+    reason: a.alasan_tolak || undefined,
+  };
+}
+
 /** Pendaftaran milik peserta (format portal peserta) */
 function serializeMyRegistration(reg, attendances = []) {
   const latest = attendances[attendances.length - 1];
@@ -164,6 +181,8 @@ function serializeMyRegistration(reg, attendances = []) {
         reason: latest.alasan_tolak || undefined,
       },
     } : {}),
+    // Presensi per hari kegiatan (kegiatan multi-hari), urut tanggal
+    attendanceDays: attendances.map(serializeMyAttendance),
   };
 }
 
