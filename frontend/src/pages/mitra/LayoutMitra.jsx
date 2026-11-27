@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Briefcase, Users, FileText, Award, Pencil, BarChart3, Bell } from 'lucide-react';
 import './mitra.css';
@@ -6,6 +6,8 @@ import { usePortalData } from '../../context/PortalData';
 import useNotifications from '../../hooks/useNotifications';
 import { useMobileNav } from '../../components/MobileNav';
 import Sidebar from '../../components/Sidebar';
+import { PageLoader } from '../../components/RequireRole';
+import useOnChange from '../../hooks/useOnChange';
 
 const SECTIONS = [
   { items: [
@@ -43,9 +45,8 @@ export default function LayoutMitra() {
   const [, setNotifRead] = useState(false);
   const notifRef = useRef(null);
 
-  useEffect(() => {
-    setNotifOpen(false);
-  }, [location.pathname]);
+  // Tutup panel notifikasi saat pindah halaman
+  useOnChange(location.pathname, () => setNotifOpen(false));
 
   useEffect(() => {
     const handleOutside = (event) => {
@@ -145,7 +146,7 @@ export default function LayoutMitra() {
 
         {/* Content Outlet */}
         <main className="mitra-content">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}><Outlet /></Suspense>
         </main>
       </div>
     </div>

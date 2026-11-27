@@ -9,20 +9,18 @@ import {
   X,
   SearchX,
   ArrowLeft,
-  FileText,
   AlertTriangle,
   Check,
   CheckCircle2,
-  Building2,
-  HelpCircle,
 } from 'lucide-react';
 import UnandLogo from '../../components/UnandLogo';
 import { usePortalData } from '../../context/PortalData';
-import { useEffect as useSyncEffect } from 'react';
 import { certificatesApi, readFileAsDataUrl } from '../../api';
 import { usePagination } from '../../components/Pagination';
 import { toast } from '../../components/Dialog';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
+import useOnChange from '../../hooks/useOnChange';
 
 
 const statusConfig = {
@@ -36,10 +34,10 @@ const defaultForm = { id: null, nama: '', kegiatanTerkait: '', berkas: null, ber
 export default function TemplateSertifikatMitra() {
   const { mitraTemplates, mitraKegiatan, reload } = usePortalData();
   const [templates, setTemplates]       = useState(mitraTemplates);
-  useSyncEffect(() => { setTemplates(mitraTemplates); }, [mitraTemplates]);
-  const [search, setSearch]             = useState('');
+  useOnChange(mitraTemplates, next => setTemplates(next));
+  const [search, setSearch]             = useUrlState('q');
   const kegiatanOptions = mitraKegiatan.map(k => k.nama);
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   // View mode: 'list' atau 'form' (halaman form baru)
   const [viewMode, setViewMode]         = useState('list');
@@ -519,12 +517,12 @@ export default function TemplateSertifikatMitra() {
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#9CA3AF',
+                  color: 'var(--gray-500, #6b7280)',
                   cursor: 'pointer',
                   padding: 4,
                   borderRadius: 6,
                 }}
-              >
+               aria-label="Tutup">
                 <X size={18} />
               </button>
             </div>
@@ -645,7 +643,7 @@ export default function TemplateSertifikatMitra() {
                 <span className="modal-header-crumb">PRATINJAU TEMPLATE</span>
                 <h3 className="modal-header-title">{previewItem.nama}</h3>
               </div>
-              <button className="modal-close-btn" onClick={() => setPreviewItem(null)}>
+              <button className="modal-close-btn" onClick={() => setPreviewItem(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -659,7 +657,7 @@ export default function TemplateSertifikatMitra() {
                       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--green-800)' }}>
                         {previewItem.penerbit || 'PT SEMEN PADANG'}
                       </div>
-                      <div style={{ fontSize: 11, color: 'var(--gray-400)' }}>
+                      <div style={{ fontSize: 11, color: 'var(--gray-500, #6b7280)' }}>
                         Pratinjau Desain Template Sertifikat
                       </div>
                     </div>

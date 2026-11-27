@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CalendarDays, Clock, MapPin, ArrowLeft, Users, CheckCircle2, UserCheck, Calendar, Download } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, ArrowLeft, Users, UserCheck, Calendar, Download, Inbox } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
 import { exportExcel } from '../../utils/excel';
@@ -201,9 +201,7 @@ export default function DetailKegiatanMitra() {
                 <tbody>
                   {(detail?.peserta ?? []).length === 0 ? (
                     <tr>
-                      <td colSpan={4} style={{ textAlign: 'center', color: 'var(--mitra-muted)', padding: '32px' }}>
-                        Belum ada data peserta.
-                      </td>
+                      <td colSpan={4} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada data peserta.</div></div></td>
                     </tr>
                   ) : (
                     pesertaPage.map(p => (
@@ -242,9 +240,7 @@ export default function DetailKegiatanMitra() {
                 <tbody>
                   {(detail?.peserta ?? []).length === 0 ? (
                     <tr>
-                      <td colSpan={4} style={{ textAlign: 'center', color: 'var(--mitra-muted)', padding: '32px' }}>
-                        Belum ada data presensi.
-                      </td>
+                      <td colSpan={4} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada data presensi.</div></div></td>
                     </tr>
                   ) : (
                     pesertaPage.map(p => (

@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Search, Download, ArrowLeft, Users, CheckCircle, Clock } from 'lucide-react';
+import { Search, Download, ArrowLeft, Inbox } from 'lucide-react';
 import { downloadPresensiCSV } from './utils/exportHelper';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
 import { toast } from '../../components/Dialog';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function Presensi() {
   const { workshops, presensiData } = usePortalData();
-  const [search, setSearch]             = useState('');
-  const [filterJenis, setFilterJenis]   = useState('');
+  const [search, setSearch]             = useUrlState('q');
+  const [filterJenis, setFilterJenis]   = useUrlState('jenis');
   const [selectedWorkshopId, setSelectedWorkshopId] = useState(null);
   const [pesertaSearch, setPesertaSearch]           = useState('');
   const [pesertaStatusFilter, setPesertaStatusFilter] = useState('');
@@ -35,7 +36,7 @@ export default function Presensi() {
     return matchSearch && matchStatus;
   });
   // Paginasi tabel
-  const { pageItems: pg_filteredPeserta, pager: pager_filteredPeserta } = usePagination(filteredPeserta, 10);
+  const { pageItems: pg_filteredPeserta, pager: pager_filteredPeserta } = usePagination(filteredPeserta, 10, 'page2');
 
   const handleDownload = (workshop, pesertaList) => {
     const dataToExport = pesertaList && pesertaList.length > 0 
@@ -175,9 +176,7 @@ export default function Presensi() {
               <tbody>
                 {filteredPeserta.length === 0 ? (
                   <tr>
-                    <td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                      Tidak ada data peserta untuk filter yang dipilih.
-                    </td>
+                    <td colSpan={4} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada data peserta untuk filter yang dipilih.</div></div></td>
                   </tr>
                 ) : (
                   pg_filteredPeserta.map(p => (
@@ -283,9 +282,7 @@ export default function Presensi() {
               <tbody>
                 {filteredWorkshops.length === 0 ? (
                   <tr>
-                    <td colSpan={8} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                      Tidak ada kegiatan ditemukan.
-                    </td>
+                    <td colSpan={8} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada kegiatan ditemukan.</div></div></td>
                   </tr>
                 ) : (
                   pg_filteredWorkshops.map(w => {
@@ -294,7 +291,7 @@ export default function Presensi() {
                       <tr key={w.id}>
                         <td>
                           <div className="table-name-bold">{w.nama}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--gray-400)', marginTop: '2px' }}>
+                          <div style={{ fontSize: '12px', color: 'var(--gray-500, #6b7280)', marginTop: '2px' }}>
                             {w.lokasi}
                           </div>
                         </td>
@@ -325,7 +322,7 @@ export default function Presensi() {
                             <button
                               type="button"
                               className="btn-table-icon"
-                              title="Unduh Rekap Presensi (CSV)"
+                              title="Unduh rekap presensi (Excel)" aria-label="Unduh rekap presensi (Excel)"
                               onClick={() => handleDownload(w)}
                             >
                               <Download size={13} />

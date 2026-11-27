@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Briefcase, Users, Check, Plus, Eye, Pencil,
-  Trash2, X, CalendarDays
+  Briefcase,
+  Users,
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 import { IconAction } from '../../components/Pagination';

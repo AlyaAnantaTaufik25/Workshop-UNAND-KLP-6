@@ -34,5 +34,10 @@ const config = {
   },
 };
 
+// Production wajib memakai JWT_SECRET sendiri (bukan nilai bawaan pengembangan)
+if (config.app.env === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || config.jwt.secret === 'dev_secret_unand_workshop')) {
+  throw new Error('JWT_SECRET wajib diisi (minimal 32 karakter acak) saat NODE_ENV=production');
+}
+
 module.exports = config;
 

@@ -1,0 +1,114 @@
+# CI — dijalankan setiap push / pull request ke main.
+# Menjaga agar perubahan tidak diam-diam merusak aplikasi: lint, unit test, test backend
+# (dengan MySQL sungguhan), build, dan smoke test E2E di browser.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend — lint, unit test, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  backend:
+    name: Backend — test API (MySQL)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      TEST_DB_NAME: sim_workshop_unand_test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  e2e:
+    name: E2E — smoke test 5 portal
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: sim_workshop_unand
+      NODE_ENV: development
+      SCHEDULER_ENABLED: "false"
+      CHROME_PATH: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pasang dependensi
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix frontend
+      - name: Siapkan database (migrasi + data demo)
+        run: npm run db:fresh --prefix backend
+      - name: Jalankan backend & frontend
+        run: |
+          (cd backend && node src/server.js > ../backend.log 2>&1 &)
+          (cd frontend && npx vite --host 0.0.0.0 --port 5173 --strictPort > ../frontend.log 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:5000/api/v1/health >/dev/null && curl -sf http://localhost:5173 >/dev/null && break
+            sleep 2
+          done
+      - name: Smoke test E2E
+        run: npm run test:e2e --prefix frontend
+      - name: Log server (bila gagal)
+        if: failure()
+        run: |
+          echo "── backend.log"; tail -n 200 backend.log || true
+          echo "── frontend.log"; tail -n 100 frontend.log || true

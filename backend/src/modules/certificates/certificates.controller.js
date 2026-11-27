@@ -29,6 +29,15 @@ class CertificatesController {
 
   // Sertifikat
   my = async (req, res) => successResponse(res, 'Sertifikat saya', await this.service.myCertificates(req.user));
+  certificatePdf = async (req, res) => {
+    const { buffer, filename } = await this.service.certificatePdf(req.params.code, req.user);
+    const headers = { 'Content-Type': 'application/pdf', 'Content-Length': buffer.length, 'Cache-Control': 'private, no-store', 'X-Filename': filename };
+    // Hanya untuk tautan unduh langsung; pengambilan via XHR/fetch memberi nama berkas sendiri
+    if (req.query.download) headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+    res.set(headers);
+    return res.send(buffer);
+  };
+
   verify = async (req, res) => successResponse(res, 'Sertifikat valid', await this.service.verifyCertificate(req.params.serialNumber));
 
   // Perbaikan

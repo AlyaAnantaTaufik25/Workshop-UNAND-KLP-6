@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Inbox } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
@@ -77,9 +77,7 @@ export default function SertifikatPerbaikan() {
               <tbody>
                 {filteredDp.length === 0 && (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                      Tidak ada pengajuan dokumen pengganti.
-                    </td>
+                    <td colSpan={7} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada pengajuan dokumen pengganti.</div></div></td>
                   </tr>
                 )}
                 {pg_filteredDp.map(d => (
@@ -89,7 +87,7 @@ export default function SertifikatPerbaikan() {
                       <div style={{ fontWeight: 600, color: 'var(--gray-800)', fontSize: '13px' }}>
                         {d.namaKegiatan}
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--gray-400)' }}>{d.penyelenggara}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--gray-500, #6b7280)' }}>{d.penyelenggara}</div>
                     </td>
                     <td style={{ fontFamily: 'monospace', fontSize: '12px' }}>{d.nomorSertifikat}</td>
                     <td>

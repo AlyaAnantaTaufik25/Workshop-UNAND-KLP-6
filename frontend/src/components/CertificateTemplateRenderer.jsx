@@ -1,11 +1,11 @@
 import React from 'react';
 import UnandLogo from './UnandLogo';
-import { Award, ShieldCheck, CheckCircle2, Bookmark } from 'lucide-react';
+import { Award, ShieldCheck } from 'lucide-react';
 
 export default function CertificateTemplateRenderer({
   desainKey = 'klasik',
   namaKegiatan = 'Workshop Data Science untuk Riset Akademik',
-  namaPeserta = 'Nadia Amelia',
+  namaPeserta = 'Nama Peserta',
   tanggal = '18 Mei 2026',
   penyelenggara = 'Universitas Andalas',
   nomorSertifikat = 'UNAND/CERT/2026/0488',
@@ -45,7 +45,7 @@ export default function CertificateTemplateRenderer({
               <strong style={{ fontSize: '13px', color: '#14532d', letterSpacing: '0.06em', display: 'block', fontFamily: 'Georgia, serif' }}>
                 UNIVERSITAS ANDALAS
               </strong>
-              <span style={{ fontSize: '10px', color: '#66736c' }}>
+              <span style={{ fontSize: '11px', color: '#66736c' }}>
                 Sertifikat Resmi Terverifikasi
               </span>
             </div>
@@ -63,7 +63,7 @@ export default function CertificateTemplateRenderer({
             SERTIFIKAT PENGHARGAAN
           </div>
           <div style={{ width: '80px', height: '2px', background: '#d4af37', margin: '4px auto 10px' }} />
-          <div style={{ fontSize: '10px', color: '#87918c', fontFamily: 'monospace' }}>
+          <div style={{ fontSize: '11px', color: '#87918c', fontFamily: 'monospace' }}>
             No: {nomorSertifikat}
           </div>
         </div>
@@ -103,12 +103,12 @@ export default function CertificateTemplateRenderer({
           borderTop: '1px solid #e8ede9',
         }}>
           <div>
-            <p style={{ fontSize: '10px', color: '#66736c', margin: 0, fontWeight: 600 }}>Pimpinan Mitra</p>
+            <p style={{ fontSize: '11px', color: '#66736c', margin: 0, fontWeight: 600 }}>Pimpinan Mitra</p>
             <div style={{ height: '26px', borderBottom: '1px solid #cbd5e1', width: '110px', margin: '4px auto' }} />
             <p style={{ fontSize: '9px', color: '#94a3b8', margin: 0 }}>Tanda Tangan Digital</p>
           </div>
           <div>
-            <p style={{ fontSize: '10px', color: '#66736c', margin: 0, fontWeight: 600 }}>Rektor Universitas Andalas</p>
+            <p style={{ fontSize: '11px', color: '#66736c', margin: 0, fontWeight: 600 }}>Rektor Universitas Andalas</p>
             <div style={{ height: '26px', borderBottom: '1px solid #cbd5e1', width: '110px', margin: '4px auto' }} />
             <p style={{ fontSize: '9px', color: '#94a3b8', margin: 0 }}>Tanda Tangan Digital</p>
           </div>
@@ -182,7 +182,7 @@ export default function CertificateTemplateRenderer({
             }}>
               SERTIFIKAT KELULUSAN
             </div>
-            <div style={{ fontSize: '10px', color: '#94a3b8', fontFamily: 'monospace' }}>
+            <div style={{ fontSize: '11px', color: '#94a3b8', fontFamily: 'monospace' }}>
               ID: {nomorSertifikat}
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function CertificateTemplateRenderer({
           <p style={{ fontSize: '13.5px', fontWeight: 700, color: '#1c1917', margin: '0 0 4px' }}>
             {namaKegiatan}
           </p>
-          <p style={{ fontSize: '10px', color: '#78716c' }}>
+          <p style={{ fontSize: '11px', color: '#78716c' }}>
             Padang, {tanggal}
           </p>
         </div>
@@ -446,7 +446,7 @@ export default function CertificateTemplateRenderer({
         <p style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 6px' }}>
           {namaKegiatan}
         </p>
-        <p style={{ fontSize: '10px', color: '#64748b', margin: 0 }}>
+        <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>
           Diterbitkan pada {tanggal} di {penyelenggara}
         </p>
       </div>

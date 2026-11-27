@@ -1,0 +1,66 @@
+/* Kelas hasil pemindahan style inline statis (dibuat otomatis oleh codemod) */
+.ix-e18bc3c { display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 12px !important; }
+.ix-2736f7e { margin: 0 !important; font-size: 22px !important; font-weight: 800 !important; color: #111827 !important; }
+.ix-9f4e9eb { margin: 4px 0 0 !important; font-size: 13px !important; color: #6B7280 !important; }
+.ix-bc6f935 { display: grid !important; grid-template-columns: 1fr 300px !important; gap: 20px !important; align-items: start !important; margin-top: 12px !important; }
+.ix-6479258 { border: 1px solid #E5E7EB !important; border-radius: 10px !important; background: #fff !important; overflow: hidden !important; }
+.ix-f2053a4 { padding: 12px 16px !important; border-bottom: 1px solid #E5E7EB !important; font-weight: 700 !important; font-size: 14px !important; color: #111827 !important; }
+.ix-afade10 { padding: 20px !important; background: #f9fafb !important; }
+.ix-a4b3b72 { background: #fff !important; border: 1px solid #d1d5db !important; border-radius: 6px !important; padding: 18px !important; min-height: 380px !important; position: relative !important; }
+.ix-5824171 { font-size: 12px !important; color: #374151 !important; line-height: 1.7 !important; }
+.ix-9767892 { text-align: center !important; border-bottom: 2px double #14532d !important; padding-bottom: 10px !important; margin-bottom: 14px !important; }
+.ix-aef56fc { font-weight: 800 !important; color: #14532d !important; font-size: 15px !important; }
+.ix-474aa03 { font-size: 11px !important; color: #6B7280 !important; }
+.ix-379b76a { font-weight: 700 !important; font-size: 13px !important; color: #111827 !important; margin-top: 6px !important; }
+.ix-cb73c78 { padding-left: 18px !important; margin: 6px 0 12px !important; }
+.ix-0c358c0 { margin-top: 24px !important; padding: 12px !important; border: 1px dashed #cbd5e1 !important; border-radius: 6px !important; background: #f8fafc !important; text-align: center !important; font-size: 11px !important; color: #64748b !important; }
+.ix-806ccfc { position: absolute !important; inset: 0 !important; padding: 16px !important; }
+.ix-2f1ca42 { position: absolute !important; right: 40px !important; bottom: 40px !important; width: 85px !important; opacity: 0.88 !important; pointer-events: none !important; }
+.ix-73188d0 { padding: 10px 16px !important; border-top: 1px solid #E5E7EB !important; display: flex !important; flex-wrap: wrap !important; gap: 8px !important; align-items: center !important; background: #fff !important; }
+.ix-ec14521 { padding: 5px 12px !important; border-radius: 6px !important; border: 1px solid #d1d5db !important; background: #fff !important; color: #374151 !important; display: flex !important; align-items: center !important; gap: 5px !important; font-size: 13px !important; cursor: pointer !important; }
+.ix-3e2e7c3 { display: none !important; }
+.ix-e1bf5fc { display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px !important; color: #374151 !important; margin-left: 6px !important; }
+.ix-38208a7 { width: 70px !important; accent-color: #14532d !important; }
+.ix-3973df2 { display: flex !important; align-items: center !important; gap: 6px !important; font-size: 13px !important; color: #374151 !important; }
+.ix-b32b92d { width: 30px !important; height: 24px !important; border: none !important; cursor: pointer !important; padding: 0 !important; }
+.ix-a095b66 { margin-left: auto !important; color: #dc2626 !important; background: none !important; border: none !important; cursor: pointer !important; font-size: 13px !important; display: flex !important; align-items: center !important; gap: 4px !important; font-weight: 600 !important; }
+.ix-cf27ffe { padding: 14px 18px !important; border-top: 1px solid #E5E7EB !important; background: #fff !important; }
+.ix-5d93d84 { display: block !important; font-size: 13px !important; font-weight: 700 !important; color: #111827 !important; margin-bottom: 6px !important; }
+.ix-91f6676 { color: #dc2626 !important; }
+.ix-f1041c7 { display: flex !important; gap: 10px !important; align-items: flex-start !important; }
+.ix-f68b1b2 { flex: 1 !important; }
+.ix-721bee1 { width: 100% !important; padding: 9px 12px !important; border: 1px solid #d1d5db !important; border-radius: 6px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.ix-d390c88 { font-size: 12px !important; color: #dc2626 !important; display: block !important; margin-top: 4px !important; }
+.ix-f1e761c { padding: 9px 20px !important; background: #16a34a !important; color: #fff !important; border: none !important; border-radius: 6px !important; font-size: 13px !important; font-weight: 700 !important; cursor: pointer !important; display: flex !important; align-items: center !important; gap: 6px !important; white-space: nowrap !important; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3) !important; }
+.ix-af84281 { padding: 10px 16px !important; border-top: 1px solid #E5E7EB !important; display: flex !important; justify-content: space-between !important; align-items: center !important; font-size: 13px !important; color: #374151 !important; }
+.ix-fb60eee { display: flex !important; gap: 8px !important; }
+.ix-49b6a84 { vertical-align: middle !important; }
+.ix-814058e { display: flex !important; flex-direction: column !important; gap: 16px !important; }
+.ix-b5da40d { border: 1px solid #E5E7EB !important; border-radius: 10px !important; background: #fff !important; padding: 18px !important; }
+.ix-b068e7f { margin: 0 0 14px !important; font-size: 15px !important; font-weight: 700 !important; color: #111827 !important; }
+.ix-a022263 { display: flex !important; flex-direction: column !important; gap: 10px !important; font-size: 13px !important; }
+.ix-024c3ee { color: #6B7280 !important; font-size: 11px !important; text-transform: uppercase !important; letter-spacing: 0.4px !important; font-weight: 600 !important; }
+.ix-528d9c9 { font-weight: 700 !important; color: #14532d !important; margin-top: 2px !important; }
+.ix-1028079 { color: #334155 !important; margin-top: 2px !important; }
+.ix-e4e3058 { border: 1px solid #E5E7EB !important; border-radius: 10px !important; background: #f8fafc !important; padding: 16px !important; font-size: 12.5px !important; color: #4b5563 !important; line-height: 1.6 !important; }
+.ix-b6a7336 { font-weight: 700 !important; color: #1f2937 !important; margin-bottom: 8px !important; display: flex !important; align-items: center !important; gap: 6px !important; }
+.ix-8d431f9 { padding-left: 18px !important; margin: 0 !important; }
+.ix-d9930ed { padding: 9px 16px !important; border: 1px solid #d1d5db !important; border-radius: 6px !important; background: #fff !important; color: #374151 !important; font-size: 13px !important; font-weight: 600 !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; }
+.ix-77d5e40 { padding: 40px !important; text-align: center !important; color: var(--gray-500, #6b7280) !important; }
+.ix-7f35be1 { margin-bottom: 20px !important; }
+.ix-d6681c4 { display: block !important; font-size: 11px !important; color: var(--gray-500, #6b7280) !important; font-weight: 400 !important; margin-top: 2px !important; }
+.ix-8366ab4 { font-size: 11px !important; color: var(--gray-500, #6b7280) !important; margin-bottom: 18px !important; }
+.ix-eaa3ab6 { min-height: 40px !important; margin: 6px 16px !important; display: flex !important; align-items: center !important; justify-content: center !important; border-bottom: 1px solid var(--gray-300) !important; }
+.ix-8e8d2de { max-height: 38px !important; max-width: 140px !important; object-fit: contain !important; }
+.ix-76d06c6 { font-family: cursive !important; font-size: 15px !important; color: var(--green-900) !important; font-weight: 700 !important; }
+.ix-22d6331 { font-size: 11px !important; font-weight: 700 !important; color: #B45309 !important; background: #FEF3C7 !important; border: 1px dashed #F59E0B !important; border-radius: 4px !important; padding: 3px 8px !important; }
+.ix-eb54941 { font-family: cursive !important; font-size: 14px !important; color: var(--green-900) !important; font-weight: 700 !important; }
+.ix-0d92821 { color: #15803d !important; font-weight: 600 !important; }
+.ix-739a043 { font-size: 12px !important; }
+.ix-f70c68d { color: var(--green-700) !important; font-weight: 700 !important; }
+.ix-b4c4077 { display: flex !important; flex-direction: column !important; gap: 12px !important; }
+.ix-75648e1 { margin: 0 !important; }
+.ix-32e8260 { font-size: 12px !important; color: var(--gray-500) !important; margin: 0 0 4px !important; }
+.ix-72b389a { width: 100% !important; justify-content: center !important; padding: 9px 14px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; background: #ffffff !important; color: #334155 !important; font-weight: 600 !important; font-size: 13px !important; cursor: pointer !important; display: flex !important; align-items: center !important; gap: 6px !important; }
+.ix-ec36eb4 { width: 100% !important; background: var(--green-900) !important; color: white !important; cursor: pointer !important; border: none !important; border-radius: 6px !important; padding: 11px 16px !important; font-weight: 700 !important; font-size: 13.5px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; box-shadow: 0 3px 10px rgba(20, 83, 45, 0.25) !important; }
+.ix-8ed92f5 { background: #DCFCE7 !important; border: 1px solid #86EFAC !important; border-radius: 6px !important; padding: 12px 14px !important; font-size: 12.5px !important; color: #15803d !important; display: flex !important; align-items: center !important; gap: 8px !important; font-weight: 600 !important; }

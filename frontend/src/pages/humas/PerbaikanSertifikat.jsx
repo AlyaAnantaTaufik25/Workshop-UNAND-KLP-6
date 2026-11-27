@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Bell, Eye } from 'lucide-react';
+import { Search, Eye, Inbox } from 'lucide-react';
 import useApi from '../../hooks/useApi';
 import { certificatesApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
@@ -7,6 +7,8 @@ import { usePagination } from '../../components/Pagination';
 import { dialog } from '../../components/Dialog';
 import Select from '../../components/Select';
 import BackButton from '../../components/BackButton';
+import useUrlState from '../../hooks/useUrlState';
+import useUnsavedChanges from '../../hooks/useUnsavedChanges';
 
 const statusConfig = {
   menunggu: { label: 'Menunggu Pemeriksaan', className: 'humas-badge humas-badge-draft' },
@@ -19,8 +21,8 @@ export default function PerbaikanSertifikat() {
   const { data: apiData, loading, error, reload } = useApi(() => certificatesApi.corrections(), [], []);
   const data = apiData || [];
   const [actionError, setActionError] = useState('');
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [search, setSearch] = useUrlState('q');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   // Mode: 'list' | 'detail' | 'koreksi'
   const [mode, setMode] = useState('list');
@@ -28,6 +30,7 @@ export default function PerbaikanSertifikat() {
 
   // State untuk form koreksi
   const [koreksiForm, setKoreksiForm] = useState({ namaPeserta: '', informasiKegiatan: '', informasiLainnya: '' });
+  useUnsavedChanges(mode === 'koreksi' && Object.values(koreksiForm).some(v => String(v || '').trim()));
 
   const filtered = data.filter(d => {
     const q = search.toLowerCase();
@@ -209,7 +212,7 @@ export default function PerbaikanSertifikat() {
         </div>
 
         {/* Tanggal & Lokasi */}
-        <div style={{ fontSize: '10px', color: '#4b5563', marginBottom: '36px' }}>
+        <div style={{ fontSize: '11px', color: '#4b5563', marginBottom: '36px' }}>
           15 April 2026 · Universitas Andalas
         </div>
 
@@ -226,12 +229,12 @@ export default function PerbaikanSertifikat() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '120px' }}>
             <div style={{ width: '100%', height: '1px', background: '#374151', marginBottom: '6px' }} />
             <div style={{ fontSize: '10.5px', fontWeight: '700', color: '#111827' }}>Rektor UNAND</div>
-            <div style={{ fontSize: '9px', color: '#9ca3af', marginTop: '2px' }}>Tahap selesai</div>
+            <div style={{ fontSize: '9px', color: 'var(--gray-500, #6b7280)', marginTop: '2px' }}>Tahap selesai</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '120px' }}>
             <div style={{ width: '100%', height: '1px', background: '#374151', marginBottom: '6px' }} />
             <div style={{ fontSize: '10.5px', fontWeight: '700', color: '#111827' }}>Pimpinan Mitra</div>
-            <div style={{ fontSize: '9px', color: '#9ca3af', marginTop: '2px' }}>Tahap selesai</div>
+            <div style={{ fontSize: '9px', color: 'var(--gray-500, #6b7280)', marginTop: '2px' }}>Tahap selesai</div>
           </div>
         </div>
       </div>
@@ -298,9 +301,7 @@ export default function PerbaikanSertifikat() {
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', color: '#9ca3af', padding: '32px' }}>
-                      Tidak ada pengajuan perbaikan sertifikat.
-                    </td>
+                    <td colSpan={7} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada pengajuan perbaikan sertifikat.</div></div></td>
                   </tr>
                 ) : (
                   pg_filtered.map(d => {

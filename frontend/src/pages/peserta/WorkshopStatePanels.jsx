@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import QrScanner from '../../components/QrScanner';
-import { AlertCircle, Check, CheckCircle2, ClipboardCheck, Clock3, FileImage, LoaderCircle, LockKeyhole, MapPin, QrCode, Upload, Users, XCircle } from 'lucide-react';
+import { workshopsApi } from '../../api';
+import { AlertCircle, CalendarPlus, Check, CheckCircle2, ClipboardCheck, Clock3, FileImage, LoaderCircle, LockKeyhole, MapPin, QrCode, Upload, Users, XCircle } from 'lucide-react';
 import { Status } from './components';
 import { attendanceStates, getRegistrationAvailability, registrationStates } from './workshopStates';
 
@@ -26,6 +27,7 @@ export function RegistrationPanel({ workshop, state: stateKey, registration, onR
       {canRegister ? <button className="peserta-button" onClick={onRegister}>{stateKey === 'waiting-list' ? <Users size={17} /> : <Check size={17} />}{state.action}</button>
         : ['registered', 'waiting', 'completed'].includes(stateKey) ? <button className="peserta-button" onClick={onView}>{state.action}</button>
           : <button className="peserta-button" disabled><LockKeyhole size={16} />{stateKey === 'cancelled' ? availability.action : state.action}</button>}
+      {stateKey === 'registered' && <a className="peserta-button peserta-button--secondary" href={workshopsApi.calendarUrl(workshop.id)} download><CalendarPlus size={17} />Tambah ke kalender</a>}
       {state.canCancel && <button className="peserta-text-button peserta-text-button--danger" onClick={onCancel}>Batalkan {stateKey === 'waiting' ? 'antrean' : 'pendaftaran'}</button>}
     </div>
   </section>;
@@ -39,7 +41,6 @@ const formatTime = value => {
 export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmit, initialCode = '' }) {
   const [code, setCode] = useState(initialCode);
   const [scanning, setScanning] = useState(false);
-  const onScan = useCallback(({ code: scanned }) => { setCode(scanned); setScanning(false); setFeedbackState(null); }, []);
   const [file, setFile] = useState(null);
   const [agreed, setAgreed] = useState(false);
   const [location, setLocation] = useState(null);
@@ -47,6 +48,7 @@ export function AttendancePanel({ workshop, state: stateKey, attendance, onSubmi
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [feedbackState, setFeedbackState] = useState(null);
+  const onScan = useCallback(({ code: scanned }) => { setCode(scanned); setScanning(false); setFeedbackState(null); }, []);
   const mounted = useRef(true);
   // The form can close while the browser's location prompt is still open.
   const ref = node => { mounted.current = Boolean(node); };

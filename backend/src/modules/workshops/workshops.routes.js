@@ -9,6 +9,7 @@ const { asyncHandler } = require('../../utils/http.util');
 
 // Katalog publik; bila login, data disesuaikan dengan role (mitra hanya kegiatannya, peserta + status pendaftaran)
 router.get('/', optionalAuth, asyncHandler(c.list));
+router.get('/:id/calendar.ics', optionalAuth, asyncHandler(c.calendar));
 router.get('/:id', optionalAuth, asyncHandler(c.detail));
 
 router.post('/', authenticate, authorizeRoles('humas'), validate(v.create), asyncHandler(c.create));

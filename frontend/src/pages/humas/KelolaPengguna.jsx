@@ -1,20 +1,31 @@
 import { useState } from 'react';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X, UserX, UserCheck } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, X, UserX, UserCheck, Inbox } from 'lucide-react';
 import useCrud from '../../hooks/useCrud';
 import { usersApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
-import { usePagination, IconAction } from '../../components/Pagination';
+import Pagination, { IconAction } from '../../components/Pagination';
 import Select from '../../components/Select';
 import BackButton from '../../components/BackButton';
+import useUrlState from '../../hooks/useUrlState';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
 
 const roleOptions = ['Peserta', 'Humas', 'Sekretariat Rektor', 'Mitra', 'Rektor'];
 const defaultForm = { nama: '', email: '', role: 'Peserta', status: 'Aktif' };
 
 export default function KelolaPengguna() {
-  const { items, loading, error, reload, actionError, create, update, run } = useCrud(usersApi);
-  const pengguna = items;
-  const [search, setSearch]             = useState('');
-  const [filterRole, setFilterRole]     = useState('');
+  const [search, setSearchRaw]          = useUrlState('q');
+  const [filterRole, setFilterRoleRaw]  = useUrlState('role');
+  const [pageParam, setPage]            = useUrlState('page', '1');
+  const page = Math.max(1, parseInt(pageParam, 10) || 1);
+  const setSearch = v => { setSearchRaw(v); setPage('1'); };
+  const setFilterRole = v => { setFilterRoleRaw(v); setPage('1'); };
+  const q = useDebouncedValue(search, 300);
+  // Pencarian, filter, dan pagination dilakukan di server
+  const { data, loading, error, reload, actionError, create, update, run } = useCrud(
+    usersApi, () => usersApi.list({ q: q || undefined, role: filterRole || undefined, page, limit: 10 }), [q, filterRole, page],
+  );
+  const pengguna = data?.items || [];
+  const meta = data?.meta || { page: 1, pages: 1, total: 0, limit: 10 };
   const [showModal, setShowModal]       = useState(false);
   const [detailPengguna, setDetailPengguna] = useState(null);
   const [editPengguna, setEditPengguna] = useState(null);
@@ -22,14 +33,9 @@ export default function KelolaPengguna() {
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
-  const filtered = pengguna.filter(p => {
-    const q = search.toLowerCase();
-    const matchSearch = p.nama.toLowerCase().includes(q) || p.email.toLowerCase().includes(q);
-    const matchRole   = filterRole ? p.role === filterRole : true;
-    return matchSearch && matchRole;
-  });
-  // Paginasi tabel
-  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
+  const filtered = pengguna;
+  const pg_filtered = pengguna;
+  const pager_filtered = <Pagination page={meta.page} pages={meta.pages} total={meta.total} pageSize={meta.limit} onChange={n => setPage(String(n))} />;
 
   const handleBukaTambah = () => {
     setForm(defaultForm);
@@ -73,7 +79,7 @@ export default function KelolaPengguna() {
       <div className="humas-list-page">
         <ErrorNotice error={error} onRetry={reload} />
         {actionError && <ErrorNotice error={{ message: actionError }} />}
-        {loading && !items.length && <PageLoader />}
+        {loading && !data && <PageLoader />}
 
         {/* Header + actions */}
         <div className="humas-list-header">
@@ -122,9 +128,7 @@ export default function KelolaPengguna() {
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                    Tidak ada pengguna ditemukan.
-                  </td>
+                  <td colSpan={5} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada pengguna ditemukan.</div></div></td>
                 </tr>
               )}
               {pg_filtered.map(p => (
@@ -172,7 +176,7 @@ export default function KelolaPengguna() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Detail Data</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setDetailPengguna(null)}>
+              <button className="modal-close-btn" onClick={() => setDetailPengguna(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -223,7 +227,7 @@ export default function KelolaPengguna() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Edit Akun</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setEditPengguna(null)}>
+              <button className="modal-close-btn" onClick={() => setEditPengguna(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -303,7 +307,7 @@ export default function KelolaPengguna() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Tambah Akun</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setShowModal(false)}>
+              <button className="modal-close-btn" onClick={() => setShowModal(false)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>

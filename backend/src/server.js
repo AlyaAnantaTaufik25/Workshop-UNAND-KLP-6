@@ -1,6 +1,7 @@
 const app = require('./app');
 const config = require('./config/app.config');
 const { testConnection, pool } = require('./config/database');
+const scheduler = require('./services/scheduler.service');
 
 const PORT = config.app.port;
 
@@ -17,6 +18,7 @@ async function startServer() {
   await testConnection();
 
   const server = app.listen(PORT, () => {
+    scheduler.start();
     console.log(`[Server] Berjalan di port : http://localhost:${PORT}`);
     console.log(`[Health] Cek kesehatan API : http://localhost:${PORT}${config.app.apiPrefix}/health`);
     console.log(`[Env]    Environment     : ${config.app.env}`);

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Inbox } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 const statusLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -20,10 +21,10 @@ const statusClass = {
 export default function Kegiatan() {
   const { workshops } = usePortalData();
   const navigate = useNavigate();
-  const [search,     setSearch]     = useState('');
-  const [filterJenis, setFilterJenis] = useState('');
-  const [filterMode,  setFilterMode]  = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [search,     setSearch]     = useUrlState('q');
+  const [filterJenis, setFilterJenis] = useUrlState('jenis');
+  const [filterMode,  setFilterMode]  = useUrlState('mode');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   const filtered = workshops.filter(w => {
     const matchSearch = w.nama.toLowerCase().includes(search.toLowerCase()) ||
@@ -106,9 +107,7 @@ export default function Kegiatan() {
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={9} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                  Tidak ada data yang ditemukan.
-                </td>
+                <td colSpan={9} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada data yang ditemukan.</div></div></td>
               </tr>
             )}
             {pg_filtered.map(w => (

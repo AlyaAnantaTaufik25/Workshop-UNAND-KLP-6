@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import useAutoRefresh from './useAutoRefresh';
 
 /**
  * Memanggil fungsi API saat komponen dimuat (dan saat deps berubah).
@@ -35,6 +36,15 @@ export default function useApi(fetcher, deps = [], initial = undefined) {
     return () => { active.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
+
+  // Saat tab kembali aktif: ambil ulang tanpa menampilkan loading
+  const refresh = useCallback(async () => {
+    try {
+      const result = await fetchRef.current();
+      if (active.current) { setData(result); setError(null); }
+    } catch { /* biarkan data lama tetap tampil */ }
+  }, []);
+  useAutoRefresh(refresh, { minGap: 20000 });
 
   return { data, setData, loading, error, reload };
 }

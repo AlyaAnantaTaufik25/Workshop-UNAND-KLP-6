@@ -1,4 +1,6 @@
 const registrationsRepository = require('./registrations.repository');
+const { parsePage, pageResult } = require('../../utils/pagination.util');
+const { notify } = require('../../services/notifier.service');
 const workshopsService = require('../workshops/workshops.service');
 const { serializeParticipant } = require('../workshops/workshops.serializer');
 const { notFound, forbidden, conflict, unprocessable } = require('../../utils/http.util');
@@ -20,6 +22,7 @@ class RegistrationsService {
       throw unprocessable(w.status_pendaftaran === 'belum-dibuka' ? 'Pendaftaran belum dibuka' : 'Pendaftaran sudah ditutup');
     }
 
+    let finalStatus = null;
     await this.repository.transaction(async (conn) => {
       // Kunci baris kegiatan agar perhitungan kuota aman dari pendaftaran bersamaan
       await conn.query('SELECT id FROM workshops WHERE id = ? FOR UPDATE', [w.id]);
@@ -35,7 +38,13 @@ class RegistrationsService {
         : { status: 'terdaftar', queue_no: null, registered_at: new Date(), cancelled_at: null };
       if (existing) await this.repository.update(existing.id, data, conn);
       else await this.repository.create({ ...data, workshop_id: w.id, user_id: user.id }, conn);
+      finalStatus = data;
     });
+
+    // Konfirmasi ke peserta (lonceng + email)
+    await notify({ userId: user.id }, finalStatus.status === 'waiting'
+      ? { judul: `Masuk waiting list: ${w.nama}`, deskripsi: `Kuota penuh. Anda berada di antrean nomor ${finalStatus.queue_no}; kursi diberikan sesuai urutan.`, link: '/peserta/workshop-saya' }
+      : { judul: `Pendaftaran dikonfirmasi: ${w.nama}`, deskripsi: 'Kursi Anda sudah tercatat. Tambahkan ke kalender dari halaman Workshop Saya agar tidak terlewat.', link: '/peserta/workshop-saya' });
 
     return workshopsService.detail(w.id, user);
   }
@@ -62,14 +71,29 @@ class RegistrationsService {
   }
 
   /** Daftar peserta lintas kegiatan (humas: semua, mitra: kegiatan instansinya) */
-  async list(user, { workshopId } = {}) {
+  async list(user, query = {}) {
+    const { workshopId } = query;
     const partnerId = user.role === 'mitra' ? user.partnerId || -1 : null;
     let wid = null;
     if (workshopId) wid = (await workshopsService.getRow(workshopId, user)).id;
     const { regs, atts } = await this.repository.listAll({ partnerId, workshopId: wid });
     const byReg = {};
     atts.forEach((a) => { (byReg[a.registration_id] = byReg[a.registration_id] || []).push(a); });
-    return regs.map((r) => serializeParticipant(r, byReg[r.id] || [], r.workshop_nama, r.workshop_jenis));
+    const all = regs.map((r) => serializeParticipant(r, byReg[r.id] || [], r.workshop_nama, r.workshop_jenis));
+
+    // Pagination & filter di server (bila ?page dikirim): hanya satu halaman yang dikirim ke browser
+    const paging = parsePage(query, { defaultLimit: 10 });
+    if (!paging) return all;
+    const active = all.filter((p) => p.registrationStatus !== 'dibatalkan');
+    const q = String(query.q || '').toLowerCase();
+    const filtered = active.filter((p) =>
+      (!q || p.nama.toLowerCase().includes(q) || String(p.kegiatan).toLowerCase().includes(q))
+      && (!query.jenis || p.jenisKegiatan === query.jenis)
+      && (!query.kegiatan || p.kegiatan === query.kegiatan)
+      && (!query.status || p.statusHadir === query.status));
+    const result = pageResult(filtered.slice(paging.offset, paging.offset + paging.limit), filtered.length, paging);
+    result.facets = { kegiatan: [...new Set(active.map((p) => p.kegiatan))] };
+    return result;
   }
 }
 

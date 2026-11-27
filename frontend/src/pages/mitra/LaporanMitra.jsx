@@ -14,15 +14,17 @@ import {
   UserCheck,
   UserX,
 } from 'lucide-react';
+import useUrlState from '../../hooks/useUrlState';
+import { PERIODE_OPTIONS, inPeriode, periodeLabel } from '../../utils/periode';
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
 
 export default function LaporanMitra() {
   const { mitraKegiatan } = usePortalData();
-  const [search, setSearch] = useState('');
-  const [filterJenis, setFilterJenis] = useState('');
-  const [filterKegiatan, setFilterKegiatan] = useState('');
-  const [filterTanggal, setFilterTanggal] = useState('');
+  const [search, setSearch] = useUrlState('q');
+  const [filterJenis, setFilterJenis] = useUrlState('jenis');
+  const [filterKegiatan, setFilterKegiatan] = useUrlState('kegiatan');
+  const [filterTanggal, setFilterTanggal] = useUrlState('periode');
   const [exportToast, setExportToast] = useState('');
 
   const filtered = mitraKegiatan.filter(k => {
@@ -30,7 +32,7 @@ export default function LaporanMitra() {
     const matchSearch = k.nama.toLowerCase().includes(q) || k.penyelenggara.toLowerCase().includes(q);
     const matchJenis = filterJenis ? k.jenis === filterJenis : true;
     const matchKegiatan = filterKegiatan ? k.nama === filterKegiatan : true;
-    const matchTanggal = filterTanggal ? (k.isoTanggal === filterTanggal || k.tanggal.includes(filterTanggal)) : true;
+    const matchTanggal = inPeriode(k.isoTanggal, filterTanggal);
     return matchSearch && matchJenis && matchKegiatan && matchTanggal;
   });
   // Paginasi tabel
@@ -57,7 +59,7 @@ export default function LaporanMitra() {
         info: [
           ['Jenis', filterJenis || 'Semua jenis'],
           ...(filterKegiatan ? [['Kegiatan', filterKegiatan]] : []),
-          ...(filterTanggal ? [['Tanggal', filterTanggal]] : []),
+          ['Periode', periodeLabel(filterTanggal)],
           ...(search ? [['Pencarian', `"${search}"`]] : []),
           ['Jumlah kegiatan', `${filtered.length} kegiatan`],
         ],
@@ -514,15 +516,10 @@ export default function LaporanMitra() {
           ))}
         </Select>
 
-        {/* Filter Tanggal */}
-        <input
-          type="date"
-          className="form-input"
-          value={filterTanggal}
-          onChange={e => setFilterTanggal(e.target.value)}
-          title="Filter Tanggal Pelaksanaan"
-          style={{ height: 42, width: 150, padding: '0 10px', fontSize: 13 }}
-        />
+        {/* Filter Periode */}
+        <Select className="filter-select" value={filterTanggal} onChange={e => setFilterTanggal(e.target.value)} style={{ minWidth: 160 }} aria-label="Filter periode">
+          {PERIODE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </Select>
 
         {(search || filterJenis || filterKegiatan || filterTanggal) && (
           <button

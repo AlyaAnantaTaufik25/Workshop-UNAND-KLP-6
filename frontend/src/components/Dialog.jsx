@@ -30,6 +30,7 @@ function open(kind, options) {
   });
 }
 
+// oxlint-disable-next-line react/only-export-components -- sengaja diekspor bersama komponen (API bersama modul ini)
 export const dialog = {
   confirm: (opts = {}) => open('confirm', opts),
   prompt: (opts = {}) => open('prompt', opts),
@@ -37,6 +38,7 @@ export const dialog = {
 };
 
 let toastId = 0;
+// oxlint-disable-next-line react/only-export-components -- sengaja diekspor bersama komponen (API bersama modul ini)
 export function toast(message, { tone = 'success', duration = 3800 } = {}) {
   if (!message) return;
   const id = ++toastId;

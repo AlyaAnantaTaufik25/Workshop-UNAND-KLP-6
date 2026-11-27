@@ -1,3 +1,4 @@
+const storage = require('../../services/storage.service');
 const {
   formatTanggal, formatTanggalJam, toISODate, toISOStringWIB,
 } = require('../../utils/format.util');
@@ -96,7 +97,9 @@ function serializeCertificate(c) {
 function serializeCorrection(c) {
   const changes = parseJSON(c.changes, []);
   const events = parseJSON(c.events, []);
-  const attachment = parseJSON(c.attachment, null);
+  const rawAttachment = parseJSON(c.attachment, null);
+  // Lampiran disimpan di disk; dataUrl tetap disediakan agar portal lama kompatibel
+  const attachment = rawAttachment ? { ...rawAttachment, url: storage.publicUrl(rawAttachment.url || rawAttachment.dataUrl), dataUrl: storage.publicUrl(rawAttachment.url || rawAttachment.dataUrl) } : null;
   const first = changes[0] || {};
   return {
     // Portal peserta

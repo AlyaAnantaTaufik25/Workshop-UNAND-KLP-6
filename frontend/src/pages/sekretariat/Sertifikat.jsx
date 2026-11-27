@@ -1,10 +1,11 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import { Search, AlertTriangle } from 'lucide-react';
+import { Search, AlertTriangle, Inbox } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
 import Select from '../../components/Select';
 import PageHeader from '../../components/PageHeader';
+import useUrlState from '../../hooks/useUrlState';
 
 const ttdLabel = {
   'menunggu-rektor': 'Menunggu Rektor',
@@ -20,10 +21,10 @@ const ttdClass = {
 export default function Sertifikat() {
   const { sertifikatData, dokumenPengganti } = usePortalData();
   const navigate = useNavigate();
-  const [search, setSearch]                 = useState('');
-  const [filterJenis, setFilterJenis]       = useState('');
-  const [filterKegiatan, setFilterKegiatan] = useState('');
-  const [filterStatus, setFilterStatus]     = useState('');
+  const [search, setSearch]                 = useUrlState('q');
+  const [filterJenis, setFilterJenis]       = useUrlState('jenis');
+  const [filterKegiatan, setFilterKegiatan] = useUrlState('kegiatan');
+  const [filterStatus, setFilterStatus]     = useUrlState('status');
 
   const filteredSert = sertifikatData.filter(s => {
     const matchSearch = s.namaKegiatan.toLowerCase().includes(search.toLowerCase());
@@ -94,9 +95,7 @@ export default function Sertifikat() {
           <tbody>
             {filteredSert.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                  Tidak ada data yang ditemukan.
-                </td>
+                <td colSpan={8} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada data yang ditemukan.</div></div></td>
               </tr>
             )}
             {pg_filteredSert.map(s => (

@@ -8,19 +8,24 @@ class UsersRepository {
     this.db = pool;
   }
 
-  async findAll({ role, search } = {}) {
+  /** Tanpa `limit`: semua baris. Dengan `limit`: { rows, total } untuk pagination server. */
+  async findAll({ role, search, limit, offset = 0 } = {}) {
     const where = [];
     const params = [];
     if (role) { where.push('(r.code = ? OR r.name = ?)'); params.push(role, role); }
     if (search) { where.push('(u.nama LIKE ? OR u.email LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
+    const sqlWhere = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const [rows] = await this.db.query(
       `SELECT u.*, r.code AS role, r.name AS role_name, p.nama AS partner_nama
        FROM users u JOIN roles r ON r.id = u.role_id LEFT JOIN partners p ON p.id = u.partner_id
-       ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
-       ORDER BY FIELD(r.code, 'humas', 'sekretariat', 'rektor', 'mitra', 'peserta'), u.id`,
-      params
+       ${sqlWhere}
+       ORDER BY FIELD(r.code, 'humas', 'sekretariat', 'rektor', 'mitra', 'peserta'), u.id
+       ${limit ? 'LIMIT ? OFFSET ?' : ''}`,
+      limit ? [...params, limit, offset] : params
     );
-    return rows;
+    if (!limit) return rows;
+    const [[{ total }]] = await this.db.query(`SELECT COUNT(*) AS total FROM users u JOIN roles r ON r.id = u.role_id ${sqlWhere}`, params);
+    return { rows, total };
   }
 
   async findById(id) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Pencil, CalendarDays, Clock, MapPin, Check, Download, QrCode, X, FileText, Search } from 'lucide-react';
+import { Pencil, CalendarDays, Clock, MapPin, Check, Download, QrCode, X, FileText, Search, Inbox } from 'lucide-react';
 import { usePagination } from '../../components/Pagination';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 import useApi from '../../hooks/useApi';
@@ -72,7 +72,7 @@ export default function DetailKegiatanHumas() {
   const hariAktif = selectedDay || kegiatan?.tanggalMulai;
   const presensiFiltered = (kegiatan?.peserta || [])
     .filter(p => ['terdaftar', 'selesai'].includes(p.registrationStatus) && cocok(p));
-  const { pageItems: presensiPage, pager: presensiPager } = usePagination(presensiFiltered, 15);
+  const { pageItems: presensiPage, pager: presensiPager } = usePagination(presensiFiltered, 15, 'page2');
   const { data: templates = [] } = useApi(() => certificatesApi.templates(), []);
 
   const run = async (fn) => {
@@ -86,7 +86,7 @@ export default function DetailKegiatanHumas() {
   if (loading && !kegiatan) return <PageLoader />;
   if (!kegiatan) {
     return (
-      <div style={{ textAlign: 'center', padding: '60px', color: 'var(--gray-400)' }}>
+      <div style={{ textAlign: 'center', padding: '60px', color: 'var(--gray-500, #6b7280)' }}>
         <ErrorNotice error={error} />
         <p>Kegiatan tidak ditemukan.</p>
         <button className="humas-lihat-btn" style={{ marginTop: 16 }} onClick={() => navigate('/humas/kelola-kegiatan')}>
@@ -112,6 +112,7 @@ export default function DetailKegiatanHumas() {
       attendanceId: att?.id ?? null,
       status: att ? DAY_STATUS[att.status] : 'belum-hadir',
       waktu: att?.waktu || null,
+      buktiUrl: att?.fileUrl || null,
       bukti: att ? (att.metode === 'upload' ? `Unggahan: ${att.fileName || 'bukti'}` : att.metode === 'manual' ? 'Dicatat panitia' : 'Kode QR & GPS') : 'Belum ada',
       alasan: att?.alasanTolak || '',
     };
@@ -273,8 +274,8 @@ export default function DetailKegiatanHumas() {
                     <span className="humas-info-label">Kuota</span>
                     <span className="humas-info-value">
                       {kegiatan.pendaftar} / {kegiatan.kuota ?? '∞'}{' '}
-                      <span style={{ color: 'var(--gray-400)', fontSize: '12px' }}>terisi</span>
-                      {kegiatan.waitingCount > 0 && <span style={{ color: 'var(--gray-400)', fontSize: '12px' }}> · {kegiatan.waitingCount} antre</span>}
+                      <span style={{ color: 'var(--gray-500, #6b7280)', fontSize: '12px' }}>terisi</span>
+                      {kegiatan.waitingCount > 0 && <span style={{ color: 'var(--gray-500, #6b7280)', fontSize: '12px' }}> · {kegiatan.waitingCount} antre</span>}
                     </span>
                   </div>
                   <div className="humas-info-row">
@@ -329,9 +330,7 @@ export default function DetailKegiatanHumas() {
                 <tbody>
                   {pesertaFiltered.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                        Belum ada data peserta.
-                      </td>
+                      <td colSpan={5} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada data peserta.</div></div></td>
                     </tr>
                   ) : (
                     pesertaPage.map(p => (
@@ -443,13 +442,13 @@ export default function DetailKegiatanHumas() {
                   </thead>
                   <tbody>
                     {barisHalaman.length === 0 && (
-                      <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: 24 }}>Belum ada peserta terdaftar.</td></tr>
+                      <tr><td colSpan={5} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada peserta terdaftar.</div></div></td></tr>
                     )}
                     {barisHalaman.map(p => (
                       <tr key={p.id}>
                         <td><span className="table-name-bold">{p.nama}</span></td>
                         <td className="ui-nowrap">{p.waktu || '-'}</td>
-                        <td>{p.bukti}{p.alasan && <div style={{ fontSize: 12, color: '#b91c1c' }}>{p.alasan}</div>}</td>
+                        <td>{p.buktiUrl ? <a href={p.buktiUrl} target="_blank" rel="noreferrer" className="ui-link">{p.bukti}</a> : p.bukti}{p.alasan && <div style={{ fontSize: 12, color: '#b91c1c' }}>{p.alasan}</div>}</td>
                         <td><StatusHadirBadge status={p.status} /></td>
                         <td style={{ fontSize: '13px' }}>
                           {p.attendanceId && ['menunggu-verifikasi', 'ditolak', 'hadir-valid'].includes(p.status) ? (
@@ -540,7 +539,7 @@ export default function DetailKegiatanHumas() {
               <p className="modal-header-crumb">WORKSHOP UNAND</p>
               <h2 className="confirm-modal-title">Tolak Presensi {rejectTarget.nama}</h2>
             </div>
-            <button className="modal-close-btn" onClick={() => setRejectTarget(null)}><X size={16} /></button>
+            <button className="modal-close-btn" onClick={() => setRejectTarget(null)} aria-label="Tutup"><X size={16} /></button>
           </div>
           <div className="confirm-modal-body">
             <label className="form-label">Alasan penolakan</label>
@@ -566,7 +565,7 @@ export default function DetailKegiatanHumas() {
               <p className="modal-header-crumb">WORKSHOP UNAND</p>
               <h2 className="confirm-modal-title">Ajukan Sertifikat</h2>
             </div>
-            <button className="modal-close-btn" onClick={() => setShowAjukan(false)}><X size={16} /></button>
+            <button className="modal-close-btn" onClick={() => setShowAjukan(false)} aria-label="Tutup"><X size={16} /></button>
           </div>
           <div className="confirm-modal-body" style={{ display: 'grid', gap: 10 }}>
             <p style={{ margin: 0 }}>{kegiatan.hadir} peserta hadir akan menerima sertifikat. Alur tanda tangan: {kegiatan.partnerId ? 'Mitra → ' : ''}{ajukanForm.perluRektor ? 'Rektor → ' : ''}Terbit.</p>

@@ -1,3 +1,4 @@
+const storage = require('../../services/storage.service');
 /**
  * Serializer kegiatan workshop.
  * Menghasilkan satu objek "superset" berisi nama field yang dipakai
@@ -134,8 +135,8 @@ function serializeWorkshop(row) {
     speaker: pemateriList[0] || '',
     speakerInitials: initials(pemateriList[0] || ''),
     speakerRole: row.pemateri_peran || '',
-    imageUrl: row.poster || row.image_url || '',
-    image: row.poster || row.image_url || '',
+    imageUrl: storage.publicUrl(row.poster) || row.image_url || '',
+    image: storage.publicUrl(row.poster) || row.image_url || '',
     hasPoster: !!row.poster,
   };
 }
@@ -205,10 +206,11 @@ function serializeParticipant(reg, atts, workshopName, jenisKegiatan) {
     attendanceId: first ? first.id : null,
     metode: first ? first.method : null,
     fileName: first ? first.file_name : null,
+    fileUrl: first ? storage.publicUrl(first.file_data) : null,
     alasanTolak: first ? first.alasan_tolak : null,
     presensiHarian: atts.map((a) => ({
       id: a.id, tanggal: toISODate(a.tanggal), status: a.status, metode: a.method,
-      waktu: formatWaktuPresensi(a.submitted_at), fileName: a.file_name, alasanTolak: a.alasan_tolak,
+      waktu: formatWaktuPresensi(a.submitted_at), fileName: a.file_name, fileUrl: storage.publicUrl(a.file_data), alasanTolak: a.alasan_tolak,
     })),
   };
 }

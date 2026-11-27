@@ -39,7 +39,8 @@ export default function Select({ children, value, defaultValue, onChange, onMous
   const [pos, setPos] = useState(null);
   const [active, setActive] = useState(-1);
   const options = readOptions(children);
-  const current = String(value ?? selectRef.current?.value ?? defaultValue ?? '');
+  const [innerValue, setInnerValue] = useState(defaultValue ?? '');
+  const current = String(value ?? innerValue);
 
   // Hitung posisi panel (di bawah kotak, atau di atas bila ruang bawah sempit)
   const place = useCallback(() => {
@@ -71,7 +72,7 @@ export default function Select({ children, value, defaultValue, onChange, onMous
   const choose = opt => {
     if (!opt || opt.disabled) return;
     const el = selectRef.current;
-    if (value === undefined && el) el.value = opt.value; // mode tidak terkontrol
+    if (value === undefined) { setInnerValue(opt.value); if (el) el.value = opt.value; } // mode tidak terkontrol
     // Bentuk event mengikuti onChange <select>: handler membaca e.target.value / e.target.name
     const target = { value: opt.value, name: rest.name, id: rest.id };
     onChange?.({ target, currentTarget: target, preventDefault() {}, stopPropagation() {} });
@@ -153,13 +154,15 @@ export default function Select({ children, value, defaultValue, onChange, onMous
         ref={selectRef}
         value={value}
         defaultValue={defaultValue}
-        onChange={onChange}
+        onChange={e => { if (value === undefined) setInnerValue(e.target.value); onChange?.(e); }}
         onMouseDown={handleMouseDown}
         onKeyDown={handleKeyDown}
         onBlur={e => { onBlur?.(e); }}
         aria-expanded={open}
         aria-controls={open ? listId : undefined}
         data-ui-select-open={open || undefined}
+        // Dropdown filter tanpa label: nama aksesibel diambil dari opsi placeholder (mis. "Semua jenis")
+        aria-label={rest['aria-label'] || (rest['aria-labelledby'] || rest.id ? undefined : (options.find(o => o.value === '') || options[0])?.label)}
         {...rest}
       >
         {children}

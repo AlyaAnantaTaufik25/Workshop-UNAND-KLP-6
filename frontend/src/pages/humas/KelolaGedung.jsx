@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Plus, X, Eye, Pencil, Trash2, MapPin, Navigation, Compass } from 'lucide-react';
+import { Search, Plus, X, Eye, Pencil, Trash2, MapPin, Navigation, Compass, Inbox } from 'lucide-react';
 import useCrud from '../../hooks/useCrud';
 import { locationsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
 import { dialog } from '../../components/Dialog';
 import BackButton from '../../components/BackButton';
+import useUrlState from '../../hooks/useUrlState';
 
 const defaultForm = {
   gedung: '',
@@ -18,10 +18,9 @@ const defaultForm = {
 };
 
 export default function KelolaGedung() {
-  const navigate = useNavigate();
   const { items, loading, error, reload, actionError, create, update, remove } = useCrud(locationsApi);
   const gedung = items;
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useUrlState('q');
 
   // Modals state
   const [showTambah, setShowTambah] = useState(false);
@@ -156,9 +155,7 @@ export default function KelolaGedung() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: '#9ca3af', padding: '32px' }}>
-                    Belum ada data gedung & ruangan.
-                  </td>
+                  <td colSpan={7} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada data gedung & ruangan.</div></div></td>
                 </tr>
               ) : (
                 pg_filtered.map(g => (
@@ -200,7 +197,7 @@ export default function KelolaGedung() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Tambah Gedung / Ruangan</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setShowTambah(false)}>
+              <button className="modal-close-btn" onClick={() => setShowTambah(false)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -377,8 +374,8 @@ export default function KelolaGedung() {
                 <button
                   type="button"
                   onClick={() => setShowMapPicker(false)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af' }}
-                >
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray-500, #6b7280)' }}
+                 aria-label="Tutup">
                   <X size={18} />
                 </button>
               </div>
@@ -588,7 +585,7 @@ export default function KelolaGedung() {
               }}
             >
               <div>
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#9ca3af', fontWeight: 700, letterSpacing: 0.5 }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--gray-500, #6b7280)', fontWeight: 700, letterSpacing: 0.5 }}>
                   KOORDINAT
                 </div>
                 <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#111827', marginTop: 2, fontFamily: 'monospace' }}>
@@ -597,7 +594,7 @@ export default function KelolaGedung() {
               </div>
 
               <div>
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#9ca3af', fontWeight: 700, letterSpacing: 0.5 }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--gray-500, #6b7280)', fontWeight: 700, letterSpacing: 0.5 }}>
                   RADIUS GEOFENCE
                 </div>
                 <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#15803d', marginTop: 2 }}>
@@ -690,7 +687,7 @@ export default function KelolaGedung() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Detail Data</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setDetailData(null)}>
+              <button className="modal-close-btn" onClick={() => setDetailData(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -811,7 +808,7 @@ export default function KelolaGedung() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Edit Lokasi</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setEditData(null)}>
+              <button className="modal-close-btn" onClick={() => setEditData(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>

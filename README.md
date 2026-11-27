@@ -112,10 +112,18 @@ workshop-unand/
 
 4. **Setup Database MySQL Lokal:**
    - Jalankan MySQL (misalnya nyalakan service MySQL di kontrol panel XAMPP / Laragon).
-   - Buat database, tabel, dan data awal sekaligus (database dibuat otomatis bila belum ada):
+   - Pertama kali (database kosong) — buat skema lalu isi data demo:
      ```bash
-     npm run db:reset     # = db:migrate + db:seed (menghapus & mengisi ulang semua data)
+     npm run db:fresh     # HAPUS database, buat ulang dari semua migrasi, lalu isi data demo
      ```
+   - Setelah `git pull` yang membawa perubahan skema — **data tidak hilang**:
+     ```bash
+     npm run db:migrate          # hanya menerapkan migrasi baru
+     npm run db:migrate:status   # lihat migrasi yang sudah / belum diterapkan
+     ```
+   - **Migrasi bertahap:** setiap berkas di `database/migrations/` dijalankan sekali dan dicatat di tabel
+     `schema_migrations`. Perubahan skema baru = berkas baru (mis. `004_tambah_kolom_x.sql`); jangan mengubah
+     berkas migrasi yang sudah di-push. Berkas `.js` dipakai untuk migrasi data (`exports.up = async (conn) => {}`).
    - Akun demo hasil seed (kata sandi semua `password123`, PIN TTE Rektor/Mitra `123456`):
      `peserta@unand.ac.id`, `humas@unand.ac.id`, `sekretariat@unand.ac.id`, `mitra@unand.ac.id`, `rektor@unand.ac.id`
    - Pastikan konfigurasi di `backend/.env` telah sesuai:
@@ -150,6 +158,45 @@ workshop-unand/
    --------------------------------------------------------
    ```
 
+7. **Pengujian backend** (memakai database terpisah `sim_workshop_unand_test` yang dibuat ulang otomatis —
+   database pengembangan tidak tersentuh):
+   ```bash
+   npm test   # login & penguncian, CSRF, audit, presensi QR + geofence, alur TTE, PDF & verifikasi, perbaikan
+   ```
+
+### Keamanan & fitur backend
+
+| Fitur | Keterangan |
+|---|---|
+| Sesi login | Cookie `httpOnly` + `SameSite=Lax` (tidak bisa dibaca JavaScript). Klien API tetap boleh memakai header `Authorization: Bearer`. |
+| Penguncian | 5× kata sandi / PIN TTE salah → dikunci 15 menit. Ditambah pembatas laju (rate limit) per IP. |
+| CSRF | Permintaan pengubah data dari origin yang tidak terdaftar ditolak (403). |
+| Audit log | Login, PIN, verifikasi, TTE (dengan hash SHA-256 dokumen), penerbitan, perbaikan — tabel `audit_logs`, halaman **Log Audit** (Humas, Sekretariat). |
+| Berkas | Poster, bukti presensi, tanda tangan, lampiran disimpan di `backend/uploads/` (bukan base64 di database). |
+| Sertifikat | PDF resmi dibuat server dengan QR → halaman publik `/verifikasi/<nomor>` + kode keaslian. |
+| Notifikasi | Real-time (Server-Sent Events) + email (antrean `email_outbox`; isi `SMTP_*` di `.env` untuk mengirim sungguhan). |
+| Pengingat | Peserta terdaftar diingatkan H-1 (lonceng + email); tombol "Tambah ke kalender" (.ics). |
+
+---
+
+## 🐳 Menjalankan dengan Docker (satu perintah)
+
+Tidak perlu memasang MySQL/Node manual. Di folder root:
+
+```bash
+cp .env.docker.example .env      # ganti JWT_SECRET & sandi database untuk server sungguhan
+docker compose up -d --build
+```
+
+Buka **http://localhost:8080**. Database terisi data demo otomatis saat pertama kali dijalankan; migrasi baru
+diterapkan otomatis setiap container backend start. Data MySQL & berkas unggahan disimpan di volume Docker.
+
+## ✅ CI (GitHub Actions)
+
+Setiap push / pull request ke `main` menjalankan `.github/workflows/ci.yml`: lint + unit test + build frontend,
+test backend dengan MySQL, lalu smoke test E2E di Chrome (semua halaman 5 portal + cek aksesibilitas WCAG 2.1 AA).
+Bila ada yang merah, perubahan tersebut merusak sesuatu — periksa log job yang gagal.
+
 ---
 
 ## 🔍 Cara Menguji Endpoint Health
@@ -175,19 +222,38 @@ workshop-unand/
 
 ## 🎨 Panduan Memulai untuk Frontend Developer
 
-1. Buka folder `frontend/` dan baca file [`frontend/README.md`](file:///frontend/README.md).
-2. Tentukan framework yang disepakati (disarankan **React.js + Vite**).
-3. Jalankan inisialisasi di dalam folder `frontend/`:
+Frontend memakai **React 19 + Vite + React Router**.
+
+1. Pasang dependensi dan jalankan server pengembangan (backend harus sudah berjalan):
    ```bash
    cd frontend
-   npm create vite@latest . -- --template react
    npm install
+   npm run dev          # http://localhost:5173
    ```
-4. Salin `.env.example` menjadi `.env` dan gunakan variabel:
+2. Salin `.env.example` menjadi `.env` bila alamat API berbeda:
    ```env
    VITE_API_BASE_URL=http://localhost:5000/api/v1
    ```
-5. Mulai proses *slicing UI* dan integrasi ke backend API.
+3. Akun demo (setelah `npm run db:seed` di backend): `peserta|humas|sekretariat|mitra|rektor@unand.ac.id`, kata sandi `password123`, PIN TTE `123456`.
+
+### Pemeriksaan kualitas
+
+```bash
+npm run lint         # oxlint (harus 0 error)
+npm test             # unit test portal peserta
+npm run build        # build produksi
+npm run test:e2e     # smoke test E2E: login, semua halaman 5 portal, tampilan HP, alur tanda tangan
+```
+
+`test:e2e` memakai Chrome/Edge yang sudah terpasang (tanpa unduh browser). Backend & frontend harus berjalan
+dan database sudah di-seed. Lokasi browser bisa diatur dengan `CHROME_PATH`, alamat dengan `BASE_URL` / `API_URL`.
+
+### Komponen bersama
+
+- `components/PageHeader`, `BackButton`, `Sidebar`, `Select`, `Dialog` (konfirmasi & toast), `PosterDropzone`
+- `components/design-language.css` — bahasa desain seragam untuk semua portal
+- `hooks/useApi`, `useUrlState` (filter tersimpan di URL), `useAutoRefresh`, `useUnsavedChanges`
+- `utils/excel.js` (ekspor .xlsx), `utils/periode.js` (filter periode)
 
 ---
 

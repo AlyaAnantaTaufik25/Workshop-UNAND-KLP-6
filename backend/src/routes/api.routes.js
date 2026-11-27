@@ -66,6 +66,7 @@ router.use('/locations', locationsRoutes);
 router.use('/certificates', certificatesRoutes);
 router.use('/reports', reportsRoutes);
 router.use('/notifications', notificationsRoutes);
+router.use('/audit-logs', require('../modules/audit/audit.routes'));
 
 module.exports = router;
 

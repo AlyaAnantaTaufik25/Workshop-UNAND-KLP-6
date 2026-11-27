@@ -4,6 +4,7 @@ import { Check, FilePenLine, LoaderCircle, Upload } from 'lucide-react';
 import { Modal } from './components';
 import { certificateValues, correctionFields, validateAttachment, validateCorrection } from './certificateCorrections';
 import { CertificateHeading, CertificateNotFound } from './CertificateUi';
+import useUnsavedChanges from '../../hooks/useUnsavedChanges';
 
 function readAttachment(file) {
   if (!file) return Promise.resolve(null);
@@ -31,6 +32,9 @@ export default function FormPerbaikanSertifikat() {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
+  const initialFields = previous?.changes.map(change => change.field) || [];
+  const dirty = !busy && (selected.join() !== initialFields.join() || reason !== (previous?.reason || '') || Boolean(file) || Object.keys(values).some(k => (values[k] || '') !== (previous?.changes.find(c => c.field === k)?.newValue || '')));
+  useUnsavedChanges(dirty);
   if (!certificate) return <CertificateNotFound />;
   const active = corrections.find(item => item.certificateId === id && ['menunggu', 'diproses'].includes(item.status));
   if (active) return <div className="peserta-stack"><CertificateHeading title="Pengajuan masih berjalan" description="Selesaikan pengajuan yang sedang diperiksa sebelum mengajukan perbaikan baru." /><div className="peserta-certificate-panel"><p>Sertifikat {certificate.number} memiliki pengajuan aktif.</p><Link className="peserta-button" to={`/peserta/sertifikat/perbaikan/${active.id}`}>Lihat Pengajuan</Link></div></div>;

@@ -3,35 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Eye,
   Check,
-  PenTool,
-  Eraser,
-  Upload,
   ShieldCheck,
-  X,
   FileText,
-  Clock,
   CheckCircle2,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
-import SignatureCanvas from '../../components/SignatureCanvas';
 import { usePortalData } from '../../context/PortalData';
 import { certificatesApi } from '../../api';
 import { dialog, toast } from '../../components/Dialog';
-
-const statusClass = {
-  'menunggu-rektor': 'badge badge-orange',
-  'menunggu-mitra':  'badge badge-amber',
-  'diterbitkan':     'badge badge-green',
-};
-const statusLabel = {
-  'menunggu-rektor': 'Menunggu Rektor',
-  'menunggu-mitra':  'Menunggu Mitra',
-  'diterbitkan':     'Diterbitkan',
-};
+import { statusClass, statusLabel } from './detailPengajuan/shared';
+import SignView from './detailPengajuan/SignView';
+import './rektor-static.css';
 
 export default function DetailPengajuanRektor() {
   const { sertifikatData, currentRektor, reload } = usePortalData();
@@ -39,6 +22,7 @@ export default function DetailPengajuanRektor() {
   const navigate = useNavigate();
 
   const sert = sertifikatData.find(s => String(s.id) === id);
+  const contohPeserta = sert?.penerimaContoh && sert.penerimaContoh !== '-' ? sert.penerimaContoh : 'Nama Peserta';
 
   // View mode: 'detail' | 'sign'
   const [viewMode, setViewMode] = useState('detail');
@@ -65,14 +49,13 @@ export default function DetailPengajuanRektor() {
 
   if (!sert) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
+      <div className="ix-77d5e40">
         <p>Data tidak ditemukan.</p>
         <BackButton onClick={() => navigate('/rektor/pengajuan')} label="Kembali ke daftar" />
       </div>
     );
   }
 
-  const isMenungguRektor = !signed;
 
   // Urutan sesuai alur backend: Humas -> TTE Mitra (bila ada mitra) -> TTE Rektor -> terbit
   const mitraDone = !sert.perluMitra || sert.statusTandaTangan !== 'menunggu-mitra';
@@ -248,389 +231,7 @@ export default function DetailPengajuanRektor() {
   // VIEW MODE: SIGN (Canvas Tanda Tangan + Tools + PIN 6-Digit)
   // =========================================================================
   if (viewMode === 'sign') {
-    return (
-      <div>
-
-        {/* Header Tanda Tangan Template */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#111827' }}>
-              Tanda Tangan Template
-            </h2>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6B7280' }}>
-              Tandatangani dokumen sertifikat kegiatan: <strong>{sert.namaKegiatan}</strong>
-            </p>
-          </div>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              padding: '4px 10px',
-              borderRadius: 20,
-              background: signed ? '#DCFCE7' : '#FEF3C7',
-              color: signed ? '#15803d' : '#B45309',
-            }}
-          >
-            {signed ? 'Sudah Ditandatangani' : 'Belum Ditandatangani'}
-          </span>
-        </div>
-
-        {/* Layout 2 Kolom (Canvas + Tools di kiri, Info di kanan) */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start', marginTop: 12 }}>
-          {/* SISI KIRI: Template Preview & Canvas */}
-          <div style={{ border: '1px solid #E5E7EB', borderRadius: 10, background: '#fff', overflow: 'hidden' }}>
-            {/* Panel title */}
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid #E5E7EB', fontWeight: 700, fontSize: 14, color: '#111827' }}>
-              Template Preview & Canvas TTE
-            </div>
-
-            {/* Canvas area */}
-            <div style={{ padding: '20px', background: '#f9fafb' }}>
-              <div style={{ background: '#fff', border: '1px solid #d1d5db', borderRadius: 6, padding: 18, minHeight: 380, position: 'relative' }}>
-                {/* Dokumen Teks Latar Belakang */}
-                <div style={{ fontSize: 12, color: '#374151', lineHeight: 1.7 }}>
-                  <div style={{ textAlign: 'center', borderBottom: '2px double #14532d', paddingBottom: 10, marginBottom: 14 }}>
-                    <div style={{ fontWeight: 800, color: '#14532d', fontSize: 15 }}>UNIVERSITAS ANDALAS</div>
-                    <div style={{ fontSize: 11, color: '#6B7280' }}>Mitra Kerja Sama: {sert.penyelenggara}</div>
-                    <div style={{ fontWeight: 700, fontSize: 13, color: '#111827', marginTop: 6 }}>SERTIFIKAT PENGHARGAAN</div>
-                  </div>
-                  <p><strong>Ketentuan dan Pengesahan Digital:</strong></p>
-                  <ol style={{ paddingLeft: 18, margin: '6px 0 12px' }}>
-                    <li>Sertifikat ini diterbitkan secara sah dan berurutan oleh Universitas Andalas.</li>
-                    <li>Tanda tangan digital Rektor mengesahkan partisipasi seluruh peserta dengan presensi valid.</li>
-                    <li>Gunakan panel di bawah untuk menggambar tanda tangan fisik atau membubuhkan stempel resmi.</li>
-                  </ol>
-                  <div style={{ marginTop: 24, padding: 12, border: '1px dashed #cbd5e1', borderRadius: 6, background: '#f8fafc', textAlign: 'center', fontSize: 11, color: '#64748b' }}>
-                    Area tanda tangan digital Rektor UNAND ({currentRektor.nama})
-                  </div>
-                </div>
-
-                {/* Canvas Overlay tempat menggambar */}
-                <div style={{ position: 'absolute', inset: 0, padding: 16 }}>
-                  <SignatureCanvas ref={canvasRef} tool={tool} lineWidth={lineWidth} color={color} height="350px" />
-                </div>
-
-                {/* Stempel Overlay jika diupload */}
-                {stampImg && (
-                  <img
-                    src={stampImg}
-                    alt="Stempel UNAND"
-                    style={{ position: 'absolute', right: 40, bottom: 40, width: 85, opacity: 0.88, pointerEvents: 'none' }}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Tools Bar */}
-            <div style={{ padding: '10px 16px', borderTop: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', background: '#fff' }}>
-              {/* Pen */}
-              <button
-                type="button"
-                onClick={() => setTool('pen')}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #d1d5db',
-                  background: tool === 'pen' ? '#14532d' : '#fff',
-                  color: tool === 'pen' ? '#fff' : '#374151',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                <PenTool size={14} /> Pen
-              </button>
-
-              {/* Eraser */}
-              <button
-                type="button"
-                onClick={() => setTool('eraser')}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #d1d5db',
-                  background: tool === 'eraser' ? '#14532d' : '#fff',
-                  color: tool === 'eraser' ? '#fff' : '#374151',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                <Eraser size={14} /> Eraser
-              </button>
-
-              {/* Stempel Resmi */}
-              <label
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#374151',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                }}
-              >
-                <ShieldCheck size={14} /> Stempel
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => setStampImg(ev.target.result);
-                    reader.readAsDataURL(file);
-                  }}
-                />
-              </label>
-
-              {/* Upload Gambar */}
-              <label
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #d1d5db',
-                  background: '#fff',
-                  color: '#374151',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                }}
-              >
-                <Upload size={14} /> Upload Gambar
-                <input
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => setStampImg(ev.target.result);
-                    reader.readAsDataURL(file);
-                  }}
-                />
-              </label>
-
-              {/* Size Slider */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', marginLeft: 6 }}>
-                Size:
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  value={lineWidth}
-                  onChange={(e) => setLineWidth(Number(e.target.value))}
-                  style={{ width: 70, accentColor: '#14532d' }}
-                />
-                {lineWidth}
-              </div>
-
-              {/* Color Picker */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151' }}>
-                Color:
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  style={{ width: 30, height: 24, border: 'none', cursor: 'pointer', padding: 0 }}
-                />
-              </div>
-
-              {/* Clear */}
-              <button
-                type="button"
-                onClick={() => {
-                  canvasRef.current?.clear();
-                  setStampImg(null);
-                }}
-                style={{
-                  marginLeft: 'auto',
-                  color: '#dc2626',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  fontWeight: 600,
-                }}
-              >
-                <X size={14} /> Clear
-              </button>
-            </div>
-
-            {/* PIN Digital Signature & Simpan TTD */}
-            <div style={{ padding: '14px 18px', borderTop: '1px solid #E5E7EB', background: '#fff' }}>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 6 }}>
-                PIN Digital Signature <span style={{ color: '#dc2626' }}>*</span>
-              </label>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="password"
-                    value={signPin}
-                    maxLength={6}
-                    placeholder="Masukkan 6-digit PIN (default: 123456)"
-                    onChange={(e) => setSignPin(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '9px 12px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: 6,
-                      fontSize: 13,
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  {signPinError && (
-                    <span style={{ fontSize: 12, color: '#dc2626', display: 'block', marginTop: 4 }}>
-                      {signPinError}
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={handleProsesTTE}
-                  style={{
-                    padding: '9px 20px',
-                    background: '#16a34a',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 6,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)',
-                  }}
-                >
-                  <Check size={15} /> Simpan TTD
-                </button>
-              </div>
-            </div>
-
-            {/* Pagination Preview */}
-            <div style={{ padding: '10px 16px', borderTop: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, color: '#374151' }}>
-              <span>Halaman {signPage} dari 3</span>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                  type="button"
-                  onClick={() => setSignPage((p) => Math.max(1, p - 1))}
-                  disabled={signPage === 1}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: 6,
-                    border: '1px solid #d1d5db',
-                    background: signPage === 1 ? '#f3f4f6' : '#fff',
-                    color: signPage === 1 ? '#9CA3AF' : '#374151',
-                    cursor: signPage === 1 ? 'default' : 'pointer',
-                    fontSize: 13,
-                  }}
-                >
-                  <ChevronLeft size={14} style={{ verticalAlign: 'middle' }} /> Previous
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSignPage((p) => Math.min(3, p + 1))}
-                  disabled={signPage === 3}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: 6,
-                    border: '1px solid #d1d5db',
-                    background: signPage === 3 ? '#f3f4f6' : '#fff',
-                    color: signPage === 3 ? '#9CA3AF' : '#374151',
-                    cursor: signPage === 3 ? 'default' : 'pointer',
-                    fontSize: 13,
-                  }}
-                >
-                  Next <ChevronRight size={14} style={{ verticalAlign: 'middle' }} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* SISI KANAN: Template Info & Petunjuk */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Info card */}
-            <div style={{ border: '1px solid #E5E7EB', borderRadius: 10, background: '#fff', padding: '18px' }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 700, color: '#111827' }}>Template Info</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
-                <div>
-                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: 600 }}>Kegiatan</span>
-                  <div style={{ fontWeight: 700, color: '#14532d', marginTop: 2 }}>{sert.namaKegiatan}</div>
-                </div>
-                <div>
-                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: 600 }}>Status</span>
-                  <div style={{ fontWeight: 700, color: signed ? '#15803d' : '#B45309', marginTop: 2 }}>
-                    {signed ? 'Sudah Ditandatangani' : 'Belum Ditandatangani'}
-                  </div>
-                </div>
-                <div>
-                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: 600 }}>Jumlah Dokumen</span>
-                  <div style={{ color: '#334155', marginTop: 2 }}>{sert.jumlahSertifikat} Sertifikat Peserta</div>
-                </div>
-                <div>
-                  <span style={{ color: '#6B7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.4px', fontWeight: 600 }}>Penyelenggara</span>
-                  <div style={{ color: '#334155', marginTop: 2 }}>{sert.penyelenggara}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Petunjuk Penggunaan */}
-            <div style={{ border: '1px solid #E5E7EB', borderRadius: 10, background: '#f8fafc', padding: '16px', fontSize: 12.5, color: '#4b5563', lineHeight: 1.6 }}>
-              <div style={{ fontWeight: 700, color: '#1f2937', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <ShieldCheck size={16} color="#14532d" /> Petunjuk Penandatanganan
-              </div>
-              <ul style={{ paddingLeft: 18, margin: 0 }}>
-                <li>Goreskan tanda tangan Anda pada canvas gambar menggunakan pen atau mouse/stylus.</li>
-                <li>Upload stempel resmi UNAND bila diperlukan.</li>
-                <li>Masukkan PIN 6-digit keamanan tanda tangan digital (default: <code>123456</code>).</li>
-                <li>Klik tombol <strong>Simpan TTD</strong> untuk mengesahkan sertifikat batch ini.</li>
-              </ul>
-            </div>
-
-            {/* Back button */}
-            <button
-              type="button"
-              onClick={() => setViewMode('detail')}
-              style={{
-                padding: '9px 16px',
-                border: '1px solid #d1d5db',
-                borderRadius: 6,
-                background: '#fff',
-                color: '#374151',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-              }}
-            >
-              <ArrowLeft size={15} /> Kembali ke Detail
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <SignView {...{ color, setSignPin, currentRektor, setLineWidth, signPinError, setTool, canvasRef, tool, signed, handleProsesTTE, sert, signPin, lineWidth, setColor, stampImg, signPage, setSignPage, setViewMode, setStampImg }} />;
   }
 
   // =========================================================================
@@ -643,7 +244,7 @@ export default function DetailPengajuanRektor() {
       <BackButton to="/rektor/pengajuan" label="Kembali ke Daftar Pengajuan" />
 
       {/* Header Info */}
-      <div className="detail-header" style={{ marginBottom: '20px' }}>
+      <div className="detail-header ix-7f35be1" >
         <p className="detail-source-tag">Sumber {sert.sumber}</p>
         <div className="detail-title">
           {sert.namaKegiatan}
@@ -673,17 +274,17 @@ export default function DetailPengajuanRektor() {
                 <UnandLogo className="cert-logo" />
                 <div className="cert-univ-name">
                   UNIVERSITAS<br />ANDALAS
-                  <span style={{ display: 'block', fontSize: '10px', color: 'var(--gray-400)', fontWeight: 400, marginTop: '2px' }}>
+                  <span className="ix-d6681c4">
                     Mitra Kerja Sama: {sert.penyelenggara}
                   </span>
                 </div>
               </div>
-              <p style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '18px' }}>
-                Pratinjau ilustrasi sertifikat baku · Contoh peserta: Nadia Amelia
+              <p className="ix-8366ab4">
+                Pratinjau ilustrasi sertifikat baku · Contoh peserta: {contohPeserta}
               </p>
               <p className="cert-title">SERTIFIKAT</p>
               <p className="cert-given">Diberikan kepada</p>
-              <p className="cert-recipient">NADIA AMELIA</p>
+              <p className="cert-recipient">{contohPeserta.toUpperCase()}</p>
               <p className="cert-participation">atas partisipasinya sebagai peserta dalam</p>
               <p className="cert-event-name">{sert.namaKegiatan}</p>
               <p className="cert-date-place">
@@ -695,38 +296,23 @@ export default function DetailPengajuanRektor() {
                 <div className="cert-sig-item">
                   <p className="cert-sig-line">Rektor UNAND</p>
                   <div
-                    style={{
-                      minHeight: 40,
-                      margin: '6px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderBottom: '1px solid var(--gray-300)',
-                    }}
+                    className="ix-eaa3ab6"
                   >
                     {signed ? (
                       signatureImg ? (
                         <img
                           src={signatureImg}
                           alt="TTD Rektor"
-                          style={{ maxHeight: 38, maxWidth: 140, objectFit: 'contain' }}
+                          className="ix-8e8d2de"
                         />
                       ) : (
-                        <span style={{ fontFamily: 'cursive', fontSize: '15px', color: 'var(--green-900)', fontWeight: 700 }}>
+                        <span className="ix-76d06c6">
                           {currentRektor.nama}
                         </span>
                       )
                     ) : (
                       <span
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          color: '#B45309',
-                          background: '#FEF3C7',
-                          border: '1px dashed #F59E0B',
-                          borderRadius: 4,
-                          padding: '3px 8px',
-                        }}
+                        className="ix-22d6331"
                       >
                         AREA TANDA TANGAN REKTOR
                       </span>
@@ -741,20 +327,13 @@ export default function DetailPengajuanRektor() {
                 <div className="cert-sig-item">
                   <p className="cert-sig-line">Pimpinan Mitra</p>
                   <div
-                    style={{
-                      minHeight: 40,
-                      margin: '6px 16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderBottom: '1px solid var(--gray-300)',
-                    }}
+                    className="ix-eaa3ab6"
                   >
-                    <span style={{ fontFamily: 'cursive', fontSize: '14px', color: 'var(--green-900)', fontWeight: 700 }}>
+                    <span className="ix-eb54941">
                       Pimpinan Mitra
                     </span>
                   </div>
-                  <p className="cert-sig-role" style={{ color: '#15803d', fontWeight: 600 }}>
+                  <p className="cert-sig-role ix-0d92821" >
                     ✓ TTD Mitra Terverifikasi
                   </p>
                 </div>
@@ -770,11 +349,11 @@ export default function DetailPengajuanRektor() {
             <p className="info-card-title">Informasi dokumen</p>
             <div className="info-row">
               <span className="info-row-label">Template</span>
-              <span className="info-row-value" style={{ fontSize: '12px' }}>{sert.template}</span>
+              <span className="info-row-value ix-739a043" >{sert.template}</span>
             </div>
             <div className="info-row">
               <span className="info-row-label">Dokumen</span>
-              <span className="info-row-value" style={{ color: 'var(--green-700)', fontWeight: 700 }}>
+              <span className="info-row-value ix-f70c68d" >
                 {sert.jumlahSertifikat} sertifikat peserta hadir
               </span>
             </div>
@@ -807,82 +386,29 @@ export default function DetailPengajuanRektor() {
           </div>
 
           {/* Action Card Rektor (Identik dengan Mitra) */}
-          <div className="info-card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <p className="info-card-title" style={{ margin: 0 }}>Tindakan Pengesahan</p>
-            <p style={{ fontSize: '12px', color: 'var(--gray-500)', margin: '0 0 4px' }}>
+          <div className="info-card ix-b4c4077" >
+            <p className="info-card-title ix-75648e1" >Tindakan Pengesahan</p>
+            <p className="ix-32e8260">
               Periksa isi dokumen sebelum membubuhkan tanda tangan elektronik dan PIN resmi.
             </p>
 
             {/* Tombol Pratinjau PDF Resmi */}
-            <button
-              type="button"
-              className="btn-perbesar"
-              onClick={handlePratinjauPDF}
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                padding: '9px 14px',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                background: '#ffffff',
-                color: '#334155',
-                fontWeight: 600,
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
+            <button type="button" className="btn-perbesar ix-72b389a" onClick={handlePratinjauPDF}
+              
             >
               <FileText size={15} /> Pratinjau PDF Resmi
             </button>
 
             {/* Tombol Tanda Tangan jika belum ditandatangani */}
             {!signed ? (
-              <button
-                type="button"
-                className="btn-upload"
-                onClick={() => {
-                  setSignPin('');
-                  setSignPinError('');
-                  setStampImg(null);
-                  setSignPage(1);
-                  setTool('pen');
-                  setViewMode('sign');
-                }}
-                style={{
-                  width: '100%',
-                  background: 'var(--green-900)',
-                  color: 'white',
-                  cursor: 'pointer',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '11px 16px',
-                  fontWeight: 700,
-                  fontSize: '13.5px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  boxShadow: '0 3px 10px rgba(20, 83, 45, 0.25)',
-                }}
+              <button type="button" className="btn-upload ix-ec36eb4" onClick={() => { setSignPin(''); setSignPinError(''); setStampImg(null); setSignPage(1); setTool('pen'); setViewMode('sign'); }}
+                
               >
                 <ShieldCheck size={16} /> Konfirmasi dan Tanda Tangani
               </button>
             ) : (
               <div
-                style={{
-                  background: '#DCFCE7',
-                  border: '1px solid #86EFAC',
-                  borderRadius: 6,
-                  padding: '12px 14px',
-                  fontSize: '12.5px',
-                  color: '#15803d',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  fontWeight: 600,
-                }}
+                className="ix-8ed92f5"
               >
                 <CheckCircle2 size={18} />
                 <span>Sertifikat batch kegiatan telah ditandatangani secara resmi oleh Rektor UNAND.</span>

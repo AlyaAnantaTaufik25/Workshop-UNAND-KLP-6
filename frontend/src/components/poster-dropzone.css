@@ -1,0 +1,34 @@
+.ui-poster { display: flex; flex-direction: column; gap: 8px; }
+.ui-poster-zone {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 132px;
+  padding: 14px;
+  border: 1.5px dashed #c5d6cb;
+  border-radius: 12px;
+  background: #f8fbf9;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.ui-poster-zone:hover, .ui-poster-zone:focus-visible { border-color: #1a7f45; background: #f1f8f4; outline: none; }
+.ui-poster-zone.is-drag { border-color: #1a7f45; border-style: solid; background: #e7f3ec; }
+.ui-poster-zone.is-disabled { cursor: not-allowed; opacity: .6; }
+.ui-poster-zone.has-image { padding: 0; min-height: 0; border-style: solid; background: #0f1f16; }
+.ui-poster-zone img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
+.ui-poster-empty { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; color: #66736c; font-size: 12.5px; }
+.ui-poster-empty strong { color: #10291b; font-size: 13.5px; }
+.ui-poster-empty u { color: #1a7f45; font-weight: 600; text-underline-offset: 2px; }
+.ui-poster-icon { width: 42px; height: 42px; margin-bottom: 4px; display: grid; place-items: center; border-radius: 12px; background: #e7f3ec; color: #1a7f45; }
+.ui-poster-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ui-poster-name { flex: 1; min-width: 0; font-size: 12.5px; color: #66736c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-poster-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px;
+  border: 1px solid #cfdcd4; border-radius: 8px; background: #fff;
+  font: inherit; font-size: 12.5px; font-weight: 600; color: #10291b; cursor: pointer;
+}
+.ui-poster-btn:hover { background: #f4f8f5; }
+.ui-poster-btn--danger { color: #a8322d; }
+.ui-poster-btn--danger:hover { background: #fdecea; border-color: #f2b8b3; }
+.ui-poster-error { margin: 0; font-size: 12.5px; color: #a8322d; }

@@ -4,6 +4,7 @@ import { LogOut, X } from 'lucide-react';
 import UnandLogo from './UnandLogo';
 import { useAuth } from '../context/AuthContext';
 import { reportsApi } from '../api';
+import { subscribeNotifications } from '../api/realtime';
 import './sidebar.css';
 
 /**
@@ -80,11 +81,13 @@ function useSidebarTasks(enabled) {
   }, []);
   useEffect(() => {
     if (!enabled) return undefined;
+    // oxlint-disable-next-line react/set-state-in-effect -- ambil data dari server (sinkronisasi sistem eksternal)
     load();
     const t = setInterval(load, 60000);
     const onFocus = () => { if (document.visibilityState === 'visible') load(); };
     document.addEventListener('visibilitychange', onFocus);
-    return () => { clearInterval(t); document.removeEventListener('visibilitychange', onFocus); };
+    const unsubscribe = subscribeNotifications(() => load());
+    return () => { clearInterval(t); document.removeEventListener('visibilitychange', onFocus); unsubscribe(); };
   }, [enabled, load]);
   return tasks;
 }

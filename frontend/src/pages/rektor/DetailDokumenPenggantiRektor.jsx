@@ -7,8 +7,6 @@ import {
   Check,
   X,
   Eraser,
-  ShieldCheck,
-  CheckCircle2,
 } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
@@ -140,7 +138,7 @@ export default function DetailDokumenPenggantiRektor() {
             <div className="dp-reason-title">Perbaikan {dp.jenisPerbaikan}</div>
             <div className="dp-reason-text">
               {dp.jenisPerbaikanDetail ||
-                `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || 'Nadia Amelya'}", seharusnya "${dp.namaPeserta}".`}
+                `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || '-'}", seharusnya "${dp.namaPeserta}".`}
             </div>
           </div>
         </div>
@@ -237,7 +235,7 @@ export default function DetailDokumenPenggantiRektor() {
             }}>
               <AlertTriangle size={18} color="#dc2626" />
               <span>
-                <strong>Kesalahan Ejaan Nama:</strong> Tertulis <em>"{dp.namaPesertaLama || 'Nadia Amelya'}"</em>, seharusnya <em>"{dp.namaPeserta}"</em>.
+                <strong>Kesalahan Ejaan Nama:</strong> Tertulis <em>"{dp.namaPesertaLama || '-'}"</em>, seharusnya <em>"{dp.namaPeserta}"</em>.
               </span>
             </div>
           ) : (
@@ -274,7 +272,7 @@ export default function DetailDokumenPenggantiRektor() {
                 <UnandLogo className="dp-cert-logo-box" />
                 <div className="dp-cert-partner-name">{dp.penyelenggara.toUpperCase()}</div>
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--gray-400)', marginBottom: '14px' }}>
+              <div style={{ fontSize: '11px', color: 'var(--gray-500, #6b7280)', marginBottom: '14px' }}>
                 {activeView === 'lama' ? 'Dokumen Awal (Ejaan Salah)' : 'Dokumen Pengganti (Ejaan Benar)'}
               </div>
 
@@ -298,7 +296,7 @@ export default function DetailDokumenPenggantiRektor() {
                     display: 'inline-block',
                     letterSpacing: '0.5px',
                   }}>
-                    {(dp.namaPesertaLama || 'Nadia Amelya').toUpperCase()}
+                    {(dp.namaPesertaLama || '-').toUpperCase()}
                   </div>
                   <div style={{ fontSize: '10.5px', color: '#b91c1c', marginTop: '4px', fontWeight: 600 }}>
                     ⚠️ Kesalahan ejaan nama (akan diganti)
@@ -358,7 +356,7 @@ export default function DetailDokumenPenggantiRektor() {
                         </span>
                       )
                     ) : (
-                      <span style={{ fontSize: '10px', color: '#B45309', background: '#FEF3C7', padding: '2px 6px', borderRadius: 3 }}>
+                      <span style={{ fontSize: '11px', color: '#B45309', background: '#FEF3C7', padding: '2px 6px', borderRadius: 3 }}>
                         Menunggu TTD
                       </span>
                     )}
@@ -440,7 +438,7 @@ export default function DetailDokumenPenggantiRektor() {
                 type="button"
                 onClick={() => setShowSignModal(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
-              >
+               aria-label="Tutup">
                 <X size={20} />
               </button>
             </div>

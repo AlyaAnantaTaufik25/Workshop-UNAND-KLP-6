@@ -27,7 +27,7 @@
   font-size: 12.5px; font-weight: 600; color: #14532d; text-decoration: none;
 }
 .dash-head-link:hover, .dash-task-link:hover { text-decoration: underline; }
-.dash-empty { margin: 0; padding: 14px 0 4px; font-size: 13px; color: #8a958f; }
+.dash-empty { margin: 0; padding: 14px 0 4px; font-size: 13px; color: #66736c; }
 
 /* ── Stat tile ── */
 .dash-stat { display: flex; align-items: center; gap: 14px; color: inherit; text-decoration: none; }
@@ -105,7 +105,7 @@
 .dash-cols { display: grid; grid-template-columns: auto 1fr; gap: 10px; }
 .dash-yaxis {
   height: var(--plot-h); display: flex; flex-direction: column; justify-content: space-between;
-  font-size: 11px; color: #8a958f; text-align: right; font-variant-numeric: tabular-nums;
+  font-size: 11px; color: #66736c; text-align: right; font-variant-numeric: tabular-nums;
   transform: translateY(6px);
 }
 .dash-plot { position: relative; height: var(--plot-h); margin-bottom: 26px; }
@@ -170,7 +170,7 @@
    ============================================================ */
 .dash-page { gap: 18px; }
 .dash-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.dash-hero-date { font-size: 12.5px; font-weight: 600; color: #228b45; letter-spacing: 0.02em; margin: 0 0 4px; text-transform: capitalize; }
+.dash-hero-date { font-size: 12.5px; font-weight: 600; color: #1a7f45; letter-spacing: 0.02em; margin: 0 0 4px; text-transform: capitalize; }
 .dash-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* 4 kartu statistik selalu sejajar rapi */
@@ -278,13 +278,13 @@
 }
 .dash-agenda-meta { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 12.5px; color: #4b5852; }
 .dash-agenda-meta li { display: flex; align-items: center; gap: 7px; min-width: 0; }
-.dash-agenda-meta li svg { flex-shrink: 0; color: #228b45; }
+.dash-agenda-meta li svg { flex-shrink: 0; color: #1a7f45; }
 .dash-agenda-more { margin-top: auto; padding-top: 10px; border-top: 1px solid #eef2ef; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; color: #14532d; }
 .dash-agenda-card:hover .dash-agenda-more { text-decoration: underline; }
 .dash-badge--info { background: #eaf1fd; color: #1e4fa3; }
 
 .dash-empty-card { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.dash-empty-card > svg { flex-shrink: 0; color: #228b45; }
+.dash-empty-card > svg { flex-shrink: 0; color: #1a7f45; }
 .dash-empty-card > div { flex: 1; min-width: 220px; }
 .dash-empty-card strong { font-size: 14px; color: #14271c; }
 .dash-empty-card p { margin: 3px 0 0; font-size: 13px; color: #66736c; }

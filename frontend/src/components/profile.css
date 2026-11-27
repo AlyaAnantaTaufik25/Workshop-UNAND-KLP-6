@@ -37,7 +37,7 @@
 .pf-hero-sub { margin: 4px 0 0; font-size: 13.5px; color: #4b5852; }
 .pf-hero-meta { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .pf-hero-meta li { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: #4b5852; min-width: 0; overflow-wrap: anywhere; }
-.pf-hero-meta svg { flex-shrink: 0; color: #228b45; }
+.pf-hero-meta svg { flex-shrink: 0; color: #1a7f45; }
 
 .pf-intro { margin: 0; font-size: 13px; color: #66736c; }
 
@@ -71,7 +71,7 @@
 .pf-field--full { grid-column: 1 / -1; }
 .pf-label { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: #2f3d35; }
 .pf-label i { font-style: normal; color: #dc2626; }
-.pf-label svg { color: #8a958f; }
+.pf-label svg { color: #66736c; }
 .pf-field input,
 .pf-field textarea,
 .pf-field select {
@@ -95,7 +95,7 @@
 .pf-field.is-readonly input,
 .pf-field.is-readonly textarea { background: #f5f8f6; border-color: #e3e9e5; color: #5a6761; cursor: default; }
 .pf-field.is-readonly input:focus { box-shadow: none; border-color: #e3e9e5; }
-.pf-hint { font-size: 11.5px; color: #8a958f; }
+.pf-hint { font-size: 11.5px; color: #66736c; }
 .pf-error { font-size: 11.5px; color: #b91c1c; font-weight: 600; }
 
 .pf-secret { position: relative; display: block; }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getCertificateFilename, getIssuedCertificates } from '../certificates.js';
-import { initialRegistrations, participantWorkshops } from '../data.js';
+import { initialRegistrations, participantWorkshops, participantCertificates } from './fixtures/data.js';
 
 const workshop = { id: 'test', completed: true };
 const certificate = { id: '042', workshopId: 'test', number: '042/UN16/WS/IV/2025', issued: '18 April 2025', recipient: 'Nadia Amelia' };
@@ -27,7 +27,7 @@ test('attendance alone does not issue a document and missing or cancelled worksh
 });
 
 test('the reference certificate retains its issued recipient and identifies the completed workshop', () => {
-  const certificates = getIssuedCertificates(participantWorkshops, initialRegistrations);
+  const certificates = getIssuedCertificates(participantWorkshops, initialRegistrations, participantCertificates);
   const original = certificates.find(item => item.id === '042');
   assert.equal(original.number, certificate.number);
   assert.equal(original.recipient, 'Nadia Amelia');

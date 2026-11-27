@@ -1,16 +1,17 @@
-import { useState } from 'react';
+
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { History, Search } from 'lucide-react';
 import { EmptyState } from './components';
 import { correctionStatuses, formatCorrectionTime } from './certificateCorrections';
 import { CertificateHeading, CorrectionStatus } from './CertificateUi';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function RiwayatPerbaikanSertifikat() {
   const { certificates, corrections } = useOutletContext();
   const [params, setParams] = useSearchParams();
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('');
+  const [query, setQuery] = useUrlState('q');
+  const [status, setStatus] = useUrlState('status');
   const selectedCertificate = params.get('sertifikat') || '';
   const owned = corrections.filter(item => certificates.some(certificate => certificate.id === item.certificateId));
   const filtered = owned.filter(item => {

@@ -12,11 +12,11 @@ export default function DetailPerbaikanSertifikat() {
   const [error, setError] = useState('');
   const download = useCertificateDownload();
   const request = corrections.find(item => item.id === requestId && certificates.some(certificate => certificate.id === item.certificateId));
+  const requestKey = request?.id;
+  const needsRead = Boolean(request && !request.notificationRead && ['selesai', 'ditolak'].includes(request.status));
   useEffect(() => {
-    if (request && !request.notificationRead && ['selesai', 'ditolak'].includes(request.status)) {
-      markCorrectionRead(request.id).then(result => { if (!result.ok) notify(result.message); });
-    }
-  }, [request?.id, request?.notificationRead, request?.status, markCorrectionRead, notify]);
+    if (needsRead) markCorrectionRead(requestKey).then(result => { if (!result.ok) notify(result.message); });
+  }, [needsRead, requestKey, markCorrectionRead, notify]);
   if (!request) return <CertificateNotFound request />;
   const certificate = certificates.find(item => item.id === request.certificateId);
   const original = certificateOriginals.find(item => item.id === request.certificateId);

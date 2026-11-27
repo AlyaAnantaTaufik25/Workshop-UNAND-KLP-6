@@ -5,6 +5,7 @@ import UnandLogo from '../../components/UnandLogo';
 import { getWorkshopLocation } from './data';
 import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
+import { certificatePdfApi } from '../../api';
 
 export function CertificateHeading({ title, description, children }) {
   return <section className="peserta-certificate-heading"><div><h2>{title}</h2><p>{description}</p></div><div className="peserta-certificate-actions">{children}</div></section>;
@@ -40,6 +41,7 @@ export function CertificateNotFound({ request = false }) {
   return <EmptyState icon={SearchX} title={request ? 'Pengajuan tidak ditemukan' : 'Sertifikat tidak ditemukan'} action={<Link className="peserta-button" to="/peserta/sertifikat">Kembali ke Daftar</Link>}>Dokumen ini tidak tersedia untuk peserta.</EmptyState>;
 }
 
+// oxlint-disable-next-line react/only-export-components -- sengaja diekspor bersama komponen (API bersama modul ini)
 export function useCertificateDownload() {
   const { notify } = useOutletContext();
   const [downloadingId, setDownloadingId] = useState(null);
@@ -51,8 +53,15 @@ export function useCertificateDownload() {
     setDownloadingId(certificate.id);
     setError('');
     try {
-      const { downloadCertificatePdf } = await import('./certificatePdf');
-      await downloadCertificatePdf(certificate);
+      try {
+        // PDF resmi dibuat server (dengan QR verifikasi & kode keaslian)
+        await certificatePdfApi.download(certificate.id, certificate.number);
+      } catch (err) {
+        if (err?.status !== 404) throw err;
+        // Versi dokumen pengganti belum punya PDF server → buat di browser
+        const { downloadCertificatePdf } = await import('./certificatePdf');
+        await downloadCertificatePdf(certificate);
+      }
       notify('Unduhan sertifikat PDF dimulai.');
     } catch {
       setError('Sertifikat belum berhasil diunduh. Periksa koneksi, lalu coba lagi.');

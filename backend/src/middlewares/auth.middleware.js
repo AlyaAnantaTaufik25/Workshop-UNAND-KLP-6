@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/app.config');
 const { pool } = require('../config/database');
 const { errorResponse } = require('../utils/response.util');
+const { setContextUser } = require('../utils/requestContext');
 
 async function loadUser(token) {
   const decoded = jwt.verify(token, config.jwt.secret);
@@ -15,9 +16,25 @@ async function loadUser(token) {
   return { id: user.id, nama: user.nama, email: user.email, role: user.role, partnerId: user.partner_id };
 }
 
+const SESSION_COOKIE = 'wu_session';
+
+/** Token sesi: cookie httpOnly (browser) atau header Authorization Bearer (klien API/pengujian) */
 function readToken(req) {
   const header = req.headers.authorization || '';
-  return header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (header.startsWith('Bearer ')) return header.slice(7);
+  return req.cookies?.[SESSION_COOKIE] || null;
+}
+
+/** Opsi cookie sesi: httpOnly (tidak bisa dibaca JavaScript), SameSite=Lax, Secure di production */
+function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    // HTTPS: Secure=true. Bisa dipaksa lewat COOKIE_SECURE (mis. false saat uji Docker via http://)
+    secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : config.app.env === 'production',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000,
+  };
 }
 
 /**
@@ -33,6 +50,7 @@ async function authenticate(req, res, next) {
     const user = await loadUser(token);
     if (!user) return errorResponse(res, 'Akun tidak ditemukan atau nonaktif', ['Unauthorized'], 401);
     req.user = user;
+    setContextUser(user);
     return next();
   } catch (err) {
     return errorResponse(res, 'Sesi tidak valid atau kedaluwarsa, silakan masuk kembali', [err.message], 401);
@@ -57,6 +75,8 @@ function signToken(user) {
 }
 
 module.exports = {
+  SESSION_COOKIE,
+  sessionCookieOptions,
   authenticate,
   optionalAuth,
   signToken,

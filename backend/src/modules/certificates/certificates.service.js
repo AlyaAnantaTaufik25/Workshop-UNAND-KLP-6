@@ -1,11 +1,14 @@
 const repo = require('./certificates.repository');
 const authService = require('../auth/auth.service');
 const workshopsService = require('../workshops/workshops.service');
+const storage = require('../../services/storage.service');
+const { buildCertificatePdf, authenticityCode } = require('../../services/certificatePdf.service');
+const { audit, hashDocument } = require('../../services/audit.service');
 const {
   FIELD_LABEL, parseJSON, serializeTemplate, serializeSubmission, serializeCertificate, serializeCorrection, serializeReplacement,
 } = require('./certificates.serializer');
 const { notFound, forbidden, badRequest, unprocessable, conflict } = require('../../utils/http.util');
-const { toISODate } = require('../../utils/format.util');
+const { toISODate, formatTanggal } = require('../../utils/format.util');
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 const MAX_FILE = 5 * 1024 * 1024;
@@ -49,8 +52,8 @@ class CertificatesService {
       const file = body.berkas ? String(body.berkas) : null;
       if (file && !/^data:(application\/pdf|image\/(png|jpeg));base64,/.test(file)) throw badRequest('Berkas template harus PDF, PNG, atau JPG');
       if (file && file.length > MAX_FILE * 1.4) throw badRequest('Ukuran berkas template maksimal 5 MB');
-      data.berkas_data = file;
-      if (file && !data.ukuran) data.ukuran = `${(file.length / 1.37 / 1024 / 1024).toFixed(1)} MB`;
+      data.berkas_data = file ? storage.saveDataUrl(file, 'templates') : null;
+      if (file && !data.ukuran) data.ukuran = `${(storage.byteSize(file) / 1024 / 1024).toFixed(1)} MB`;
     }
     if (body.workshopId !== undefined) data.workshop_id = body.workshopId || null;
     else if (body.kegiatanTerkait !== undefined) {
@@ -90,7 +93,7 @@ class CertificatesService {
 
   async templateFile(id, user) {
     const t = await this.getTemplate(id, user);
-    return { nama: t.berkas_nama, dataUrl: t.berkas_data };
+    return { nama: t.berkas_nama, dataUrl: storage.publicUrl(t.berkas_data), url: storage.publicUrl(t.berkas_data) };
   }
 
   // ════════════════ PENGAJUAN & TTE ════════════════
@@ -112,8 +115,8 @@ class CertificatesService {
     const data = serializeSubmission(s, user.role);
     const attendees = await repo.attendeesOf(s.workshop_id);
     data.penerima = attendees.map((a) => ({ userId: a.user_id, nama: a.nama, email: a.email, nomor: a.nomor || null }));
-    data.mitraSignature = s.mitra_signature || null;
-    data.rektorSignature = s.rektor_signature || null;
+    data.mitraSignature = storage.publicUrl(s.mitra_signature);
+    data.rektorSignature = storage.publicUrl(s.rektor_signature);
     return data;
   }
 
@@ -137,8 +140,9 @@ class CertificatesService {
     else id = await repo.insert('certificate_submissions', data);
     if (data.template_id) await repo.updateRow('certificate_templates', data.template_id, { status: 'dipakai' });
 
-    if (status === 'menunggu-mitra') await repo.notify({ role_code: 'mitra', judul: 'Pengajuan Tanda Tangan Sertifikat', deskripsi: `${w.nama} menunggu TTE Anda`, link: '/mitra/tanda-tangan' });
+    if (status === 'menunggu-mitra') await repo.notify({ role_code: 'mitra', partner_id: w.partner_id, judul: 'Pengajuan Tanda Tangan Sertifikat', deskripsi: `${w.nama} menunggu TTE Anda`, link: `/mitra/tanda-tangan/${id}` });
     if (status === 'menunggu-rektor') await repo.notify({ role_code: 'rektor', judul: 'Sertifikat Menunggu Persetujuan', deskripsi: w.nama, link: '/rektor/pengajuan' });
+    await audit({ action: 'certificate.submit', entity: 'certificate_submission', entityId: id, description: `Pengajuan sertifikat "${w.nama}" (${status})`, meta: { perluMitra, perluRektor, templateId: data.template_id, nomorSk: data.nomor_sk } });
     if (status === 'diterbitkan') await this.issueCertificates(id);
     return this.getSubmission(id, user);
   }
@@ -168,6 +172,7 @@ class CertificatesService {
     }
     if (body.catatan !== undefined) data.catatan = String(body.catatan).slice(0, 500) || null;
     await repo.updateRow('certificate_submissions', s.id, data);
+    await audit({ action: 'certificate.verify', entity: 'certificate_submission', entityId: s.id, description: `Verifikasi draft "${s.workshop_nama}"${data.template_id ? ' · template diganti' : ''}`, meta: { templateId: data.template_id, catatan: data.catatan } });
     return this.getSubmission(s.id, user);
   }
 
@@ -175,7 +180,10 @@ class CertificatesService {
   async signSubmission(id, body, user) {
     const s = await this.getSubmissionRow(id, user);
     await authService.verifyPin(user.id, body.pin);
-    const signature = body.signature ? String(body.signature).slice(0, 2_000_000) : null;
+    const rawSignature = body.signature ? String(body.signature).slice(0, 2_000_000) : null;
+    // Hash dokumen yang ditandatangani: isi pengajuan + template + gambar tanda tangan
+    const docHash = hashDocument({ submission: s.id, workshop: s.workshop_id, nama: s.workshop_nama, nomorSk: s.nomor_sk, template: s.template_id, peran: user.role, signature: rawSignature || '' });
+    const signature = rawSignature && rawSignature.startsWith('data:') ? storage.saveDataUrl(rawSignature, 'signatures') : null;
     let data;
     if (user.role === 'mitra') {
       if (s.status !== 'menunggu-mitra') throw unprocessable('Pengajuan ini tidak sedang menunggu tanda tangan mitra');
@@ -186,6 +194,9 @@ class CertificatesService {
       data = { status: 'diterbitkan', rektor_signed_at: new Date(), rektor_signed_by: user.id, rektor_signature: signature };
     }
     await repo.updateRow('certificate_submissions', s.id, data);
+    await audit({ action: 'certificate.sign', entity: 'certificate_submission', entityId: s.id, docHash,
+      description: `TTE ${user.role === 'mitra' ? 'Mitra' : 'Rektor'} untuk "${s.workshop_nama}"${s.nomor_sk ? ` (SK ${s.nomor_sk})` : ''}`,
+      meta: { statusSebelum: s.status, statusSesudah: data.status, workshopId: s.workshop_id } });
     if (data.status === 'diterbitkan') await this.issueCertificates(s.id);
     return this.getSubmission(s.id, user);
   }
@@ -211,6 +222,7 @@ class CertificatesService {
       await repo.notify({ user_id: a.user_id, judul: 'Sertifikat Terbit', deskripsi: s.workshop_nama, link: '/peserta/sertifikat' });
     }
     if (s.template_id) await repo.updateRow('certificate_templates', s.template_id, { status: 'diterbitkan' });
+    await audit({ action: 'certificate.issue', entity: 'certificate_submission', entityId: s.id, description: `${n} sertifikat "${s.workshop_nama}" diterbitkan`, meta: { jumlah: n } });
     return n;
   }
 
@@ -223,7 +235,34 @@ class CertificatesService {
   async verifyCertificate(nomor) {
     const c = await repo.certificateByCode(nomor);
     if (!c) throw notFound('Nomor sertifikat tidak terdaftar');
-    return { valid: true, ...serializeCertificate(c), namaKegiatan: c.workshop_nama };
+    const sub = await this.submissionWithSigners(c.workshop_id);
+    return {
+      valid: true, ...serializeCertificate(c), namaKegiatan: c.workshop_nama,
+      tanggalKegiatan: c.tanggal_selesai && c.tanggal_selesai !== c.tanggal_mulai ? `${formatTanggal(c.tanggal_mulai)} – ${formatTanggal(c.tanggal_selesai)}` : formatTanggal(c.tanggal_mulai),
+      kodeKeaslian: authenticityCode(c),
+      penandatangan: [
+        sub?.mitra_signed_at ? { peran: `Pimpinan ${c.partner_nama || 'Mitra'}`, nama: sub.mitra_signer, waktu: sub.mitra_signed_at } : null,
+        sub?.rektor_signed_at ? { peran: 'Rektor Universitas Andalas', nama: sub.rektor_signer, waktu: sub.rektor_signed_at } : null,
+      ].filter(Boolean),
+    };
+  }
+
+  async submissionWithSigners(workshopId) {
+    const row = await repo.submissionByWorkshop(workshopId);
+    return row ? repo.submission(row.id) : null;
+  }
+
+  /** PDF sertifikat resmi (dibuat server, dengan QR verifikasi) */
+  async certificatePdf(code, user) {
+    const c = await repo.certificateByCode(code);
+    if (!c) throw notFound('Sertifikat tidak ditemukan');
+    const allowed = c.user_id === user.id
+      || ['humas', 'sekretariat', 'rektor'].includes(user.role)
+      || (user.role === 'mitra' && c.sumber === 'Mitra' && (await repo.db.query('SELECT partner_id FROM workshops WHERE id = ?', [c.workshop_id]))[0][0]?.partner_id === user.partnerId);
+    if (!allowed) throw forbidden('Anda tidak berhak mengunduh sertifikat ini');
+    const buffer = await buildCertificatePdf(c, await this.submissionWithSigners(c.workshop_id));
+    const safe = String(c.nomor).replace(/[^\w.-]+/g, '-');
+    return { buffer, filename: `Sertifikat-${safe}.pdf` };
   }
 
   // ════════════════ PERBAIKAN SERTIFIKAT ════════════════
@@ -285,7 +324,7 @@ class CertificatesService {
     const now = nowISO();
     const id = await repo.insert('certificate_corrections', {
       code: `PB-TMP-${Date.now()}-${user.id}`, certificate_id: cert.id, user_id: user.id, status: 'menunggu',
-      changes: JSON.stringify(changes), reason, attachment: att ? JSON.stringify(att) : null, notification_read: 1,
+      changes: JSON.stringify(changes), reason, attachment: att ? JSON.stringify({ name: att.name, type: att.type, size: att.size, url: storage.saveDataUrl(att.dataUrl, 'perbaikan') }) : null, notification_read: 1,
       events: JSON.stringify([{ status: 'menunggu', at: now, note: `Pengajuan ditujukan kepada ${issuer}. Menunggu pemeriksaan penerbit.` }]),
     });
     await repo.updateRow('certificate_corrections', id, { code: `PB-${now.slice(0, 4)}-${3000 + id}` });
@@ -354,6 +393,7 @@ class CertificatesService {
     } else {
       throw badRequest("Aksi harus 'proses', 'tolak', atau 'selesai'");
     }
+    await audit({ action: `correction.${body.action}`, entity: 'certificate_correction', entityId: c.id, description: `Perbaikan sertifikat ${c.nomor} (${c.user_nama}) → ${body.action}`, meta: note ? { catatan: note } : null });
     return serializeCorrection(await repo.correction(c.id));
   }
 
@@ -378,6 +418,7 @@ class CertificatesService {
     const c = await repo.correction(id);
     if (c.mitra_approved_at) throw unprocessable('Dokumen pengganti ini sudah disetujui');
     await repo.updateRow('certificate_corrections', c.id, { mitra_approved_at: new Date(), mitra_approved_by: user.id });
+    await audit({ action: 'replacement.approve', entity: 'certificate_correction', entityId: c.id, description: `Mitra menyetujui dokumen pengganti ${c.replacement_number || c.nomor} (${c.user_nama})` });
     if (c.tte_status === 'sedang-diproses') {
       await repo.notify({ role_code: 'rektor', judul: 'Dokumen Pengganti Disetujui Mitra', deskripsi: `${c.user_nama} · ${c.workshop_nama}`, link: '/rektor/sertifikat-perbaikan' });
     }
@@ -391,6 +432,9 @@ class CertificatesService {
     const c = await repo.correction(id);
     if (c.tte_status !== 'sedang-diproses') throw unprocessable('Dokumen pengganti ini sudah ditandatangani');
     await repo.updateRow('certificate_corrections', c.id, { tte_status: 'selesai', tte_signed_at: new Date(), tte_signed_by: user.id });
+    await audit({ action: 'replacement.sign', entity: 'certificate_correction', entityId: c.id,
+      docHash: hashDocument({ correction: c.id, nomor: c.replacement_number, changes: c.changes, penerima: c.user_nama }),
+      description: `TTE Rektor dokumen pengganti ${c.replacement_number || c.nomor} (${c.user_nama})` });
     return this.getReplacement(c.id, user);
   }
 }

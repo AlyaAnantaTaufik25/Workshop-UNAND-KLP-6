@@ -8,6 +8,7 @@ import './components/design-language.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { DialogHost } from './components/Dialog.jsx'
+import ResponsiveTables from './components/ResponsiveTables.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,6 +16,8 @@ createRoot(document.getElementById('root')).render(
       <App />
       {/* Dialog konfirmasi & toast global yang seragam */}
       <DialogHost />
+      {/* Tabel otomatis menjadi kartu di layar kecil */}
+      <ResponsiveTables />
     </AuthProvider>
   </StrictMode>,
 )

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { CameraOff, LoaderCircle, X } from 'lucide-react';
-import { parsePresensiQr } from './QrPresensi';
+import { parsePresensiQr } from '../utils/presensiQr';
 import './qr.css';
 
 /**
@@ -8,7 +8,7 @@ import './qr.css';
  * onResult menerima { code, workshop } hasil parsePresensiQr.
  */
 export default function QrScanner({ onResult, onClose }) {
-  const regionId = useRef(`qr-region-${Math.random().toString(36).slice(2)}`).current;
+  const regionId = `qr-region-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const [status, setStatus] = useState('starting'); // starting | scanning | error
   const [message, setMessage] = useState('');
   const done = useRef(false);

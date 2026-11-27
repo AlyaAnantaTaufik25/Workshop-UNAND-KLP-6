@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { certificatesApi, registrationsApi, workshopsApi } from '../api';
 import { useCurrentUser } from './AuthContext';
+import useAutoRefresh from '../hooks/useAutoRefresh';
+import { subscribeNotifications } from '../api/realtime';
 import { PageLoader, ErrorNotice } from '../components/RequireRole';
 
 /**
@@ -44,7 +46,12 @@ export function PortalDataProvider({ role, children }) {
     }
   }, [role]);
 
+  // oxlint-disable-next-line react/set-state-in-effect -- ambil data dari server (sinkronisasi sistem eksternal)
   useEffect(() => { reload(); }, [reload]);
+  // Data portal diperbarui berkala & saat tab kembali aktif
+  useAutoRefresh(reload, { interval: 60000 });
+  // Notifikasi baru (SSE) → data portal langsung diperbarui
+  useEffect(() => subscribeNotifications(() => reload()), [reload]);
 
   const value = useMemo(() => {
     if (!raw) return null;

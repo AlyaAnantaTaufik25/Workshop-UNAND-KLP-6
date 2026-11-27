@@ -1,4 +1,5 @@
 const workshopsService = require('./workshops.service');
+const { buildIcs } = require('../../services/calendar.service');
 const { successResponse } = require('../../utils/response.util');
 
 /**
@@ -10,6 +11,14 @@ class WorkshopsController {
   }
 
   list = async (req, res) => successResponse(res, 'Daftar kegiatan', await this.service.list(req.user, req.query));
+
+  /** Berkas kalender (.ics) kegiatan — Google Calendar, Outlook, iPhone/Android */
+  calendar = async (req, res) => {
+    const w = await this.service.getRow(req.params.id, req.user);
+    const ics = buildIcs({ ...w, lokasiTeks: w.tempat || [w.gedung, w.ruangan].filter(Boolean).join(' · ') });
+    res.set({ 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': `attachment; filename="${w.slug || w.id}.ics"` });
+    return res.send(ics);
+  };
 
   detail = async (req, res) => successResponse(res, 'Detail kegiatan', await this.service.detail(req.params.id, req.user));
 

@@ -1,4 +1,5 @@
 const { pool } = require('../../config/database');
+const notifier = require('../../services/notifier.service');
 
 const SUBMISSION_SELECT = `
   SELECT s.*, w.id AS w_id, w.slug, w.nama AS workshop_nama, w.jenis, w.sumber, w.penyelenggara, w.partner_id,
@@ -150,8 +151,9 @@ class CertificatesRepository {
     return rows[0] || null;
   }
 
+  /** Notifikasi + real-time + email (lihat services/notifier.service.js) */
   async notify(data) {
-    await this.db.query('INSERT INTO notifications SET ?', [data]);
+    await notifier.notifyRow(data);
   }
 }
 

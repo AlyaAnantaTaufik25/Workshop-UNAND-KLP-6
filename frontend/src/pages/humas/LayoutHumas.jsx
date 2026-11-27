@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Home, Briefcase, Handshake, MapPin, Users, FileText, BarChart3, ChevronDown, Bell, X } from 'lucide-react';
 import { useCurrentUser } from '../../context/AuthContext';
@@ -6,7 +6,8 @@ import useNotifications from '../../hooks/useNotifications';
 import './humas.css';
 import { useMobileNav } from '../../components/MobileNav';
 import Sidebar from '../../components/Sidebar';
-import { Award } from 'lucide-react';
+import { PageLoader } from '../../components/RequireRole';
+import { Award, ShieldCheck } from 'lucide-react';
 
 const SECTIONS = [
   { items: [{ to: '/humas/ringkasan', label: 'Dashboard', icon: Home }] },
@@ -20,7 +21,10 @@ const SECTIONS = [
     { to: '/humas/template-sertifikat', label: 'Template', icon: FileText },
     { to: '/humas/perbaikan-sertifikat', label: 'Perbaikan', icon: Award, badge: t => t.perbaikanAktif?.total },
   ] },
-  { title: 'Analitik', items: [{ to: '/humas/laporan', label: 'Laporan', icon: BarChart3 }] },
+  { title: 'Analitik', items: [
+    { to: '/humas/laporan', label: 'Laporan', icon: BarChart3 },
+    { to: '/humas/log-audit', label: 'Log Audit', icon: ShieldCheck },
+  ] },
 ];
 
 
@@ -34,6 +38,7 @@ const pageTitles = {
   '/humas/template-sertifikat':  'Template Sertifikat',
   '/humas/perbaikan-sertifikat': 'Perbaikan Sertifikat',
   '/humas/laporan':              'Laporan',
+  '/humas/log-audit':            'Log Audit',
   '/humas/profil':               'Profil',
 };
 
@@ -100,7 +105,7 @@ export default function LayoutHumas() {
                 <div className="layout-notif-dropdown">
                   <div className="layout-notif-dropdown-header">
                     <span className="layout-notif-dropdown-title">Notifikasi Perbaikan Sertifikat</span>
-                    <button className="modal-close-btn" onClick={() => setShowNotif(false)}><X size={15} /></button>
+                    <button className="modal-close-btn" onClick={() => setShowNotif(false)} aria-label="Tutup"><X size={15} /></button>
                   </div>
                   <div className="layout-notif-dropdown-body">
                     {notifikasiData.length === 0 && <p className="notif-item-desc" style={{ padding: 16 }}>Belum ada notifikasi.</p>}
@@ -142,7 +147,7 @@ export default function LayoutHumas() {
 
         {/* Page Content */}
         <main className="content-container">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}><Outlet /></Suspense>
         </main>
       </div>
 

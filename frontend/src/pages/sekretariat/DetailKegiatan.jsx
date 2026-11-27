@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Upload, Check, CheckCircle } from 'lucide-react';
+import { Upload, Check } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import CertificateTemplateRenderer from '../../components/CertificateTemplateRenderer';
 import { usePortalData } from '../../context/PortalData';
@@ -79,7 +79,7 @@ export default function DetailKegiatan() {
 
   if (!sert) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-400)' }}>
+      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--gray-500, #6b7280)' }}>
         <p>Data tidak ditemukan.</p>
         <BackButton onClick={() => navigate('/sekretariat/sertifikat')} label="Kembali ke Sertifikat" />
       </div>

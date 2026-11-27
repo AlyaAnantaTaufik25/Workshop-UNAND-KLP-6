@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FileText, Clock, Bell, Award } from 'lucide-react';
 import './rektor.css';
@@ -6,6 +6,8 @@ import { usePortalData } from '../../context/PortalData';
 import useNotifications from '../../hooks/useNotifications';
 import { useMobileNav } from '../../components/MobileNav';
 import Sidebar from '../../components/Sidebar';
+import { PageLoader } from '../../components/RequireRole';
+import useOnChange from '../../hooks/useOnChange';
 
 const SECTIONS = [
   { title: 'Tanda Tangan', items: [
@@ -35,9 +37,8 @@ export default function LayoutRektor() {
   const [, setNotifRead] = useState(false);
   const notifRef = useRef(null);
 
-  useEffect(() => {
-    setNotifOpen(false);
-  }, [location.pathname]);
+  // Tutup panel notifikasi saat pindah halaman
+  useOnChange(location.pathname, () => setNotifOpen(false));
 
   useEffect(() => {
     const handleOutside = (event) => {
@@ -139,7 +140,7 @@ export default function LayoutRektor() {
 
         {/* Page Content */}
         <main className="content-container">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}><Outlet /></Suspense>
         </main>
       </div>
 

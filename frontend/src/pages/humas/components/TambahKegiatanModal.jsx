@@ -3,6 +3,8 @@ import { X, Calendar, Clock } from 'lucide-react';
 import useApi from '../../../hooks/useApi';
 import { locationsApi, partnersApi, readFileAsDataUrl } from '../../../api';
 import Select from '../../../components/Select';
+import useUnsavedChanges from '../../../hooks/useUnsavedChanges';
+import PosterDropzone from '../../../components/PosterDropzone';
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum', 'Pelatihan', 'Konferensi'];
 const jenisPelaksanaanOptions = ['Offline', 'Online'];
@@ -65,9 +67,12 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
     : defaultForm;
 
   const [form, setForm] = useState(initialForm);
-  const [posterName, setPosterName] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  // Ada isian yang berubah? → konfirmasi sebelum menutup modal / pindah halaman
+  const dirty = !saving && (Boolean(form.poster) || Object.keys(initialForm).some(k => k !== 'poster' && String(form[k] ?? '') !== String(initialForm[k] ?? '')));
+  const guard = useUnsavedChanges(dirty);
+  const closeSafely = guard(onClose);
 
   // Opsi penyelenggara & gedung/ruangan dari database
   const { data: partners } = useApi(() => partnersApi.list(), []);
@@ -83,14 +88,6 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
   const handleGedungChange = (val) => {
     set('gedung', val);
     set('ruangan', ruanganMap[val]?.[0] ?? '');
-  };
-
-  const handlePosterChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      set('poster', file);
-      setPosterName(file.name);
-    }
   };
 
   const hitungDurasiHari = () => {
@@ -139,7 +136,7 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={closeSafely}>
       <div className="modal-box humas-tambah-modal" onClick={e => e.stopPropagation()}>
 
         {/* ── Header ── */}
@@ -148,7 +145,7 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
             <p className="modal-header-crumb">WORKSHOP UNAND</p>
             <h2 className="modal-header-title">{editData ? 'Edit Kegiatan' : 'Tambah Kegiatan'}</h2>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Tutup">
+          <button className="modal-close-btn" onClick={closeSafely} aria-label="Tutup">
             <X size={16} />
           </button>
         </div>
@@ -261,17 +258,7 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
               </div>
               <div className="form-group">
                 <label className="form-label">Poster kegiatan <span className="form-label-opt">(opsional)</span></label>
-                <label className="custom-file-input-box">
-                  <span className="file-box-text">
-                    {posterName ? posterName : 'Pilih File Tidak ada file yang dipilih'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={handlePosterChange}
-                  />
-                </label>
+                <PosterDropzone value={form.poster} currentUrl={editData?.imageUrl} onChange={file => set('poster', file)} disabled={saving} />
               </div>
             </div>
           </div>
@@ -438,7 +425,7 @@ export default function TambahKegiatanModal({ onClose, onSave, editData = null }
         {/* ── Footer Buttons ── */}
         {error && <p role="alert" style={{ margin: '0 24px 12px', padding: '8px 12px', borderRadius: 8, background: '#fef2f2', color: '#b91c1c', fontSize: 13 }}>{error}</p>}
         <div className="modal-footer">
-          <button className="modal-btn modal-btn-batal" onClick={onClose} disabled={saving}>
+          <button className="modal-btn modal-btn-batal" onClick={closeSafely} disabled={saving}>
             Batal
           </button>
           <button className="modal-btn modal-btn-draft" onClick={() => handleSubmit('draft')} disabled={saving}>

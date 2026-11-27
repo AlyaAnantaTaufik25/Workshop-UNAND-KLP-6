@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X, Check, ClipboardCheck, EyeOff } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, Trash2, ClipboardCheck, EyeOff, Inbox } from 'lucide-react';
 import { usePagination, IconAction } from '../../components/Pagination';
 import TambahKegiatanModal from './components/TambahKegiatanModal';
 import useKegiatan from './useKegiatan';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { dialog } from '../../components/Dialog';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 const statusConfig = {
   berlangsung: { label: 'Berlangsung', className: 'humas-badge humas-badge-berlangsung' },
@@ -24,15 +25,11 @@ export default function KelolaKegiatan() {
   const { kegiatan, loading, error, reload, save, remove, setStatus } = useKegiatan();
   const [actionError, setActionError]   = useState('');
   const [search, setSearch]             = useState(initialMitra);
-  const [filterJenis, setFilterJenis]   = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterJenis, setFilterJenis]   = useUrlState('jenis');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
   const [showTambah, setShowTambah]     = useState(false);
   const [editTarget, setEditTarget]     = useState(null);
 
-  useEffect(() => {
-    const m = searchParams.get('mitra') || searchParams.get('q') || '';
-    if (m) setSearch(m);
-  }, [searchParams]);
 
   const filtered = kegiatan.filter(k => {
     const q = search.toLowerCase();
@@ -130,9 +127,7 @@ export default function KelolaKegiatan() {
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                    Tidak ada kegiatan ditemukan.
-                  </td>
+                  <td colSpan={6} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada kegiatan ditemukan.</div></div></td>
                 </tr>
               )}
               {pageItems.map(k => {

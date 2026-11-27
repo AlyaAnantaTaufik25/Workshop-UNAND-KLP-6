@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ROLE_HOME, useAuth } from '../context/AuthContext';
 import UnandLogo from '../components/UnandLogo';
 import './login.css';
@@ -24,9 +24,18 @@ export default function Login() {
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, login } = useAuth();
 
-  if (user) return <Navigate to={ROLE_HOME[user.role] || '/'} replace />;
+  // Tujuan setelah masuk: halaman yang tadi dibuka (bila milik role yang sama), selain itu beranda role
+  const from = location.state?.from;
+  const targetFor = role => {
+    const home = ROLE_HOME[role] || '/';
+    const prefix = home.split('/').slice(0, 2).join('/');
+    return typeof from === 'string' && from.startsWith(`${prefix}/`) ? from : home;
+  };
+
+  if (user) return <Navigate to={targetFor(user.role)} replace />;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,7 +44,7 @@ export default function Login() {
     setLoading(true);
     try {
       const me = await login(email.trim(), password);
-      navigate(ROLE_HOME[me.role] || '/', { replace: true });
+      navigate(targetFor(me.role), { replace: true });
     } catch (err) {
       setError(err.message || 'Gagal masuk. Silakan coba lagi.');
     } finally {

@@ -169,7 +169,7 @@ function TabPeserta({ w }) {
 // ── Tab: Presensi ────────────────────────────────────────────
 function TabPresensi({ w }) {
   const presensiSample = usePesertaKegiatan(w);
-  const { pageItems: presensiPage, pager: presensiPager } = usePagination(presensiSample, 15);
+  const { pageItems: presensiPage, pager: presensiPager } = usePagination(presensiSample, 15, 'page2');
 
   return (
     <div>
@@ -286,7 +286,7 @@ export default function DetailKegiatanKegiatan() {
 
   if (!w) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px', color: 'var(--gray-400)' }}>
+      <div style={{ textAlign: 'center', padding: '48px', color: 'var(--gray-500, #6b7280)' }}>
         <p>Kegiatan tidak ditemukan.</p>
         <button className="dk-back-link" style={{ marginTop: '16px' }}
           onClick={() => navigate('/sekretariat/kegiatan')}>

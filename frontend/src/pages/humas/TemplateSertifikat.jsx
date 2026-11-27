@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, Trash2, X, Inbox } from 'lucide-react';
 import useApi from '../../hooks/useApi';
 import { certificatesApi, readFileAsDataUrl, workshopsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
 import { usePagination, IconAction } from '../../components/Pagination';
 import { dialog } from '../../components/Dialog';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 const defaultForm = {
   nama: '',
@@ -23,7 +23,6 @@ const statusConfig = {
 };
 
 export default function TemplateSertifikat() {
-  const navigate = useNavigate();
   // Template milik UNAND (bukan desain bawaan pustaka)
   const { data: templateData, loading, error, reload } = useApi(() => certificatesApi.templates({ library: 0 }), [], []);
   const templates = templateData || [];
@@ -37,8 +36,8 @@ export default function TemplateSertifikat() {
     catch (err) { setActionError(err.message); return false; }
     finally { setSaving(false); }
   };
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [search, setSearch] = useUrlState('q');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   // Modal Tambah
   const [showTambahModal, setShowTambahModal] = useState(false);
@@ -190,9 +189,7 @@ export default function TemplateSertifikat() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', color: '#9ca3af', padding: '32px' }}>
-                    Belum ada template sertifikat.
-                  </td>
+                  <td colSpan={5} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Belum ada template sertifikat.</div></div></td>
                 </tr>
               ) : (
                 pg_filtered.map(t => {
@@ -268,7 +265,7 @@ export default function TemplateSertifikat() {
               <button
                 className="modal-close-btn"
                 onClick={() => setShowTambahModal(false)}
-              >
+               aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -388,7 +385,7 @@ export default function TemplateSertifikat() {
               <button
                 className="modal-close-btn"
                 onClick={() => setShowEditModal(false)}
-              >
+               aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -530,7 +527,7 @@ export default function TemplateSertifikat() {
               <button
                 className="modal-close-btn"
                 onClick={() => setPreviewTemplate(null)}
-              >
+               aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -656,7 +653,7 @@ export default function TemplateSertifikat() {
                       >
                         UNIVERSITAS ANDALAS
                       </div>
-                      <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '2px' }}>
+                      <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>
                         Dokumen resmi
                       </div>
                     </div>
@@ -753,12 +750,12 @@ export default function TemplateSertifikat() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '130px' }}>
                       <div style={{ width: '100%', height: '1px', background: '#374151', marginBottom: '8px' }} />
                       <div style={{ fontSize: '11px', fontWeight: '700', color: '#111827' }}>Rektor UNAND</div>
-                      <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>Menunggu</div>
+                      <div style={{ fontSize: '11px', color: 'var(--gray-500, #6b7280)', marginTop: '2px' }}>Menunggu</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '130px' }}>
                       <div style={{ width: '100%', height: '1px', background: '#374151', marginBottom: '8px' }} />
                       <div style={{ fontSize: '11px', fontWeight: '700', color: '#111827' }}>Pimpinan Mitra</div>
-                      <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>Menunggu</div>
+                      <div style={{ fontSize: '11px', color: 'var(--gray-500, #6b7280)', marginTop: '2px' }}>Menunggu</div>
                     </div>
                   </div>
                 </div>

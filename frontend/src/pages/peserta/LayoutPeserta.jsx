@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Award, Bell, CalendarDays, House, Menu, Search, User } from 'lucide-react';
 import { initials } from './data';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
@@ -10,7 +10,10 @@ import './peserta.css';
 import './workshopStates.css';
 import './sertifikat.css';
 import { toast } from '../../components/Dialog';
+import useAutoRefresh from '../../hooks/useAutoRefresh';
+import useNotifications from '../../hooks/useNotifications';
 import Sidebar from '../../components/Sidebar';
+import useOnChange from '../../hooks/useOnChange';
 
 const SECTIONS = [
   { items: [
@@ -36,9 +39,9 @@ const toParticipantWorkshop = workshop => ({ ...workshop, id: workshop.slug, dbI
 
 export default function LayoutPeserta() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notificationsRead, setNotificationsRead] = useState(false);
   const notificationRef = useRef();
   const menuButtonRef = useRef();
   const sidebarRef = useRef();
@@ -68,18 +71,23 @@ export default function LayoutPeserta() {
       setLoading(false);
     }
   }, []);
+  // oxlint-disable-next-line react/set-state-in-effect -- ambil data dari server (sinkronisasi sistem eksternal)
   useEffect(() => { reload(); }, [reload]);
+  useAutoRefresh(reload, { interval: 60000 });
 
   const certificateOriginals = issued
     .map(certificate => ({ ...certificate, workshop: workshops.find(item => item.id === certificate.workshopId) }))
     .filter(certificate => certificate.workshop);
   const certificates = certificateOriginals.map(certificate => getCertificateVersions(certificate, corrections).at(-1));
   const unreadCorrections = corrections.filter(item => ['selesai', 'ditolak'].includes(item.status) && !item.notificationRead && certificates.some(certificate => certificate.id === item.certificateId)).length;
+  // Notifikasi server (pendaftaran, pengingat H-1, sertifikat terbit) — real-time via SSE
+  const { items: serverNotifications, unread: serverUnread, markRead } = useNotifications({ onNew: reload });
+  const totalUnread = serverUnread + unreadCorrections;
   // Pesan singkat memakai toast global yang seragam dengan portal lain
   const notify = useCallback(text => {
     toast(text, { tone: /belum|gagal|tidak|salah|ditolak/i.test(text) ? 'error' : 'success', duration: 5000 });
   }, []);
-  useEffect(() => { setMenuOpen(false); setNotificationsOpen(false); }, [location.pathname]);
+  useOnChange(location.pathname, () => { setMenuOpen(false); setNotificationsOpen(false); });
   useEffect(() => {
     const handleOutside = event => { if (!notificationRef.current?.contains(event.target)) setNotificationsOpen(false); };
     const handleEscape = event => { if (event.key === 'Escape') setNotificationsOpen(false); };
@@ -89,6 +97,7 @@ export default function LayoutPeserta() {
     return () => { document.removeEventListener('pointerdown', handleOutside); document.removeEventListener('keydown', handleEscape); };
   }, [notificationsOpen]);
   useEffect(() => {
+    const menuButton = menuButtonRef.current;
     if (!menuOpen) return;
     const sidebar = sidebarRef.current;
     const previousOverflow = document.body.style.overflow;
@@ -104,7 +113,7 @@ export default function LayoutPeserta() {
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     sidebar.addEventListener('keydown', handleKey);
-    return () => { sidebar.removeEventListener('keydown', handleKey); document.body.style.overflow = previousOverflow; menuButtonRef.current?.focus(); };
+    return () => { sidebar.removeEventListener('keydown', handleKey); document.body.style.overflow = previousOverflow; menuButton?.focus(); };
   }, [menuOpen]);
 
   // ── Aksi peserta (semua tersimpan di database melalui API)
@@ -182,13 +191,19 @@ export default function LayoutPeserta() {
       <header className="peserta-topbar">
         <div className="peserta-title-wrap"><button ref={menuButtonRef} className="peserta-menu-button peserta-icon-button" aria-label="Buka navigasi" title="Buka navigasi" aria-expanded={menuOpen} aria-controls="peserta-navigation" onClick={() => setMenuOpen(true)}><Menu size={22} /></button><div><span className="peserta-eyebrow">WORKSHOP UNAND</span><h1>{pageTitle}</h1></div></div>
         <div className="peserta-top-actions">
-          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label="Notifikasi" title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(value => !value); setNotificationsRead(true); }}><Bell size={20} />{unreadCorrections > 0 ? <span className="peserta-notification-count" aria-label={`${unreadCorrections} notifikasi belum dibaca`}>{unreadCorrections}</span> : (!notificationsRead && certificates.length > 0) && <i className="peserta-notification-dot" />}</button>
-            {notificationsOpen && <div className="peserta-notification-popover"><h2>Notifikasi</h2>{certificates.length ? <><NavLink to="/peserta/sertifikat/notifikasi"><Bell size={20} /><div><strong>Notifikasi perbaikan ({unreadCorrections})</strong><p>Lihat tanggapan penerbit untuk pengajuan Anda.</p></div></NavLink><NavLink to="/peserta/sertifikat"><Award size={20} /><div><strong>Sertifikat telah diterbitkan</strong><p>{certificates[0].workshop.title}</p><small>{certificates[0].issued}</small></div></NavLink></> : <p>Belum ada notifikasi sertifikat.</p>}</div>}
+          <div className="peserta-notifications" ref={notificationRef}><button className="peserta-icon-button" aria-label={totalUnread ? `Notifikasi, ${totalUnread} belum dibaca` : 'Notifikasi'} title="Notifikasi" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen(value => !value)}><Bell size={20} />{totalUnread > 0 && <span className="peserta-notification-count" aria-hidden="true">{totalUnread > 9 ? '9+' : totalUnread}</span>}</button>
+            {notificationsOpen && <div className="peserta-notification-popover"><div className="peserta-notif-head"><h2>Notifikasi</h2>{serverUnread > 0 && <button type="button" className="peserta-notif-readall" onClick={() => markRead()}>Tandai semua dibaca</button>}</div>
+              <div className="peserta-notif-list">
+                {unreadCorrections > 0 && <NavLink to="/peserta/sertifikat/notifikasi" className="peserta-notif-item is-unread"><Award size={18} /><div><strong>Tanggapan perbaikan sertifikat ({unreadCorrections})</strong><p>Lihat tanggapan penerbit untuk pengajuan Anda.</p></div></NavLink>}
+                {serverNotifications.slice(0, 6).map(n => <button type="button" key={n.id} className={`peserta-notif-item${n.belumDibaca ? ' is-unread' : ''}`} onClick={() => { markRead(n.id); setNotificationsOpen(false); if (n.link) navigate(n.link); }}><Bell size={18} /><div><strong>{n.judul}</strong>{n.deskripsi && <p>{n.deskripsi}</p>}<small>{n.waktu.replace(' · belum dibaca', '')}</small></div></button>)}
+                {!serverNotifications.length && !unreadCorrections && <p className="peserta-notif-empty">Belum ada notifikasi.</p>}
+              </div>
+            </div>}
           </div>
           <NavLink to="/peserta/profil" className="peserta-profile-link" aria-label={`Profil ${profile.nama}`}><span className="peserta-avatar">{initials(profile.nama)}</span><div><strong>{profile.nama}</strong><span>Peserta</span></div></NavLink>
         </div>
       </header>
-      <main id="peserta-content" className="peserta-content">{loading ? <PageLoader /> : loadError && !workshops.length ? <ErrorNotice error={loadError} onRetry={() => { setLoading(true); reload(); }} /> : <Outlet context={{ profile, saveProfile, workshops, registrations, certificates, certificateOriginals, corrections, submitCorrection, cancelCorrection, markCorrectionRead, register, cancelRegistration, submitAttendance, notify, reload }} />}</main>
+      <main id="peserta-content" className="peserta-content">{loading ? <PageLoader /> : loadError && !workshops.length ? <ErrorNotice error={loadError} onRetry={() => { setLoading(true); reload(); }} /> : <Suspense fallback={<PageLoader />}><Outlet context={{ profile, saveProfile, workshops, registrations, certificates, certificateOriginals, corrections, submitCorrection, cancelCorrection, markCorrectionRead, register, cancelRegistration, submitAttendance, notify, reload }} /></Suspense>}</main>
     </div>
   </div>;
 }

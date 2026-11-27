@@ -7,8 +7,8 @@ import useApi from './useApi';
  *
  *   const { items, create, update, remove, actionError } = useCrud(partnersApi);
  */
-export default function useCrud(api, listFn) {
-  const { data, loading, error, reload } = useApi(listFn || (() => api.list()), [], []);
+export default function useCrud(api, listFn, deps = []) {
+  const { data, loading, error, reload } = useApi(listFn || (() => api.list()), deps, []);
   const [actionError, setActionError] = useState('');
 
   const run = useCallback(async fn => {
@@ -25,6 +25,7 @@ export default function useCrud(api, listFn) {
 
   return {
     items: data || [],
+    data,
     loading,
     error,
     reload,

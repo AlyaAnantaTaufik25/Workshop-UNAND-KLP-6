@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createCorrection, getCertificateVersions, isCorrectionRecord, MAX_ATTACHMENT_SIZE, validateAttachment, validateCorrection } from '../certificateCorrections.js';
-import { initialCertificateCorrections } from '../certificateExamples.js';
+import { initialCertificateCorrections } from './fixtures/certificateExamples.js';
 import { getIssuedCertificates, getCertificateFilename } from '../certificates.js';
-import { initialRegistrations, participantWorkshops, participantCertificates } from '../data.js';
+import { initialRegistrations, participantWorkshops, participantCertificates } from './fixtures/data.js';
 
 const certificate = { id: 'test', recipient: 'Nadia Amelia', issuer: 'UNAND', issuerType: 'unand', number: 'TEST/1', issued: '18 April 2026', workshop: { title: 'Workshop Penelitian' } };
 const payload = { changes: [{ field: 'recipient', newValue: 'Nadia Amelia Putri' }], reason: 'Nama belum sesuai dengan identitas peserta.', agreed: true };
@@ -60,7 +60,7 @@ test('example records cover both issuers and all processing outcomes and survive
   const roundTrip = JSON.parse(JSON.stringify(initialCertificateCorrections));
   assert.ok(roundTrip.every(item => isCorrectionRecord(item, ids)));
   assert.equal(new Set(roundTrip.map(item => item.status)).size, 4);
-  const issued = getIssuedCertificates(participantWorkshops, initialRegistrations);
+  const issued = getIssuedCertificates(participantWorkshops, initialRegistrations, participantCertificates);
   assert.equal(issued.find(item => item.id === 'mitra-004').issuer, 'PT Semen Padang');
   const original = issued.find(item => item.id === 'unand-1005');
   assert.equal(getCertificateVersions(original, roundTrip).at(-1).recipient, 'Nadia Amelia');

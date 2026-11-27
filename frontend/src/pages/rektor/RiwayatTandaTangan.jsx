@@ -1,18 +1,19 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Inbox } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
 import { usePagination } from '../../components/Pagination';
 import Select from '../../components/Select';
 import PageHeader from '../../components/PageHeader';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function RiwayatTandaTangan() {
   const { sertifikatData } = usePortalData();
   const navigate = useNavigate();
-  const [search, setSearch]             = useState('');
-  const [filterJenis, setFilterJenis]   = useState('');
-  const [filterKegiatan, setFilterKegiatan] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [search, setSearch]             = useUrlState('q');
+  const [filterJenis, setFilterJenis]   = useUrlState('jenis');
+  const [filterKegiatan, setFilterKegiatan] = useUrlState('kegiatan');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   // Dokumen yang sudah melalui tahap tanda tangan Rektor (Diterbitkan)
   const riwayatList = sertifikatData.filter(s => s.statusTandaTangan === 'diterbitkan');
@@ -76,9 +77,7 @@ export default function RiwayatTandaTangan() {
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                  Tidak ada dokumen riwayat.
-                </td>
+                <td colSpan={8} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada dokumen riwayat.</div></div></td>
               </tr>
             )}
             {pg_filtered.map(s => (

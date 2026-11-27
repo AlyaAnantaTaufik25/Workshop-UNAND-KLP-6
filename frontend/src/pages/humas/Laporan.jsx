@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Download } from 'lucide-react';
+import { Search, Download, Users, UserCheck, UserX, Inbox } from 'lucide-react';
 import './laporan-print.css';
 import useApi from '../../hooks/useApi';
 import { reportsApi } from '../../api';
@@ -10,6 +10,10 @@ import { dialog, toast } from '../../components/Dialog';
 import { exportExcel } from '../../utils/excel';
 import Select from '../../components/Select';
 import PageHeader from '../../components/PageHeader';
+import useUrlState from '../../hooks/useUrlState';
+import { getDateRange } from '../../utils/periode';
+import { useCurrentUser } from '../../context/AuthContext';
+import { StatTile } from '../../components/Dashboard';
 
 /* ══════════════════════════════════════════
    DATA
@@ -19,25 +23,10 @@ import PageHeader from '../../components/PageHeader';
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
-function getDateRange(fp) {
-  const today = new Date();
-  const to = today.toISOString().slice(0, 10);
-  if (fp === 'hari-ini') return { from: to, to };
-  if (fp === '7-hari') {
-    const f = new Date(today); f.setDate(today.getDate() - 6);
-    return { from: f.toISOString().slice(0, 10), to };
-  }
-  if (fp === '1-bulan') {
-    const f = new Date(today); f.setMonth(today.getMonth() - 1);
-    return { from: f.toISOString().slice(0, 10), to };
-  }
-  return null;
-}
-
 /* ══════════════════════════════════════════
    BUILD HTML UNTUK WINDOW PRINT
 ══════════════════════════════════════════ */
-function buildPrintHTML({ data, dataSeminar, filterPeriode, filterJenis }) {
+function buildPrintHTML({ data, dataSeminar, filterPeriode, filterJenis, penandatangan = '' }) {
   const totalPendaftar = data.reduce((s, k) => s + k.pendaftar, 0);
   const totalHadir     = data.reduce((s, k) => s + k.hadir, 0);
   const totalBelum     = data.reduce((s, k) => s + k.belumAbsen, 0);
@@ -183,7 +172,7 @@ function buildPrintHTML({ data, dataSeminar, filterPeriode, filterJenis }) {
     <div style="text-align:center;min-width:200px">
       <div>Padang, ${now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
       <div style="margin-bottom:60px">Humas Workshop UNAND</div>
-      <div style="font-weight:bold;border-top:1px solid #000;padding-top:4px">Nadia Amelia</div>
+      <div style="font-weight:bold;border-top:1px solid #000;padding-top:4px">${penandatangan || '(..........................)'}</div>
     </div>
   </div>
 
@@ -205,10 +194,11 @@ function buildPrintHTML({ data, dataSeminar, filterPeriode, filterJenis }) {
 ══════════════════════════════════════════ */
 export default function Laporan() {
   const navigate = useNavigate();
-  const [search,         setSearch]         = useState('');
-  const [filterJenis,    setFilterJenis]    = useState('');
-  const [filterKegiatan, setFilterKegiatan] = useState('');
-  const [filterPeriode,  setFilterPeriode]  = useState('');
+  const currentUser = useCurrentUser();
+  const [search,         setSearch]         = useUrlState('q');
+  const [filterJenis,    setFilterJenis]    = useUrlState('jenis');
+  const [filterKegiatan, setFilterKegiatan] = useUrlState('kegiatan');
+  const [filterPeriode,  setFilterPeriode]  = useUrlState('periode');
   const { data: laporan, loading, error, reload } = useApi(() => reportsApi.workshops(), []);
   const { data: harian } = useApi(() => reportsApi.daily(), []);
   const kegiatanList = useMemo(() => laporan || [], [laporan]);
@@ -236,7 +226,7 @@ export default function Laporan() {
     );
   }, [rekapSeminarHarian, filterPeriode]);
   // Paginasi tabel
-  const { pageItems: pg_filteredSeminar, pager: pager_filteredSeminar } = usePagination(filteredSeminar, 10);
+  const { pageItems: pg_filteredSeminar, pager: pager_filteredSeminar } = usePagination(filteredSeminar, 10, 'page2');
 
   const jenisOptions = useMemo(() => Array.from(new Set(kegiatanList.map(l => l.jenis))), [kegiatanList]);
 
@@ -306,7 +296,7 @@ export default function Laporan() {
 
   /* ── Export PDF – buka window baru ── */
   const handleExportPDF = () => {
-    const html = buildPrintHTML({ data: filteredKegiatan, dataSeminar: filteredSeminar, filterPeriode, filterJenis });
+    const html = buildPrintHTML({ data: filteredKegiatan, dataSeminar: filteredSeminar, filterPeriode, filterJenis, penandatangan: currentUser.nama });
     const win = window.open('', '_blank', 'width=1200,height=850');
     if (!win) { dialog.alert({ title: 'Pop-up diblokir', message: 'Izinkan pop-up browser untuk mencetak laporan.', tone: 'warning' }); return; }
     win.document.write(html);
@@ -354,18 +344,9 @@ export default function Laporan() {
 
       {/* Summary Cards */}
       <div className="laporan-summary-row" style={{ marginBottom: 20 }}>
-        <div className="laporan-summary-card">
-          <span className="laporan-summary-label">Pendaftar</span>
-          <span className="laporan-summary-value">{totalPendaftar}</span>
-        </div>
-        <div className="laporan-summary-card">
-          <span className="laporan-summary-label">Hadir (catatan)</span>
-          <span className="laporan-summary-value">{totalHadir}</span>
-        </div>
-        <div className="laporan-summary-card">
-          <span className="laporan-summary-label">Belum Absen / Tidak hadir</span>
-          <span className="laporan-summary-value">{totalBelum}</span>
-        </div>
+        <StatTile icon={Users} label="Pendaftar" value={totalPendaftar} />
+        <StatTile icon={UserCheck} label="Hadir (tercatat)" value={totalHadir} />
+        <StatTile icon={UserX} label="Belum absen / tidak hadir" value={totalBelum} />
       </div>
 
       {/* Tabel Kegiatan */}
@@ -386,7 +367,7 @@ export default function Laporan() {
           </thead>
           <tbody>
             {filteredKegiatan.length === 0 ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', color: '#9ca3af', padding: 24 }}>Tidak ada data kegiatan yang sesuai filter.</td></tr>
+              <tr><td colSpan={9} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada data kegiatan yang sesuai filter.</div></div></td></tr>
             ) : (
               pg_filteredKegiatan.map(k => (
                 <tr key={k.id}>
@@ -434,7 +415,7 @@ export default function Laporan() {
             </thead>
             <tbody>
               {filteredSeminar.length === 0 ? (
-                <tr><td colSpan={10} style={{ textAlign: 'center', color: '#9ca3af', padding: 24 }}>Tidak ada data seminar harian sesuai filter.</td></tr>
+                <tr><td colSpan={10} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada data seminar harian sesuai filter.</div></div></td></tr>
               ) : (
                 pg_filteredSeminar.map(r => (
                   <tr key={r.id}>

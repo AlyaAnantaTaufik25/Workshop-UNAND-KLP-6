@@ -1,11 +1,13 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { CalendarDays, ClipboardCheck, Award, Bell, LayoutDashboard } from 'lucide-react';
+import { CalendarDays, ClipboardCheck, Award, Bell, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import './sekretariat.css';
 import { usePortalData } from '../../context/PortalData';
 import useNotifications from '../../hooks/useNotifications';
 import { useMobileNav } from '../../components/MobileNav';
 import Sidebar from '../../components/Sidebar';
+import { PageLoader } from '../../components/RequireRole';
+import useOnChange from '../../hooks/useOnChange';
 
 const SECTIONS = [
   { items: [{ to: '/sekretariat/dashboard', label: 'Dashboard', icon: LayoutDashboard }] },
@@ -15,12 +17,14 @@ const SECTIONS = [
   ] },
   { title: 'Sertifikat', items: [
     { to: '/sekretariat/sertifikat', label: 'Sertifikat', icon: Award, match: ['/sekretariat/sertifikat', '/sekretariat/sertifikat-perbaikan', '/sekretariat/dokumen-pengganti'] },
+    { to: '/sekretariat/log-audit', label: 'Log Audit', icon: ShieldCheck },
   ] },
 ];
 
 
 // Maps route path → page title shown in header
 const pageTitles = {
+  '/sekretariat/log-audit':            'Log Audit',
   '/sekretariat/dashboard':            'Dashboard',
   '/sekretariat/kegiatan':             'Kegiatan',
   '/sekretariat/presensi':             'Presensi',
@@ -40,9 +44,8 @@ export default function Layout() {
   const [, setNotifRead] = useState(false);
   const notifRef = useRef(null);
 
-  useEffect(() => {
-    setNotifOpen(false);
-  }, [location.pathname]);
+  // Tutup panel notifikasi saat pindah halaman
+  useOnChange(location.pathname, () => setNotifOpen(false));
 
   useEffect(() => {
     const handleOutside = (event) => {
@@ -143,7 +146,7 @@ export default function Layout() {
 
         {/* Page Content */}
         <main className="content-container">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}><Outlet /></Suspense>
         </main>
       </div>
 

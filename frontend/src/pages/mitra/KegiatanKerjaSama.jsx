@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { Search, SearchX, CalendarDays, Clock, CheckCircle2 } from 'lucide-react';
 import { usePortalData } from '../../context/PortalData';
@@ -6,6 +6,7 @@ import { usePagination } from '../../components/Pagination';
 import Select from '../../components/Select';
 import { TaskPanel } from '../../components/Dashboard';
 import { FileSignature, FilePenLine } from 'lucide-react';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function KegiatanKerjaSama() {
   const { mitraKegiatan, mitraTandaTangan, mitraPerbaikan } = usePortalData();
@@ -13,9 +14,9 @@ export default function KegiatanKerjaSama() {
   const menungguTte = mitraTandaTangan.filter(t => t.statusTandaTangan === 'menunggu-ttd');
   const perbaikanAktif = mitraPerbaikan.filter(p => ['menunggu', 'diproses'].includes(p.status));
   const navigate = useNavigate();
-  const [search, setSearch]             = useState('');
-  const [filterJenis, setFilterJenis]   = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [search, setSearch]             = useUrlState('q');
+  const [filterJenis, setFilterJenis]   = useUrlState('jenis');
+  const [filterStatus, setFilterStatus] = useUrlState('status');
 
   // Ringkasan Statistik
   const totalKegiatan    = mitraKegiatan.length;

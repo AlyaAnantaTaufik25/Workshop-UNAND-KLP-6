@@ -1,4 +1,4 @@
-import client from './client';
+import client, { API_BASE_URL, downloadFile } from './client';
 
 /** Endpoint REST API SIM Workshop UNAND (lihat docs/api-contract.md) */
 
@@ -6,11 +6,13 @@ export const authApi = {
   login: (email, password) => client.post('/auth/login', { email, password }),
   register: data => client.post('/auth/register', data),
   me: () => client.get('/auth/me'),
+  session: () => client.get('/auth/session'),
   updateMe: data => client.put('/auth/me', data),
   changePassword: data => client.put('/auth/me/password', data),
   verifyPin: pin => client.post('/auth/me/pin/verify', { pin }),
   changePin: (oldPin, newPin) => client.put('/auth/me/pin', { oldPin, newPin }),
   resetPin: () => client.post('/auth/me/pin/reset'),
+  logout: () => client.post('/auth/logout'),
 };
 
 export const workshopsApi = {
@@ -20,6 +22,8 @@ export const workshopsApi = {
   update: (id, data) => client.put(`/workshops/${id}`, data),
   setStatus: (id, data) => client.patch(`/workshops/${id}/status`, data),
   remove: id => client.delete(`/workshops/${id}`),
+  /** Tautan berkas kalender (.ics) kegiatan */
+  calendarUrl: idOrSlug => `${API_BASE_URL}/workshops/${encodeURIComponent(idOrSlug)}/calendar.ics`,
 };
 
 export const registrationsApi = {
@@ -110,3 +114,15 @@ export function readFileAsDataUrl(file) {
     reader.readAsDataURL(file);
   });
 }
+
+export const auditApi = {
+  list: params => client.get('/audit-logs', { params }),
+};
+
+/** PDF sertifikat resmi dari server (dengan QR verifikasi) */
+export const certificatePdfApi = {
+  download: (code, nomor) => downloadFile(
+    `/certificates/issued/${encodeURIComponent(code)}/pdf`,
+    `Sertifikat-${String(nomor || code).replace(/[^\w.-]+/g, '-')}.pdf`,
+  ),
+};

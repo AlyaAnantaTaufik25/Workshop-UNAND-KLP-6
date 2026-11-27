@@ -1,6 +1,4 @@
-import { participantCertificates } from './data.js';
-
-export function getIssuedCertificates(workshops, registrations, certificates = participantCertificates) {
+export function getIssuedCertificates(workshops, registrations, certificates = []) {
   return certificates.flatMap(certificate => {
     const workshop = workshops.find(item => item.id === certificate.workshopId);
     const registration = registrations.find(item => item.workshopId === certificate.workshopId);

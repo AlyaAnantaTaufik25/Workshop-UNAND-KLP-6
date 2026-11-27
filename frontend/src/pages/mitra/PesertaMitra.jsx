@@ -1,8 +1,12 @@
-import { useState } from 'react';
+
 import { Search, SearchX } from 'lucide-react';
-import { usePortalData } from '../../context/PortalData';
-import { usePagination } from '../../components/Pagination';
+import Pagination from '../../components/Pagination';
+import useApi from '../../hooks/useApi';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
+import { registrationsApi } from '../../api';
+import { ErrorNotice, PageLoader } from '../../components/RequireRole';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 
 const jenisOptions = ['Workshop', 'Seminar', 'Kuliah Umum'];
@@ -13,26 +17,34 @@ function StatusHadirBadge({ status }) {
 }
 
 export default function PesertaMitra() {
-  const { mitraPeserta } = usePortalData();
-  const kegiatanOptions = [...new Set(mitraPeserta.map(p => p.kegiatan))];
-  const [search, setSearch]                 = useState('');
-  const [filterJenis, setFilterJenis]       = useState('');
-  const [filterKegiatan, setFilterKegiatan] = useState('');
-  const [filterStatus, setFilterStatus]     = useState('');
+  const [search, setSearchRaw]                 = useUrlState('q');
+  const [filterJenis, setFilterJenisRaw]       = useUrlState('jenis');
+  const [filterKegiatan, setFilterKegiatanRaw] = useUrlState('kegiatan');
+  const [filterStatus, setFilterStatusRaw]     = useUrlState('status');
+  const [pageParam, setPage]                   = useUrlState('page', '1');
+  const page = Math.max(1, parseInt(pageParam, 10) || 1);
+  // Ubah filter → kembali ke halaman 1
+  const withReset = fn => v => { fn(v); setPage('1'); };
+  const setSearch = withReset(setSearchRaw);
+  const setFilterJenis = withReset(setFilterJenisRaw);
+  const setFilterKegiatan = withReset(setFilterKegiatanRaw);
+  const setFilterStatus = withReset(setFilterStatusRaw);
+  const q = useDebouncedValue(search, 300);
 
-  const filtered = mitraPeserta.filter(p => {
-    const q = search.toLowerCase();
-    const matchSearch   = p.nama.toLowerCase().includes(q) || p.kegiatan.toLowerCase().includes(q);
-    const matchJenis    = filterJenis ? p.jenisKegiatan === filterJenis : true;
-    const matchKegiatan = filterKegiatan ? p.kegiatan === filterKegiatan : true;
-    const matchStatus   = filterStatus ? p.statusHadir === filterStatus : true;
-    return matchSearch && matchJenis && matchKegiatan && matchStatus;
-  });
-  // Paginasi tabel
-  const { pageItems: pg_filtered, pager: pager_filtered } = usePagination(filtered, 10);
+  // Pencarian, filter, dan pagination dilakukan di server — browser hanya menerima satu halaman
+  const { data, loading, error, reload } = useApi(
+    () => registrationsApi.list({ q: q || undefined, jenis: filterJenis || undefined, kegiatan: filterKegiatan || undefined, status: filterStatus || undefined, page, limit: 10 }),
+    [q, filterJenis, filterKegiatan, filterStatus, page],
+  );
+  const filtered = data?.items || [];
+  const pg_filtered = filtered;
+  const meta = data?.meta || { page: 1, pages: 1, total: 0, limit: 10 };
+  const kegiatanOptions = data?.facets?.kegiatan || [];
+  const pager_filtered = <Pagination page={meta.page} pages={meta.pages} total={meta.total} pageSize={meta.limit} onChange={n => setPage(String(n))} />;
 
   return (
     <div className="mitra-stack">
+      <ErrorNotice error={error} onRetry={reload} />
       {/* Header */}
       <div className="mitra-intro">
         <h2>Peserta</h2>
@@ -82,7 +94,9 @@ export default function PesertaMitra() {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {loading && !data ? (
+              <tr><td colSpan={5}><PageLoader rows={4} /></td></tr>
+            ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={5}>
                   <div className="mitra-empty">

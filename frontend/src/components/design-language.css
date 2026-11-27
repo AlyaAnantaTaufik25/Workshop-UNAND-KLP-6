@@ -146,11 +146,11 @@ a.mitra-back-btn,
 .peserta-stat-grid,
 .kelola-absensi-stats-grid { gap: 14px !important; }
 
-.mitra-stat-box,
-.laporan-summary-card,
-.peserta-stat,
-.kelola-absensi-stat-card,
-.rekap-stat-card {
+:root .mitra-stat-box,
+:root .laporan-summary-card,
+:root .peserta-stat,
+:root .kelola-absensi-stat-card,
+:root .rekap-stat-card {
   border: 1px solid var(--ui-line) !important;
   border-radius: var(--ui-radius) !important;
   background: var(--ui-surface) !important;
@@ -167,7 +167,7 @@ a.mitra-back-btn,
   outline-offset: -1px;
 }
 .mitra-stat-box .mitra-stat-top { display: contents; }
-.mitra-stat-box .mitra-stat-icon {
+:root .mitra-stat-box .mitra-stat-icon {
   grid-area: icon;
   width: 40px !important; height: 40px !important;
   border-radius: 11px !important;
@@ -178,11 +178,11 @@ a.mitra-back-btn,
 :root .mitra-stat-box .mitra-stat-title { grid-area: title; align-self: end; }
 :root .mitra-stat-box .mitra-stat-val { grid-area: value; align-self: start; }
 
-.mitra-stat-title,
-.laporan-summary-label,
-.peserta-stat span,
-.kelola-absensi-stat-label,
-.rekap-stat-label {
+:root .mitra-stat-title,
+:root .laporan-summary-label,
+:root .peserta-stat span,
+:root .kelola-absensi-stat-label,
+:root .rekap-stat-label {
   margin: 0 !important;
   font-size: 12.5px !important;
   font-weight: 500 !important;
@@ -190,11 +190,11 @@ a.mitra-back-btn,
   text-transform: none !important;
   color: var(--ui-muted) !important;
 }
-.mitra-stat-val,
-.laporan-summary-value,
-.peserta-stat strong,
-.kelola-absensi-stat-num,
-.rekap-stat-value {
+:root .mitra-stat-val,
+:root .laporan-summary-value,
+:root .peserta-stat strong,
+:root .kelola-absensi-stat-num,
+:root .rekap-stat-value {
   margin: 2px 0 0 !important;
   font-size: 26px !important;
   font-weight: 800 !important;
@@ -325,7 +325,7 @@ a.mitra-back-btn,
 :root .mitra-topbar .mitra-eyebrow,
 :root .peserta-topbar .peserta-eyebrow {
   display: block;
-  color: #228b45;
+  color: #1a7f45;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: .05em;
@@ -401,3 +401,183 @@ a.mitra-back-btn,
   color: var(--ui-ink);
   overflow-wrap: anywhere;
 }
+
+/* ── 11. Skeleton loading ──────────────────────────────────── */
+.ui-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ui-skeleton { display: flex; flex-direction: column; gap: 18px; padding: 4px 0 24px; animation: ui-skel-fade .25s ease-out .12s backwards; }
+.ui-skeleton--full { min-height: 100vh; padding: 48px max(24px, 8vw); background: #f6f8f7; }
+@keyframes ui-skel-fade { from { opacity: 0; } }
+.ui-skel {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e9eeeb 0%, #f4f7f5 40%, #e9eeeb 80%);
+  background-size: 300% 100%;
+  animation: ui-skel-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes ui-skel-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.ui-skel-head { display: flex; flex-direction: column; gap: 10px; }
+.ui-skel-title { width: 220px; max-width: 60%; height: 22px; }
+.ui-skel-sub { width: 360px; max-width: 80%; }
+.ui-skel-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ui-skel-card { height: 84px; border-radius: var(--ui-radius); }
+.ui-skel-table { display: flex; flex-direction: column; gap: 0; padding: 16px 18px; border: 1px solid var(--ui-line); border-radius: var(--ui-radius); background: var(--ui-surface); }
+.ui-skel-bar { height: 34px; border-radius: 8px; margin-bottom: 10px; }
+.ui-skel-row { display: flex; gap: 24px; align-items: center; padding: 14px 0; border-top: 1px solid #f0f3f1; }
+.ui-skel-row:first-of-type { border-top: 0; }
+@media (max-width: 640px) { .ui-skel-cards { grid-template-columns: 1fr; } .ui-skel-card { height: 64px; } }
+@media (prefers-reduced-motion: reduce) { .ui-skel { animation: none; } .ui-skeleton { animation: none; } }
+
+/* ── 12. Tabel menjadi kartu di layar kecil ────────────────── */
+@media (max-width: 720px) {
+  table.ui-cardable { display: block; width: 100% !important; min-width: 0 !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
+  table.ui-cardable thead { display: none; }
+  table.ui-cardable tbody { display: flex; flex-direction: column; gap: 12px; }
+  table.ui-cardable tr {
+    display: block;
+    padding: 6px 14px;
+    border: 1px solid var(--ui-line) !important;
+    border-radius: 12px;
+    background: var(--ui-surface) !important;
+    box-shadow: var(--ui-shadow);
+  }
+  table.ui-cardable td {
+    display: flex !important;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 9px 0 !important;
+    border: 0 !important;
+    border-top: 1px solid #eef2ef !important;
+    text-align: right !important;
+    white-space: normal !important;
+    background: transparent !important;
+  }
+  table.ui-cardable td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 45%;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ui-muted);
+    text-align: left;
+    text-transform: none;
+  }
+  table.ui-cardable td[data-label=""]::before,
+  table.ui-cardable td.ui-cell-span::before { display: none; }
+  /* Kolom pertama = judul kartu */
+  table.ui-cardable td:first-child { display: block !important; text-align: left !important; border-top: 0 !important; font-weight: 600; }
+  table.ui-cardable td:first-child::before { display: block; max-width: none; margin-bottom: 2px; font-size: 11px; }
+  table.ui-cardable td > * { max-width: 100%; }
+  table.ui-cardable td:last-child { justify-content: flex-end; flex-wrap: wrap; }
+  table.ui-cardable td.ui-cell-span { display: block !important; text-align: center !important; }
+  /* Pembungkus tabel tidak perlu gulir horizontal lagi */
+  .table-wrap:has(table.ui-cardable),
+  .table-container:has(table.ui-cardable),
+  .mitra-table-wrap:has(table.ui-cardable),
+  .peserta-certificate-table-wrap:has(table.ui-cardable),
+  div:has(> table.ui-cardable) { overflow: visible !important; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+}
+
+/* ── 13. Ikon kartu statistik peserta & titik lencana Mitra ── */
+:root .peserta-stat {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'icon label' 'icon value';
+  column-gap: 14px;
+  row-gap: 0;
+  align-items: center;
+  text-align: left;
+}
+:root .peserta-stat .peserta-stat-icon {
+  grid-area: icon;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 11px;
+  background: var(--ui-brand-soft);
+  color: var(--ui-accent);
+  font-style: normal;
+}
+:root .peserta-stat--amber .peserta-stat-icon { background: var(--ui-warn-bg); color: var(--ui-warn-fg); }
+:root .peserta-stat--blue .peserta-stat-icon { background: var(--ui-info-bg); color: var(--ui-info-fg); }
+:root .peserta-stat--gray .peserta-stat-icon { background: var(--ui-mute-bg); color: var(--ui-mute-fg); }
+:root .peserta-stat > span { grid-area: label; align-self: end; }
+:root .peserta-stat > strong { grid-area: value; align-self: start; }
+:root .laporan-summary-row .dash-stat { min-height: 0; }
+
+:root .mitra-badge::before {
+  content: '';
+  width: 6px; height: 6px; flex: none;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── 14. Aksesibilitas: fokus keyboard yang jelas & seragam ── */
+:root :where(button, a, [role="button"], select, input, textarea, summary):focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+:root :where(input, select, textarea):focus-visible { outline-offset: 0; }
+
+/* ── 15. Tampilan kosong & galat yang seragam ──────────────── */
+:root td.ui-empty-cell { padding: 0 !important; text-align: center !important; }
+:root .ui-empty,
+:root .mitra-empty,
+:root .peserta-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ui-muted);
+  font-size: 13.5px;
+}
+:root .ui-empty > svg,
+:root .mitra-empty > svg,
+:root .peserta-empty > div:first-child {
+  width: 52px; height: 52px; padding: 13px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--ui-soft);
+  color: #8fa69a;
+}
+:root .peserta-empty > div:first-child { display: grid; place-items: center; padding: 0; }
+:root .ui-empty-text, :root .mitra-empty p, :root .peserta-empty p { margin: 0; max-width: 420px; line-height: 1.55; }
+:root .peserta-empty h2 { margin: 2px 0 0; font-size: 15px; font-weight: 700; color: var(--ui-ink); }
+@media (max-width: 720px) {
+  table.ui-cardable td.ui-empty-cell { display: block !important; border-top: 0 !important; }
+  table.ui-cardable td.ui-empty-cell::before { display: none; }
+}
+
+.ui-error {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 0 0 16px; padding: 12px 16px;
+  border: 1px solid #f5c2bd; border-radius: var(--ui-radius-sm);
+  background: var(--ui-bad-bg); color: var(--ui-bad-fg);
+  font-size: 13.5px;
+}
+.ui-error-retry {
+  flex: none; height: 32px; padding: 0 12px;
+  border: 1px solid #eba59e; border-radius: 8px; background: #fff;
+  font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ui-bad-fg); cursor: pointer;
+}
+.ui-error-retry:hover { background: #fff6f5; }
+
+/* ── 16. Kontras teks minimal WCAG AA (4,5:1) ─────────────── */
+:root .peserta-card-theme { color: #1a7f45; }
+:root .peserta-status--gray,
+:root .peserta-datebox.is-muted,
+:root .peserta-count { color: #4f5c54; }
+:root .login-tagline-label { color: #b9cbc2; }
+:root .login-copyright { color: #a9bcb3; }
+:root .humas-table-footnote,
+:root .cert-date-place,
+:root .process-step-status { color: #5d6a63 !important; }
+:root .process-step-status.done { color: #1f6f45 !important; }
+:root .badge-blue { color: #1d4fbf !important; }
+:root .mitra-badge-ditolak { color: #a8322d !important; }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PenTool, CheckCircle, ArrowLeft, AlertCircle, FileText, Check } from 'lucide-react';
+import { CheckCircle, ArrowLeft, Check } from 'lucide-react';
 import UnandLogo from '../../components/UnandLogo';
 import { usePortalData } from '../../context/PortalData';
 import { certificatesApi } from '../../api';
@@ -100,7 +100,7 @@ export default function DetailDokumenPenggantiMitra() {
               <tr>
                 <td style={{ color: 'var(--mitra-muted)', fontWeight: 600 }}>Rincian koreksi</td>
                 <td style={{ color: '#111827', fontWeight: 500, lineHeight: 1.6 }}>
-                  {dp.jenisPerbaikanDetail || `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || 'Nadia Amelya'}", seharusnya "${dp.namaPeserta}".`}
+                  {dp.jenisPerbaikanDetail || `Kesalahan ejaan nama peserta: tertulis "${dp.namaPesertaLama || '-'}", seharusnya "${dp.namaPeserta}".`}
                 </td>
               </tr>
             </tbody>
@@ -161,9 +161,9 @@ export default function DetailDokumenPenggantiMitra() {
                   borderRadius: 4,
                   display: 'inline-block'
                 }}>
-                  {dp.namaPesertaLama || 'Nadia Amelya'}
+                  {dp.namaPesertaLama || '-'}
                 </div>
-                <div style={{ fontSize: 10, color: '#b91c1c', marginTop: 3 }}>
+                <div style={{ fontSize: 11, color: '#b91c1c', marginTop: 3 }}>
                   ⚠️ Kesalahan ejaan nama peserta
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function DetailDokumenPenggantiMitra() {
                 }}>
                   {dp.namaPeserta}
                 </div>
-                <div style={{ fontSize: 10, color: 'var(--mitra-green)', marginTop: 3 }}>
+                <div style={{ fontSize: 11, color: 'var(--mitra-green)', marginTop: 3 }}>
                   ✓ Ejaan nama telah diperbaiki
                 </div>
               </div>

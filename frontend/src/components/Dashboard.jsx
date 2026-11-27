@@ -7,6 +7,7 @@ import './dashboard.css';
  * Komponen dashboard bersama untuk semua portal.
  * Warna seri (tervalidasi CVD & kontras): Pendaftar = biru, Hadir = hijau UNAND.
  */
+// oxlint-disable-next-line react/only-export-components -- sengaja diekspor bersama komponen (API bersama modul ini)
 export const SERIES = { pendaftar: '#2a78d6', hadir: '#1a7f45' };
 
 /** Tanggal hari ini untuk sapaan dashboard, mis. "selasa, 24 november 2026" */
@@ -183,7 +184,7 @@ export function TrendChart({ data = [], title = 'Tren pendaftar & kehadiran', su
             <li><i style={{ background: SERIES.pendaftar }} />Pendaftar</li>
             <li><i style={{ background: SERIES.hadir }} />Hadir</li>
           </ul>
-          <button type="button" className="dash-toggle" onClick={() => setAsTable(v => !v)} aria-pressed={asTable} title={asTable ? 'Tampilkan grafik' : 'Tampilkan tabel'}>
+          <button type="button" className="dash-toggle" onClick={() => setAsTable(v => !v)} aria-pressed={asTable} title={asTable ? 'Tampilkan grafik' : 'Tampilkan tabel'} aria-label={asTable ? 'Tampilkan grafik' : 'Tampilkan tabel'}>
             {asTable ? <BarChart3 size={15} /> : <Table2 size={15} />}
           </button>
         </div>

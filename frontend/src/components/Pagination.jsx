@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './ui-polish.css';
 
@@ -8,13 +9,28 @@ import './ui-polish.css';
  *   ...{pageItems.map(...)} ... {pager}
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export function usePagination(items, pageSize = 10) {
-  const [page, setPage] = useState(1);
+export function usePagination(items, pageSize = 10, urlKey = 'page') {
+  // Nomor halaman disimpan di URL (?page=2) agar tetap sama saat kembali dari detail / refresh
+  const [params, setParams] = useSearchParams();
+  const page = Math.max(1, parseInt(params.get(urlKey), 10) || 1);
+  const setPage = useCallback(next => {
+    setParams(prev => {
+      const out = new URLSearchParams(prev);
+      if (next <= 1) out.delete(urlKey); else out.set(urlKey, String(next));
+      return out;
+    }, { replace: true });
+  }, [setParams, urlKey]);
+
   const total = items.length;
   const pages = Math.max(1, Math.ceil(total / pageSize));
 
   // Kembali ke halaman 1 saat hasil filter berubah jumlahnya
-  useEffect(() => { setPage(1); }, [total]);
+  // (bukan saat data pertama kali datang, agar halaman dari URL tidak hilang)
+  const prevTotal = useRef(total);
+  useEffect(() => {
+    if (prevTotal.current !== 0 && prevTotal.current !== total) setPage(1);
+    prevTotal.current = total;
+  }, [total, setPage]);
   const current = Math.min(page, pages);
 
   const pageItems = useMemo(

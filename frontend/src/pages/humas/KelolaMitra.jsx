@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Plus, Eye, Pencil, Trash2, X } from 'lucide-react';
+import { Search, Plus, Eye, Pencil, Trash2, X, Inbox } from 'lucide-react';
 import useCrud from '../../hooks/useCrud';
 import { partnersApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
@@ -8,6 +8,7 @@ import { usePagination, IconAction } from '../../components/Pagination';
 import { dialog } from '../../components/Dialog';
 import Select from '../../components/Select';
 import BackButton from '../../components/BackButton';
+import useUrlState from '../../hooks/useUrlState';
 
 const defaultForm = { nama: '', jenis: 'Eksternal', penanggungJawab: '', email: '', kontak: '' };
 
@@ -15,7 +16,7 @@ export default function KelolaMitra() {
   const navigate = useNavigate();
   const { items, loading, error, reload, actionError, create, update, remove } = useCrud(partnersApi);
   const mitra = items;
-  const [search, setSearch]         = useState('');
+  const [search, setSearch]         = useUrlState('q');
   const [showModal, setShowModal]   = useState(false);
   const [detailMitra, setDetailMitra] = useState(null);
   const [editMitra, setEditMitra]   = useState(null);
@@ -118,9 +119,7 @@ export default function KelolaMitra() {
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '32px' }}>
-                    Tidak ada mitra ditemukan.
-                  </td>
+                  <td colSpan={7} className="ui-empty-cell"><div className="ui-empty"><Inbox size={30} aria-hidden="true" /><div className="ui-empty-text">Tidak ada mitra ditemukan.</div></div></td>
                 </tr>
               )}
               {pg_filtered.map(m => (
@@ -182,7 +181,7 @@ export default function KelolaMitra() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Detail Data</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setDetailMitra(null)}>
+              <button className="modal-close-btn" onClick={() => setDetailMitra(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -231,7 +230,7 @@ export default function KelolaMitra() {
                 type="button"
                 className="modal-btn modal-btn-outline"
                 onClick={() => {
-                  navigate(`/humas/kelola-kegiatan?mitra=${encodeURIComponent(detailMitra.nama)}`);
+                  navigate(`/humas/kelola-kegiatan?q=${encodeURIComponent(detailMitra.nama)}`);
                 }}
               >
                 Lihat Kegiatan Terkait
@@ -250,7 +249,7 @@ export default function KelolaMitra() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Edit Mitra</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setEditMitra(null)}>
+              <button className="modal-close-btn" onClick={() => setEditMitra(null)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>
@@ -340,7 +339,7 @@ export default function KelolaMitra() {
                 <p className="modal-header-crumb">WORKSHOP UNAND</p>
                 <h2 className="modal-header-title">Tambah Mitra</h2>
               </div>
-              <button className="modal-close-btn" onClick={() => setShowModal(false)}>
+              <button className="modal-close-btn" onClick={() => setShowModal(false)} aria-label="Tutup">
                 <X size={16} />
               </button>
             </div>

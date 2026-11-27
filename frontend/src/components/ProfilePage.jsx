@@ -8,6 +8,7 @@ import { authApi } from '../api';
 import { dialog, toast } from './Dialog';
 import Select from './Select';
 import './profile.css';
+import useUnsavedChanges from '../hooks/useUnsavedChanges';
 
 /**
  * Halaman profil seragam untuk semua role.
@@ -242,6 +243,7 @@ export default function ProfilePage({ role }) {
 
   const initial = fromUser();
   const dirty = allFields.some(f => !f.readOnly && String(form[f.key] ?? '') !== String(initial[f.key] ?? ''));
+  useUnsavedChanges(dirty && !saving);
   const visible = list => list.filter(f => !f.when || f.when(form));
   const change = (key, value) => { setForm(f => ({ ...f, [key]: value })); setErrors(e => ({ ...e, [key]: undefined })); };
 

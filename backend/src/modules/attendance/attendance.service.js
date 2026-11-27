@@ -3,6 +3,7 @@ const attendanceRepository = require('./attendance.repository');
 const workshopsService = require('../workshops/workshops.service');
 const { notFound, forbidden, unprocessable, badRequest, HttpError } = require('../../utils/http.util');
 const { toISODate, distanceMeters } = require('../../utils/format.util');
+const storage = require('../../services/storage.service');
 
 const MAX_UPLOAD = 2 * 1024 * 1024;
 
@@ -81,7 +82,7 @@ class AttendanceService {
     if (dataUrl && !/^data:(image\/(png|jpeg)|application\/pdf);base64,/.test(dataUrl)) throw badRequest('Bukti harus berupa PNG, JPG, atau PDF');
     if (dataUrl.length > MAX_UPLOAD * 1.4) throw badRequest('Ukuran bukti maksimal 2 MB');
     await this.repository.upsert(reg.id, tanggal, {
-      status: 'pending', method: 'upload', file_name: String(body.fileName).slice(0, 255), file_data: dataUrl || null,
+      status: 'pending', method: 'upload', file_name: String(body.fileName).slice(0, 255), file_data: dataUrl ? storage.saveDataUrl(dataUrl, 'presensi') : null,
       submitted_at: new Date(), verified_at: null, verified_by: null, alasan_tolak: null,
     });
     return workshopsService.detail(w.id, user);

@@ -2,6 +2,7 @@ const workshopsRepository = require('./workshops.repository');
 const { serializeWorkshop, serializeParticipant, serializeMyRegistration } = require('./workshops.serializer');
 const { notFound, forbidden, badRequest } = require('../../utils/http.util');
 const { slugify, formatWaktuPresensi, toISODate } = require('../../utils/format.util');
+const storage = require('../../services/storage.service');
 
 const STATUSES = ['draft', 'publik', 'berlangsung', 'selesai', 'dibatalkan'];
 const REG_STATUSES = ['belum-dibuka', 'dibuka', 'segera-ditutup', 'ditutup'];
@@ -113,7 +114,9 @@ class WorkshopsService {
     if (body.jenisPelaksanaan !== undefined || body.mode !== undefined) {
       data.mode = String(body.mode || body.jenisPelaksanaan).toLowerCase() === 'online' ? 'online' : 'offline';
     }
-    if (body.poster !== undefined) data.poster = typeof body.poster === 'string' && body.poster.startsWith('data:') ? body.poster : null;
+    if (body.poster !== undefined) {
+      data.poster = typeof body.poster === 'string' && body.poster.startsWith('data:') ? storage.saveDataUrl(body.poster, 'posters') : null;
+    }
     if (body.kuotaJenis !== undefined || body.kuota !== undefined) {
       // kuotaJenis: 'Terbatas' | 'Tanpa Batas'
       const unlimited = body.kuotaJenis !== undefined && body.kuotaJenis !== 'Terbatas';

@@ -5,12 +5,13 @@ import { EmptyState, Status } from './components';
 import { correctionStatuses } from './certificateCorrections';
 import { CertificateDownloadButton, CertificateEmpty, CertificateHeading, CorrectionStatus, useCertificateDownload } from './CertificateUi';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function SertifikatPeserta() {
   const { certificates, corrections } = useOutletContext();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useUrlState('q');
   const [issuer, setIssuer] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useUrlState('status');
   const download = useCertificateDownload();
   const latestRequest = certificateId => corrections.filter(item => item.certificateId === certificateId).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))[0];
   const filtered = certificates.filter(certificate => {

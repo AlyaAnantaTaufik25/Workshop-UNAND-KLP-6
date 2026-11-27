@@ -3,14 +3,16 @@ const router = express.Router();
 const c = require('./auth.controller');
 const v = require('./auth.validation');
 const { validate } = require('../../middlewares/validation.middleware');
-const { authenticate } = require('../../middlewares/auth.middleware');
+const { authenticate, optionalAuth } = require('../../middlewares/auth.middleware');
 const { authorizeRoles } = require('../../middlewares/role.middleware');
 const { asyncHandler } = require('../../utils/http.util');
 
 router.post('/login', validate(v.login), asyncHandler(c.login));
 router.post('/register', validate(v.register), asyncHandler(c.register));
-router.post('/logout', authenticate, asyncHandler(c.logout));
+router.post('/logout', optionalAuth, asyncHandler(c.logout));
 router.get('/me', authenticate, asyncHandler(c.me));
+// Cek sesi tanpa error 401: { user } atau { user: null } bila belum masuk
+router.get('/session', optionalAuth, asyncHandler(c.session));
 router.put('/me', authenticate, asyncHandler(c.updateMe));
 router.put('/me/password', authenticate, asyncHandler(c.changePassword));
 

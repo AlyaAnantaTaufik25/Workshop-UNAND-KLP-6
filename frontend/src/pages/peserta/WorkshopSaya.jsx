@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
-import { CalendarDays, Check, ClipboardCheck, UserPlus } from 'lucide-react';
+import { CalendarCheck, CalendarPlus, CalendarDays, CalendarX, Check, ClipboardCheck, Hourglass, UserPlus } from 'lucide-react';
 import { getWorkshopLocation } from './data';
 import { EmptyState, Modal, Status } from './components';
 import OnlineMeetingInfo from './OnlineMeetingInfo';
@@ -8,6 +8,8 @@ import { attendanceStates, canSubmitAttendance, getAttendanceState, getRegistrat
 import { AttendancePanel } from './WorkshopStatePanels';
 import WorkshopRegistrationDialog from './WorkshopRegistrationDialog';
 import Select from '../../components/Select';
+import { workshopsApi } from '../../api';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function WorkshopSaya() {
   const { workshops, registrations, submitAttendance, notify } = useOutletContext();
@@ -23,8 +25,8 @@ export default function WorkshopSaya() {
     }
   };
   const [registrationAction, setRegistrationAction] = useState(null);
-  const [filter, setFilter] = useState('');
-  const [mode, setMode] = useState('');
+  const [filter, setFilter] = useUrlState('filter');
+  const [mode, setMode] = useUrlState('mode');
   const selected = workshops.find(item => item.id === attendanceId);
   const selectedRegistration = registrations.find(item => item.workshopId === attendanceId);
   const registrationWorkshop = workshops.find(item => item.id === registrationAction?.id);
@@ -40,10 +42,10 @@ export default function WorkshopSaya() {
   entries.sort((first, second) => Number(Boolean(actionable(second))) - Number(Boolean(actionable(first))));
   const filtered = entries.filter(item => (!filter || item.status === filter) && (!mode || item.workshop.mode === mode));
   const counts = [
-    { label: 'Terdaftar', status: 'registered', tone: 'green' },
-    { label: 'Waiting list', status: 'waiting', tone: 'amber' },
-    { label: 'Selesai', status: 'completed', tone: 'blue' },
-    { label: 'Dibatalkan', status: 'cancelled', tone: 'gray' },
+    { label: 'Terdaftar', status: 'registered', tone: 'green', icon: CalendarCheck },
+    { label: 'Waiting list', status: 'waiting', tone: 'amber', icon: Hourglass },
+    { label: 'Selesai', status: 'completed', tone: 'blue', icon: Check },
+    { label: 'Dibatalkan', status: 'cancelled', tone: 'gray', icon: CalendarX },
   ];
   const startRegistration = (id, action = 'register') => setRegistrationAction({ id, action });
 
@@ -52,7 +54,7 @@ export default function WorkshopSaya() {
       <h2>Workshop dan kegiatan Anda</h2>
       <p>Daftar workshop tersimpan, pantau antrean, dan isi presensi sesuai jadwal kegiatan.</p>
     </section>
-    <div className="peserta-stat-grid">{counts.map(item => <button key={item.status} className={`peserta-stat peserta-stat--${item.tone}${filter === item.status ? ' is-selected' : ''}`} aria-pressed={filter === item.status} onClick={() => setFilter(filter === item.status ? '' : item.status)}><span>{item.label}</span><strong>{entries.filter(entry => entry.status === item.status).length}</strong></button>)}</div>
+    <div className="peserta-stat-grid">{counts.map(item => <button key={item.status} className={`peserta-stat peserta-stat--${item.tone}${filter === item.status ? ' is-selected' : ''}`} aria-pressed={filter === item.status} onClick={() => setFilter(filter === item.status ? '' : item.status)}><i className="peserta-stat-icon" aria-hidden="true"><item.icon size={18} /></i><span>{item.label}</span><strong>{entries.filter(entry => entry.status === item.status).length}</strong></button>)}</div>
     <div className="peserta-section-line peserta-my-workshop-heading">
       <h2>Daftar workshop <span className="peserta-count" aria-live="polite">{filtered.length}</span></h2>
       <div className="peserta-workshop-filters">
@@ -91,6 +93,7 @@ export default function WorkshopSaya() {
               : showAttendance ? <button className={`peserta-button${canAttend ? '' : ' peserta-button--secondary'}`} onClick={() => setAttendanceId(workshop.id)}><ClipboardCheck size={16} />{registration.status === 'waiting' ? 'Status Antrean' : attendanceAction}</button>
                 : <button className="peserta-button peserta-button--secondary" disabled>{stateKey === 'cancelled' ? availability.action : state.action}</button>}
             <Link className="peserta-button peserta-button--secondary" to={`/peserta/workshop/${workshop.id}`} state={{ from: 'workshop-saya' }}>Detail</Link>
+            {registration?.status === 'registered' && !workshop.completed && !workshop.cancelled ? <a className="peserta-button peserta-button--secondary" href={workshopsApi.calendarUrl(workshop.id)} download title="Unduh berkas kalender (.ics) untuk Google Calendar, Outlook, atau ponsel"><CalendarPlus size={16} />Kalender</a> : null}
             {state.canCancel && <button className="peserta-text-button peserta-text-button--danger" onClick={() => startRegistration(workshop.id, 'cancel')}>Batalkan</button>}
           </div>
         </div>

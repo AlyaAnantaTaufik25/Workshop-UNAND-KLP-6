@@ -28,6 +28,8 @@ router.patch('/submissions/:id/verify', auth('sekretariat'), asyncHandler(c.veri
 
 // Sertifikat peserta
 router.get('/my', auth('peserta'), asyncHandler(c.my));
+// PDF sertifikat resmi (server) — peserta pemilik, staf UNAND, atau mitra penyelenggara
+router.get('/issued/:code/pdf', auth('peserta', 'humas', 'sekretariat', 'rektor', 'mitra'), asyncHandler(c.certificatePdf));
 
 // Perbaikan sertifikat
 router.get('/corrections', auth('peserta', 'humas', 'mitra'), asyncHandler(c.listCorrections));

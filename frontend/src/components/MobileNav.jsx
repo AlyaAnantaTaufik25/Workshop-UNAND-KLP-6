@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import useOnChange from '../hooks/useOnChange';
 
 /**
  * Navigasi sidebar untuk layar kecil (≤ 900px): sidebar disembunyikan
@@ -11,7 +12,7 @@ export function useMobileNav() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useOnChange(location.pathname, () => setOpen(false));
   useEffect(() => {
     if (!open) return undefined;
     const onKey = e => { if (e.key === 'Escape') setOpen(false); };

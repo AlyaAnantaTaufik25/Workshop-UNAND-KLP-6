@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Check, PenTool, FileText, CheckCircle2 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Eye, Check, FileText, CheckCircle2 } from 'lucide-react';
 import BackButton from '../../components/BackButton';
 import UnandLogo from '../../components/UnandLogo';
 import { usePortalData } from '../../context/PortalData';
@@ -8,7 +8,6 @@ import { dialog } from '../../components/Dialog';
 export default function DetailRiwayatRektor() {
   const { sertifikatData, currentRektor } = usePortalData();
   const { id }   = useParams();
-  const navigate = useNavigate();
 
   const sert = sertifikatData.find(s => String(s.id) === id) || sertifikatData.find(s => s.id === 3);
 
@@ -154,7 +153,7 @@ export default function DetailRiwayatRektor() {
                 <UnandLogo className="cert-logo" />
                 <div className="cert-univ-name">
                   UNIVERSITAS ANDALAS<br />
-                  <span style={{ fontSize: '10px', color: 'var(--gray-400)', fontWeight: 400 }}>
+                  <span style={{ fontSize: '11px', color: 'var(--gray-500, #6b7280)', fontWeight: 400 }}>
                     Mitra Kerja Sama: {sert?.penyelenggara || 'PT Semen Padang'}
                   </span>
                 </div>

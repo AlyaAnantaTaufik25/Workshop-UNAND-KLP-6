@@ -5,20 +5,22 @@ import { getWorkshopLocation } from './data';
 import { EmptyState, Status } from './components';
 import { getRegistrationState, registrationStates } from './workshopStates';
 import Select from '../../components/Select';
+import useUrlState from '../../hooks/useUrlState';
 
 export default function CariWorkshop() {
   const { workshops, registrations } = useOutletContext();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useUrlState('q');
   const [theme, setTheme] = useState('');
   const [date, setDate] = useState('');
-  const [mode, setMode] = useState('');
-  const [status, setStatus] = useState('');
+  const [mode, setMode] = useUrlState('mode');
+  const [status, setStatus] = useUrlState('status');
 
   const available = workshops.filter(workshop => !workshop.completed);
 
+  // Tanggal hari ini (WIB) dihitung sekali per kunjungan halaman
+  const [today] = useState(() => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' })));
   const filtered = useMemo(() => available.filter(workshop => {
     const matchSearch = `${workshop.title} ${workshop.speaker}`.toLocaleLowerCase('id-ID').includes(search.trim().toLocaleLowerCase('id-ID'));
-    const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
     const day = new Date(`${workshop.isoDate}T12:00:00`);
     const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const end = new Date(start);
@@ -26,7 +28,7 @@ export default function CariWorkshop() {
     const matchDate = !date || (date === 'week' ? day >= start && day < end : day.getMonth() === today.getMonth() && day.getFullYear() === today.getFullYear());
     const registrationState = getRegistrationState(workshop, registrations.find(item => item.workshopId === workshop.id));
     return matchSearch && (!theme || workshop.theme === theme) && matchDate && (!mode || workshop.mode === mode) && (!status || registrationState === status);
-  }), [available, registrations, search, theme, date, mode, status]);
+  }), [available, registrations, search, theme, date, mode, status, today]);
 
   const reset = () => { setSearch(''); setTheme(''); setDate(''); setMode(''); setStatus(''); };
 

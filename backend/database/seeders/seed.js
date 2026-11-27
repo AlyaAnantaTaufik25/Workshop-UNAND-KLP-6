@@ -222,7 +222,7 @@ async function seed() {
   const conn = await mysql.createConnection({ ...config.db, multipleStatements: true });
   console.log('[Seed] Mengosongkan tabel...');
   await conn.query('SET FOREIGN_KEY_CHECKS = 0');
-  for (const t of ['notifications', 'certificate_corrections', 'certificates', 'certificate_submissions', 'certificate_templates', 'attendance_tokens', 'attendances', 'registrations', 'workshops', 'locations', 'users', 'partners', 'roles']) {
+  for (const t of ['audit_logs', 'email_outbox', 'notifications', 'certificate_corrections', 'certificates', 'certificate_submissions', 'certificate_templates', 'attendance_tokens', 'attendances', 'registrations', 'workshops', 'locations', 'users', 'partners', 'roles']) {
     await conn.query(`TRUNCATE TABLE \`${t}\``);
   }
   await conn.query('SET FOREIGN_KEY_CHECKS = 1');

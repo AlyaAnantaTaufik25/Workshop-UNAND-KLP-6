@@ -266,3 +266,18 @@
   .peserta-shell .peserta-modal-body { padding: 0; }
   .peserta-shell .peserta-certificate-preview { min-height: 170mm; break-inside: avoid; print-color-adjust: exact; }
 }
+
+/* Daftar notifikasi server di lonceng peserta */
+.peserta-notif-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.peserta-notif-head h2 { margin: 0 !important; }
+.peserta-notif-readall { border: 0; background: none; padding: 0; font: inherit; font-size: 12px; font-weight: 600; color: var(--peserta-accent, #1a7f45); cursor: pointer; }
+.peserta-notif-list { display: flex; flex-direction: column; gap: 2px; max-height: 360px; overflow-y: auto; margin: 0 -8px; }
+.peserta-notification-popover .peserta-notif-item { display: flex; align-items: flex-start; gap: 11px; width: 100%; padding: 10px 8px; border: 0; border-radius: 8px; background: none; font: inherit; text-align: left; color: #33433a; cursor: pointer; }
+.peserta-notification-popover .peserta-notif-item:hover { background: #f4f8f5; }
+.peserta-notif-item > svg { flex: none; margin-top: 2px; color: #8fa69a; }
+.peserta-notif-item.is-unread > svg { color: var(--peserta-green, #14532d); }
+.peserta-notif-item strong { display: block; font-size: 13px; color: #10291b; }
+.peserta-notif-item.is-unread strong::after { content: ''; display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: #1a7f45; vertical-align: middle; }
+.peserta-notif-item p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: #5d6a63; }
+.peserta-notif-item small { display: block; margin-top: 3px; font-size: 11.5px; color: #66736c; }
+.peserta-notif-empty { margin: 4px 8px; font-size: 13px; color: #66736c; }

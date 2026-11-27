@@ -1,10 +1,35 @@
 const bcrypt = require('bcryptjs');
 const authRepository = require('./auth.repository');
 const { signToken } = require('../../middlewares/auth.middleware');
-const { unauthorized, conflict, badRequest, notFound, forbidden } = require('../../utils/http.util');
+const { unauthorized, conflict, badRequest, notFound, forbidden, tooMany } = require('../../utils/http.util');
+const { pool } = require('../../config/database');
+const { audit } = require('../../services/audit.service');
 const { initials } = require('../../utils/format.util');
 
 const DEFAULT_PIN = '123456';
+
+// Penguncian sementara setelah percobaan gagal berulang
+const MAX_ATTEMPTS = 5;
+const LOCK_MINUTES = 15;
+
+/** Sisa detik penguncian (0 = tidak terkunci) */
+async function lockSeconds(userId, column) {
+  const [[row]] = await pool.query(`SELECT GREATEST(COALESCE(TIMESTAMPDIFF(SECOND, NOW(), ${column}), 0), 0) AS s FROM users WHERE id = ?`, [userId]);
+  return row ? Number(row.s) : 0;
+}
+/** Catat kegagalan; kunci bila mencapai batas. Mengembalikan { locked, remaining } */
+async function registerFailure(userId, prefix) {
+  await pool.query(
+    `UPDATE users SET
+       ${prefix}_locked_until = IF(${prefix}_failed_count + 1 >= ?, NOW() + INTERVAL ? MINUTE, ${prefix}_locked_until),
+       ${prefix}_failed_count = IF(${prefix}_failed_count + 1 >= ?, 0, ${prefix}_failed_count + 1)
+     WHERE id = ?`,
+    [MAX_ATTEMPTS, LOCK_MINUTES, MAX_ATTEMPTS, userId]
+  );
+  const [[row]] = await pool.query(`SELECT ${prefix}_failed_count AS n, ${prefix}_locked_until > NOW() AS locked FROM users WHERE id = ?`, [userId]);
+  return { locked: !!row.locked, remaining: MAX_ATTEMPTS - Number(row.n) };
+}
+const lockMessage = (what, seconds) => `${what} dikunci sementara karena terlalu banyak percobaan gagal. Coba lagi dalam ${Math.max(1, Math.ceil(seconds / 60))} menit.`;
 
 /** Bentuk profil user yang dipakai seluruh portal frontend */
 function serializeUser(u) {
@@ -44,11 +69,29 @@ class AuthService {
   }
 
   async login(email, password) {
-    const user = await this.repository.findByEmail(String(email).trim().toLowerCase());
+    const normalized = String(email).trim().toLowerCase();
+    const user = await this.repository.findByEmail(normalized);
+    const actor = user ? { id: user.id, nama: user.nama, role: user.role } : null;
+    if (user) {
+      const locked = await lockSeconds(user.id, 'login_locked_until');
+      if (locked > 0) {
+        await audit({ action: 'auth.login_blocked', entity: 'user', entityId: user.id, description: 'Login ditolak: akun terkunci sementara', user: actor });
+        throw tooMany(lockMessage('Akun', locked));
+      }
+    }
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      throw unauthorized('Email atau kata sandi salah');
+      if (!user) {
+        await audit({ action: 'auth.login_failed', entity: 'user', description: `Login gagal untuk email tidak terdaftar: ${normalized.slice(0, 120)}` });
+        throw unauthorized('Email atau kata sandi salah');
+      }
+      const { locked, remaining } = await registerFailure(user.id, 'login');
+      await audit({ action: locked ? 'auth.login_locked' : 'auth.login_failed', entity: 'user', entityId: user.id, description: locked ? `Akun dikunci ${LOCK_MINUTES} menit setelah ${MAX_ATTEMPTS} percobaan gagal` : 'Kata sandi salah', user: actor });
+      if (locked) throw tooMany(lockMessage('Akun', LOCK_MINUTES * 60));
+      throw unauthorized(remaining <= 2 ? `Email atau kata sandi salah. Sisa ${remaining} percobaan sebelum akun dikunci ${LOCK_MINUTES} menit.` : 'Email atau kata sandi salah');
     }
     if (user.status !== 'Aktif') throw forbidden('Akun Anda dinonaktifkan. Hubungi Humas UNAND.');
+    await pool.query('UPDATE users SET login_failed_count = 0, login_locked_until = NULL, last_login_at = NOW() WHERE id = ?', [user.id]);
+    await audit({ action: 'auth.login', entity: 'user', entityId: user.id, description: 'Login berhasil', user: actor });
     const profile = await this.repository.findById(user.id);
     return { token: signToken(user), user: serializeUser(profile) };
   }
@@ -109,14 +152,27 @@ class AuthService {
     if (!(await bcrypt.compare(String(oldPassword || ''), profile.password_hash))) throw badRequest('Kata sandi lama salah');
     if (String(newPassword || '').length < 8) throw badRequest('Kata sandi baru minimal 8 karakter');
     await this.repository.updateUser(userId, { password_hash: await bcrypt.hash(String(newPassword), 10) });
+    await audit({ action: 'auth.password_changed', entity: 'user', entityId: userId, description: 'Kata sandi diubah' });
   }
 
   async verifyPin(userId, pin) {
     const profile = await this.repository.findById(userId);
     if (!['rektor', 'mitra'].includes(profile.role)) throw forbidden('PIN TTE hanya untuk Rektor dan Mitra');
+    const actor = { id: profile.id, nama: profile.nama, role: profile.role };
+    const locked = await lockSeconds(userId, 'pin_locked_until');
+    if (locked > 0) {
+      await audit({ action: 'tte.pin_blocked', entity: 'user', entityId: userId, description: 'PIN TTE ditolak: terkunci sementara', user: actor });
+      throw tooMany(lockMessage('PIN tanda tangan elektronik', locked));
+    }
     const hash = profile.pin_hash;
     const ok = hash ? await bcrypt.compare(String(pin || ''), hash) : String(pin) === DEFAULT_PIN;
-    if (!ok) throw badRequest('PIN tanda tangan elektronik salah');
+    if (!ok) {
+      const { locked: nowLocked, remaining } = await registerFailure(userId, 'pin');
+      await audit({ action: nowLocked ? 'tte.pin_locked' : 'tte.pin_failed', entity: 'user', entityId: userId, description: nowLocked ? `PIN TTE dikunci ${LOCK_MINUTES} menit setelah ${MAX_ATTEMPTS} percobaan gagal` : 'PIN TTE salah', user: actor });
+      if (nowLocked) throw tooMany(lockMessage('PIN tanda tangan elektronik', LOCK_MINUTES * 60));
+      throw badRequest(`PIN tanda tangan elektronik salah. Sisa ${remaining} percobaan sebelum PIN dikunci ${LOCK_MINUTES} menit.`);
+    }
+    await pool.query('UPDATE users SET pin_failed_count = 0, pin_locked_until = NULL WHERE id = ?', [userId]);
     return true;
   }
 
@@ -124,10 +180,12 @@ class AuthService {
     await this.verifyPin(userId, oldPin);
     if (!/^\d{6}$/.test(String(newPin || ''))) throw badRequest('PIN baru harus 6 digit angka');
     await this.repository.updateUser(userId, { pin_hash: await bcrypt.hash(String(newPin), 10) });
+    await audit({ action: 'tte.pin_changed', entity: 'user', entityId: userId, description: 'PIN TTE diubah' });
   }
 
   async resetPin(userId) {
-    await this.repository.updateUser(userId, { pin_hash: await bcrypt.hash(DEFAULT_PIN, 10) });
+    await this.repository.updateUser(userId, { pin_hash: await bcrypt.hash(DEFAULT_PIN, 10), pin_failed_count: 0, pin_locked_until: null });
+    await audit({ action: 'tte.pin_reset', entity: 'user', entityId: userId, description: 'PIN TTE dikembalikan ke bawaan' });
   }
 }
 

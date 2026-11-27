@@ -1,18 +1,30 @@
-# Database Migrations - SIM Workshop UNAND
+# Migrasi Database — SIM Workshop UNAND
 
-Folder ini diperuntukkan bagi berkas skema migrasi database MySQL.
+Migrasi bersifat **bertahap**: setiap berkas dijalankan **sekali**, berurutan menurut nama, dan dicatat di tabel
+`schema_migrations`. Menjalankan `npm run db:migrate` lagi hanya menerapkan berkas baru — data tidak hilang.
 
-## Panduan Migrasi
+| Perintah | Fungsi |
+|---|---|
+| `npm run db:migrate` | Terapkan migrasi yang belum dijalankan |
+| `npm run db:migrate:status` | Daftar migrasi `[x]` sudah / `[ ]` belum |
+| `npm run db:fresh` | **Hapus** database, buat ulang dari semua migrasi, isi data demo (khusus pengembangan; diblokir di production) |
 
-1. **Konfirmasi Desain**: Jangan membuat tabel sebelum ERD dan dokumen perancangan A3 disetujui bersama oleh tim.
-2. **Konvensi Penamaan File**:
-   - Format: `YYYYMMDD_HHMMSS_<aksi_nama_tabel>.sql`
-   - Contoh: `20261029_001_create_roles_table.sql`
-   - Contoh: `20261029_002_create_users_table.sql`
-3. **Standar MySQL**:
-   - Storage Engine: `InnoDB`
-   - Character Set: `utf8mb4`
-   - Collation: `utf8mb4_unicode_ci`
-   - Primary Key: `id` (INT AUTO_INCREMENT atau UUID VARCHAR(36))
-   - Timestamps: `created_at` dan `updated_at` (TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+## Menambah perubahan skema
 
+1. Buat berkas baru dengan nomor berikutnya, mis. `004_tambah_kolom_telepon_mitra.sql`.
+2. Tulis perubahan **bertambah** (`ALTER TABLE ... ADD COLUMN`, `CREATE TABLE`) — jangan `DROP` tabel berisi data.
+3. **Jangan mengubah berkas migrasi yang sudah di-push** — anggota tim lain sudah menjalankannya.
+4. Perlu memindahkan/mengubah data? Pakai berkas `.js`:
+   ```js
+   module.exports.up = async (conn) => { await conn.query('UPDATE ...'); };
+   ```
+
+## Riwayat
+
+| Berkas | Isi |
+|---|---|
+| `001_initial_schema.sql` | Skema awal 13 tabel |
+| `002_keamanan_audit_email.sql` | Penguncian login/PIN, `audit_logs`, `email_outbox`, notifikasi per instansi mitra, pengingat H-1 |
+| `003_pindahkan_berkas_ke_disk.js` | Memindahkan berkas base64 lama dari database ke `uploads/` |
+
+Standar: InnoDB, `utf8mb4` / `utf8mb4_unicode_ci`.

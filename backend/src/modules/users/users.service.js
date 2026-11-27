@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { parsePage, pageResult } = require('../../utils/pagination.util');
 const usersRepository = require('./users.repository');
 const { notFound, badRequest, conflict, forbidden } = require('../../utils/http.util');
 
@@ -30,7 +31,11 @@ class UsersService {
   }
 
   async list(query) {
-    return (await this.repository.findAll({ role: query.role, search: query.search })).map(serialize);
+    const search = query.search || query.q;
+    const paging = parsePage(query, { defaultLimit: 10 });
+    if (!paging) return (await this.repository.findAll({ role: query.role, search })).map(serialize);
+    const { rows, total } = await this.repository.findAll({ role: query.role, search, limit: paging.limit, offset: paging.offset });
+    return pageResult(rows.map(serialize), total, paging);
   }
 
   async get(id, user) {

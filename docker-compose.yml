@@ -1,0 +1,76 @@
+# SIM Workshop UNAND — jalankan semuanya dengan satu perintah:
+#
+#   docker compose up -d --build
+#
+# Lalu buka http://localhost:8080 (akun demo: peserta|humas|sekretariat|mitra|rektor@unand.ac.id
+# · kata sandi password123 · PIN TTE 123456). Data demo diisi otomatis saat database pertama kali kosong.
+#
+# Ubah nilai di berkas .env (salin dari .env.docker.example) — terutama JWT_SECRET & sandi database
+# sebelum dipakai di server sungguhan.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-sim_workshop_unand}
+      MYSQL_USER: ${DB_USER:-workshop}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-workshop_rahasia}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_rahasia}
+      TZ: Asia/Jakarta
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--default-time-zone=+07:00"]
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_rahasia}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      TZ: Asia/Jakarta
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-workshop}
+      DB_PASSWORD: ${DB_PASSWORD:-workshop_rahasia}
+      DB_NAME: ${DB_NAME:-sim_workshop_unand}
+      JWT_SECRET: ${JWT_SECRET:-ganti_dengan_rahasia_acak_minimal_32_karakter_ya}
+      # Alamat publik aplikasi (dipakai di email, QR sertifikat, dan URL berkas)
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      PUBLIC_URL: ${APP_URL:-http://localhost:8080}
+      CORS_ORIGIN: ${APP_URL:-http://localhost:8080}
+      TRUST_PROXY: "1"
+      # Set "true" bila diakses lewat HTTPS
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      # Email (kosongkan SMTP_HOST = email hanya dicatat di tabel email_outbox)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Workshop UNAND <no-reply@unand.ac.id>}
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api/v1
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${APP_PORT:-8080}:80"
+
+volumes:
+  db_data:
+  uploads:

@@ -1,10 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi } from '../api';
-import { clearSession, getToken, readStoredUser, setSession } from '../api/client';
+import { clearSession, readStoredUser, storeUser } from '../api/client';
 
 const AuthContext = createContext(null);
 
 /** Halaman awal tiap role setelah login */
+// oxlint-disable-next-line react/only-export-components -- sengaja diekspor bersama komponen (API bersama modul ini)
 export const ROLE_HOME = {
   peserta: '/peserta/beranda',
   humas: '/humas/ringkasan',
@@ -14,47 +15,49 @@ export const ROLE_HOME = {
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => (getToken() ? readStoredUser() : null));
-  const [checking, setChecking] = useState(() => Boolean(getToken()));
+  // Profil tersimpan hanya sebagai cache tampilan; keabsahan sesi selalu dicek ke server (cookie httpOnly)
+  const [user, setUser] = useState(() => readStoredUser());
+  const [checking, setChecking] = useState(true);
 
-  // Validasi ulang sesi tersimpan ke server saat aplikasi dibuka
   useEffect(() => {
-    if (!getToken()) return;
-    authApi.me()
-      .then(me => { setUser(me); setSession(null, me); })
+    authApi.session()
+      .then(({ user: me }) => {
+        if (me) { setUser(me); storeUser(me); } else { clearSession(); setUser(null); }
+      })
       .catch(() => { clearSession(); setUser(null); })
       .finally(() => setChecking(false));
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const { token, user: me } = await authApi.login(email, password);
-    setSession(token, me);
+    const { user: me } = await authApi.login(email, password);
+    storeUser(me);
     setUser(me);
     return me;
   }, []);
 
   const register = useCallback(async data => {
-    const { token, user: me } = await authApi.register(data);
-    setSession(token, me);
+    const { user: me } = await authApi.register(data);
+    storeUser(me);
     setUser(me);
     return me;
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     clearSession();
     setUser(null);
+    try { await authApi.logout(); } catch { /* sesi mungkin sudah berakhir */ }
   }, []);
 
   const updateProfile = useCallback(async data => {
     const me = await authApi.updateMe(data);
-    setSession(null, me);
+    storeUser(me);
     setUser(me);
     return me;
   }, []);
 
   const refresh = useCallback(async () => {
     const me = await authApi.me();
-    setSession(null, me);
+    storeUser(me);
     setUser(me);
     return me;
   }, []);

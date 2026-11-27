@@ -1,74 +1,83 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import RequireRole from './components/RequireRole';
+import RequireRole, { PageLoader } from './components/RequireRole';
 import { PortalDataProvider } from './context/PortalData';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import LayoutPeserta from './pages/peserta/LayoutPeserta';
-import BerandaPeserta from './pages/peserta/Beranda';
-import CariWorkshop from './pages/peserta/CariWorkshop';
-import DetailWorkshop from './pages/peserta/DetailWorkshop';
-import WorkshopSaya from './pages/peserta/WorkshopSaya';
-import SertifikatPeserta from './pages/peserta/SertifikatPeserta';
-import DetailSertifikatPeserta from './pages/peserta/DetailSertifikatPeserta';
-import FormPerbaikanSertifikat from './pages/peserta/FormPerbaikanSertifikat';
-import RiwayatPerbaikanSertifikat from './pages/peserta/RiwayatPerbaikanSertifikat';
-import DetailPerbaikanSertifikat from './pages/peserta/DetailPerbaikanSertifikat';
-import NotifikasiPerbaikanSertifikat from './pages/peserta/NotifikasiPerbaikanSertifikat';
-import ProfilPeserta from './pages/peserta/ProfilPeserta';
+
+// Halaman dimuat per role/per halaman agar bundle awal kecil
+const VerifikasiSertifikat = lazy(() => import('./pages/VerifikasiSertifikat'));
+const LogAudit = lazy(() => import('./pages/shared/LogAudit'));
+const LayoutPeserta = lazy(() => import('./pages/peserta/LayoutPeserta'));
+const BerandaPeserta = lazy(() => import('./pages/peserta/Beranda'));
+const CariWorkshop = lazy(() => import('./pages/peserta/CariWorkshop'));
+const DetailWorkshop = lazy(() => import('./pages/peserta/DetailWorkshop'));
+const WorkshopSaya = lazy(() => import('./pages/peserta/WorkshopSaya'));
+const SertifikatPeserta = lazy(() => import('./pages/peserta/SertifikatPeserta'));
+const DetailSertifikatPeserta = lazy(() => import('./pages/peserta/DetailSertifikatPeserta'));
+const FormPerbaikanSertifikat = lazy(() => import('./pages/peserta/FormPerbaikanSertifikat'));
+const RiwayatPerbaikanSertifikat = lazy(() => import('./pages/peserta/RiwayatPerbaikanSertifikat'));
+const DetailPerbaikanSertifikat = lazy(() => import('./pages/peserta/DetailPerbaikanSertifikat'));
+const NotifikasiPerbaikanSertifikat = lazy(() => import('./pages/peserta/NotifikasiPerbaikanSertifikat'));
+const ProfilPeserta = lazy(() => import('./pages/peserta/ProfilPeserta'));
+const Layout = lazy(() => import('./components/Layout'));
+const DashboardSekretariat = lazy(() => import('./pages/sekretariat/Dashboard'));
+const Kegiatan = lazy(() => import('./pages/sekretariat/Kegiatan'));
+const Presensi = lazy(() => import('./pages/sekretariat/Presensi'));
+const Sertifikat = lazy(() => import('./pages/sekretariat/Sertifikat'));
+const SertifikatPerbaikan = lazy(() => import('./pages/sekretariat/SertifikatPerbaikan'));
+const DetailKegiatanKegiatan = lazy(() => import('./pages/sekretariat/DetailKegiatanKegiatan'));
+const DetailKegiatan = lazy(() => import('./pages/sekretariat/DetailKegiatan'));
+const DetailDokumenPengganti = lazy(() => import('./pages/sekretariat/DetailDokumenPengganti'));
+const Profil = lazy(() => import('./pages/sekretariat/Profil'));
+const LayoutRektor = lazy(() => import('./components/LayoutRektor'));
+const PengajuanSertifikat = lazy(() => import('./pages/rektor/PengajuanSertifikat'));
+const SertifikatPerbaikanRektor = lazy(() => import('./pages/rektor/SertifikatPerbaikanRektor'));
+const DetailPengajuanRektor = lazy(() => import('./pages/rektor/DetailPengajuanRektor'));
+const RiwayatTandaTangan = lazy(() => import('./pages/rektor/RiwayatTandaTangan'));
+const DetailRiwayatRektor = lazy(() => import('./pages/rektor/DetailRiwayatRektor'));
+const DetailDokumenPenggantiRektor = lazy(() => import('./pages/rektor/DetailDokumenPenggantiRektor'));
+const ProfilRektor = lazy(() => import('./pages/rektor/ProfilRektor'));
+const LayoutHumas = lazy(() => import('./components/LayoutHumas'));
+const LayoutMitra = lazy(() => import('./pages/mitra/LayoutMitra'));
+const KegiatanKerjaSama = lazy(() => import('./pages/mitra/KegiatanKerjaSama'));
+const DetailKegiatanMitra = lazy(() => import('./pages/mitra/DetailKegiatanMitra'));
+const PesertaMitra = lazy(() => import('./pages/mitra/PesertaMitra'));
+const TemplateSertifikatMitra = lazy(() => import('./pages/mitra/TemplateSertifikatMitra'));
+const PerbaikanSertifikatMitra = lazy(() => import('./pages/mitra/PerbaikanSertifikatMitra'));
+const DetailDokumenPenggantiMitra = lazy(() => import('./pages/mitra/DetailDokumenPenggantiMitra'));
+const TandaTanganMitra = lazy(() => import('./pages/mitra/TandaTanganMitra'));
+const LaporanMitra = lazy(() => import('./pages/mitra/LaporanMitra'));
+const ProfilMitra = lazy(() => import('./pages/mitra/ProfilMitra'));
+const RingkasanHumas = lazy(() => import('./pages/humas/RingkasanHumas'));
+const DetailKegiatanHumas = lazy(() => import('./pages/humas/DetailKegiatanHumas'));
+const KelolaKegiatan = lazy(() => import('./pages/humas/KelolaKegiatan'));
+const KelolaMitra = lazy(() => import('./pages/humas/KelolaMitra'));
+const KelolaGedung = lazy(() => import('./pages/humas/KelolaGedung'));
+const KelolaPengguna = lazy(() => import('./pages/humas/KelolaPengguna'));
+const TemplateSertifikat = lazy(() => import('./pages/humas/TemplateSertifikat'));
+const PerbaikanSertifikat = lazy(() => import('./pages/humas/PerbaikanSertifikat'));
+const Laporan = lazy(() => import('./pages/humas/Laporan'));
+const ProfilHumas = lazy(() => import('./pages/humas/ProfilHumas'));
 
 // Sekretariat Rektor
-import Layout from './components/Layout';
-import DashboardSekretariat from './pages/sekretariat/Dashboard';
-import Kegiatan from './pages/sekretariat/Kegiatan';
-import Presensi from './pages/sekretariat/Presensi';
-import Sertifikat from './pages/sekretariat/Sertifikat';
-import SertifikatPerbaikan from './pages/sekretariat/SertifikatPerbaikan';
-import DetailKegiatanKegiatan from './pages/sekretariat/DetailKegiatanKegiatan';
-import DetailKegiatan from './pages/sekretariat/DetailKegiatan';
-import DetailDokumenPengganti from './pages/sekretariat/DetailDokumenPengganti';
-import Profil from './pages/sekretariat/Profil';
 
 // Rektor
-import LayoutRektor from './components/LayoutRektor';
-import PengajuanSertifikat from './pages/rektor/PengajuanSertifikat';
-import SertifikatPerbaikanRektor from './pages/rektor/SertifikatPerbaikanRektor';
-import DetailPengajuanRektor from './pages/rektor/DetailPengajuanRektor';
-import RiwayatTandaTangan from './pages/rektor/RiwayatTandaTangan';
-import DetailRiwayatRektor from './pages/rektor/DetailRiwayatRektor';
-import DetailDokumenPenggantiRektor from './pages/rektor/DetailDokumenPenggantiRektor';
-import ProfilRektor from './pages/rektor/ProfilRektor';
 
 // Humas
-import LayoutHumas from './components/LayoutHumas';
 
 // Mitra
-import LayoutMitra from './pages/mitra/LayoutMitra';
-import KegiatanKerjaSama from './pages/mitra/KegiatanKerjaSama';
-import DetailKegiatanMitra from './pages/mitra/DetailKegiatanMitra';
-import PesertaMitra from './pages/mitra/PesertaMitra';
-import TemplateSertifikatMitra from './pages/mitra/TemplateSertifikatMitra';
-import PerbaikanSertifikatMitra from './pages/mitra/PerbaikanSertifikatMitra';
-import DetailDokumenPenggantiMitra from './pages/mitra/DetailDokumenPenggantiMitra';
-import TandaTanganMitra from './pages/mitra/TandaTanganMitra';
-import LaporanMitra from './pages/mitra/LaporanMitra';
-import ProfilMitra from './pages/mitra/ProfilMitra';
-import RingkasanHumas from './pages/humas/RingkasanHumas';
-import DetailKegiatanHumas from './pages/humas/DetailKegiatanHumas';
-import KelolaKegiatan from './pages/humas/KelolaKegiatan';
-import KelolaMitra from './pages/humas/KelolaMitra';
-import KelolaGedung from './pages/humas/KelolaGedung';
-import KelolaPengguna from './pages/humas/KelolaPengguna';
-import TemplateSertifikat from './pages/humas/TemplateSertifikat';
-import PerbaikanSertifikat from './pages/humas/PerbaikanSertifikat';
-import Laporan from './pages/humas/Laporan';
-import ProfilHumas from './pages/humas/ProfilHumas';
 
 function App() {
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageLoader full />}>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        {/* Publik: verifikasi keaslian sertifikat (tujuan QR di PDF) */}
+        <Route path="/verifikasi" element={<VerifikasiSertifikat />} />
+        <Route path="/verifikasi/*" element={<VerifikasiSertifikat />} />
         <Route path="/peserta" element={<RequireRole role="peserta"><LayoutPeserta /></RequireRole>}>
           <Route index element={<Navigate to="beranda" replace />} />
           <Route path="beranda" element={<BerandaPeserta />} />
@@ -94,6 +103,7 @@ function App() {
           <Route path="presensi" element={<Presensi />} />
           <Route path="sertifikat" element={<Sertifikat />} />
           <Route path="sertifikat-perbaikan" element={<SertifikatPerbaikan />} />
+          <Route path="log-audit" element={<LogAudit />} />
           <Route path="sertifikat/:id" element={<DetailKegiatan />} />
           <Route path="dokumen-pengganti/:id" element={<DetailDokumenPengganti />} />
           <Route path="profil" element={<Profil />} />
@@ -123,6 +133,7 @@ function App() {
           <Route path="template-sertifikat" element={<TemplateSertifikat />} />
           <Route path="perbaikan-sertifikat" element={<PerbaikanSertifikat />} />
           <Route path="laporan" element={<Laporan />} />
+          <Route path="log-audit" element={<LogAudit />} />
           <Route path="profil" element={<ProfilHumas />} />
         </Route>
 
@@ -143,6 +154,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
