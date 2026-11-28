@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, Plus, X, Eye, Pencil, Trash2, MapPin, Navigation, Compass, Inbox } from 'lucide-react';
+import LeafletGeofencePicker from './components/LeafletGeofencePicker';
 import useCrud from '../../hooks/useCrud';
 import { locationsApi } from '../../api';
 import { PageLoader, ErrorNotice } from '../../components/RequireRole';
@@ -396,179 +397,73 @@ export default function KelolaGedung() {
                 <Compass size={15} />
                 <span>Tentukan Koordinat Gedung pada Peta</span>
               </div>
-              <span style={{ fontSize: '11.5px', color: '#16a34a' }}>
-                Klik atau geser pin untuk menentukan titik
-              </span>
-            </div>
-
-            {/* Container Peta Visual Leaflet */}
-            <div
-              style={{
-                position: 'relative',
-                height: 290,
-                background: '#f2efe9',
-                overflow: 'hidden',
-                cursor: 'crosshair',
-                userSelect: 'none',
-              }}
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const latOffset = ((y - 145) / 145) * -0.0012;
-                const lngOffset = ((x - (rect.width / 2)) / (rect.width / 2)) * 0.0012;
-                const newLat = (-0.914488 + latOffset).toFixed(6);
-                const newLng = (100.466542 + lngOffset).toFixed(6);
-                setTambahForm(prev => ({
-                  ...prev,
-                  lat: newLat,
-                  lng: newLng,
-                }));
-              }}
-            >
-              {/* Vektor Map jalan & gedung */}
-              <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
-                <rect width="100%" height="100%" fill="#f2efe9" />
-                <path d="M -20 75 Q 200 65 600 80" stroke="#fff" strokeWidth="22" fill="none" />
-                <path d="M 110 -20 L 130 310" stroke="#fff" strokeWidth="18" fill="none" />
-                <path d="M 380 -20 L 400 310" stroke="#fff" strokeWidth="24" fill="none" />
-                <path d="M 270 75 L 285 310" stroke="#fff" strokeWidth="16" fill="none" />
-                <path d="M -20 75 Q 200 65 600 80" stroke="#fef3c7" strokeWidth="4" fill="none" strokeDasharray="8 6" />
-
-                <rect x="25" y="105" width="90" height="65" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
-                <text x="30" y="138" fontSize="8.5" fill="#9ca3af" fontWeight="bold">Dean Engineering Faculty</text>
-
-                <rect x="160" y="125" width="120" height="60" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
-                <rect x="210" y="200" width="95" height="80" rx="3" fill="#d9d2c7" stroke="#c9c1b5" strokeWidth="1" />
-                <rect x="330" y="105" width="85" height="75" rx="3" fill="#ded7cd" stroke="#cfc7bc" strokeWidth="1" />
-                <rect x="450" y="120" width="105" height="110" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
-
-                <rect x="320" y="18" width="55" height="35" rx="3" fill="#e5e0d8" stroke="#d5cfc5" strokeWidth="1" />
-                <text x="328" y="34" fontSize="9" fill="#3b82f6" fontWeight="bold">Gedung F</text>
-
-                <text x="380" y="50" fontSize="12" fill="#4b5563" fontWeight="bold" fontStyle="italic">
-                  Padang State Polytechnic
-                </text>
-              </svg>
-
-              {/* Zoom (+ / -) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 12,
-                  left: 12,
-                  background: '#fff',
-                  borderRadius: 4,
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  zIndex: 10,
-                }}
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  style={{ width: 28, height: 28, border: 'none', borderBottom: '1px solid #e5e7eb', background: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  style={{ width: 28, height: 28, border: 'none', background: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
-                >
-                  –
-                </button>
-              </div>
-
-              {/* Tombol Lokasi Saya */}
-              <div
-                style={{ position: 'absolute', top: 12, right: 12, zIndex: 10 }}
-                onClick={e => e.stopPropagation()}
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: '11.5px', color: '#16a34a' }}>
+                  Klik peta atau geser pin untuk menentukan titik
+                </span>
                 <button
                   type="button"
                   onClick={() => {
-                    setTambahForm(prev => ({
-                      ...prev,
-                      lat: '-0.914488',
-                      lng: '100.466542',
-                    }));
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                          setTambahForm(prev => ({
+                            ...prev,
+                            lat: pos.coords.latitude.toFixed(6),
+                            lng: pos.coords.longitude.toFixed(6),
+                          }));
+                        },
+                        () => {
+                          // Fallback default kampus unand
+                          setTambahForm(prev => ({
+                            ...prev,
+                            lat: '-0.914488',
+                            lng: '100.466542',
+                          }));
+                        }
+                      );
+                    } else {
+                      setTambahForm(prev => ({
+                        ...prev,
+                        lat: '-0.914488',
+                        lng: '100.466542',
+                      }));
+                    }
                   }}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 6,
-                    padding: '6px 12px',
+                    gap: 5,
+                    padding: '4px 10px',
                     background: '#fff',
-                    borderRadius: 6,
-                    border: '1px solid #d1d5db',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    borderRadius: 5,
+                    border: '1px solid #bbf7d0',
                     color: '#15803d',
-                    fontSize: '12px',
+                    fontSize: '11.5px',
                     fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  <Navigation size={13} />
+                  <Navigation size={12} />
                   <span>Lokasi Saya</span>
                 </button>
               </div>
+            </div>
 
-              {/* Radius Circle */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: `${Math.min(Math.max((Number(tambahForm.radius) || 50) * 2.8, 60), 240)}px`,
-                  height: `${Math.min(Math.max((Number(tambahForm.radius) || 50) * 2.8, 60), 240)}px`,
-                  borderRadius: '50%',
-                  background: 'rgba(34, 197, 94, 0.22)',
-                  border: '2px solid #16a34a',
-                  pointerEvents: 'none',
-                  zIndex: 4,
+            {/* Peta Asli Leaflet OSM */}
+            <div style={{ position: 'relative' }}>
+              <LeafletGeofencePicker
+                lat={tambahForm.lat}
+                lng={tambahForm.lng}
+                radius={tambahForm.radius}
+                onLocationChange={(newLat, newLng) => {
+                  setTambahForm(prev => ({
+                    ...prev,
+                    lat: newLat,
+                    lng: newLng,
+                  }));
                 }}
               />
-
-              {/* Pin Hijau */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  pointerEvents: 'none',
-                  zIndex: 5,
-                }}
-              >
-                <div
-                  style={{
-                    width: 34,
-                    height: 42,
-                    background: '#15803d',
-                    borderRadius: '50% 50% 50% 0',
-                    transform: 'rotate(-45deg)',
-                    boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 12,
-                      height: 12,
-                      background: '#fff',
-                      borderRadius: '50%',
-                      transform: 'rotate(45deg)',
-                    }}
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Bottom Info Bar: KOORDINAT, RADIUS, & Slider */}
